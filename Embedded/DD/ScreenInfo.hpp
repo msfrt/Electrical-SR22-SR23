@@ -37,7 +37,7 @@ class CScreenInfo : public CScreen {
         /** Assignment operator disabled */
         void operator=(const CScreenInfo &) = delete;
 
-        //virtual void Initialize() override;
+        virtual void Initialize() override;
         virtual void Update() override;
 
         void SetSignal(int pos, StateSignal *sig, String label, String formatting, int divisor = 1);
@@ -64,10 +64,10 @@ class CScreenInfo : public CScreen {
         /* 
          * Labels placed to the left side of every number 
          */
-        String mLabel1;
-        String mLabel2;
-        String mLabel3;
-        String mLabel4;
+        String mLabel1 = "";
+        String mLabel2 = "";
+        String mLabel3 = "";
+        String mLabel4 = "";
 
         /* 
          * the number of digits (including '.') that there is space to display.
@@ -134,6 +134,21 @@ void CScreenInfo::DrawLabels(){
     mDisplay.setTextColor(mColorPrimary, mColorBackground);
     mDisplay.setTextWrap(false);
     mDisplay.setFont(mFont);
+
+    for (int i=0; i<4; i++){
+        mDisplay.setCursor(mMarginX, mMarginY + rowHeight * i);
+        switch (i){
+            case 0:
+                mDisplay.println(this->label1);
+                break;
+            case 0:
+                break;
+            case 0:
+                break;
+            case 0:
+                break;
+        }
+    }
 }
 
 
