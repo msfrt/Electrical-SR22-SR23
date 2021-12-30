@@ -5,6 +5,8 @@
 #include "ILI9341_t3n.h"
 #include <EasyTimer.h>
 
+#define DISPLAY_HEIGHT 240
+#define DISPLAY_WIDTH 320
 
 /*
  * base class for all screen displays
@@ -17,8 +19,10 @@ class CScreen {
     protected:
         ILI9341_t3n &mDisplay;  ///< The low-level object that actually interfaces with the hardware
         EasyTimer mFrameRateTimer = EasyTimer(10);  ///< Timer for screen updates, default at 10 Hz
-        int mWidth = 0;  ///< Width of the display
-        int mHeight = 0;  ///< Height of the display
+
+
+        int mWidth = 320;  ///< Width of the display
+        int mHeight = 240;  ///< Height of the display
 
         /*
          * Primary and secondary colors to use for all screens
@@ -34,11 +38,10 @@ class CScreen {
     public:
 
         /** Constructor */
-        CScreen(ILI9341_t3n &disp, int width, int height) : 
-                mDisplay(disp), mWidth(width), mHeight(height) {};
+        CScreen(ILI9341_t3n &disp) : mDisplay(disp) {};
 
         /** Destructor */
-        // ~CScreen() {};
+        virtual ~CScreen() {};
 
         /** Copy constructor disabled */
         CScreen(const CScreen &) = delete;
@@ -48,6 +51,7 @@ class CScreen {
         virtual void Initialize();
         virtual void Update();
         void SetMaxFrameRate(uint8_t freq);
+
 
 };
 

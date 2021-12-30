@@ -14,9 +14,6 @@
 #include "fonts/LiberationMonoBoldItalic.h"
 #include "fonts/LiberationMonoBoldItalic.c"
 
-/// The size of each char array used in this class. Keep it as one value for simplicity
-#define SCREEN_INFO_BUF_SIZE 10
-
 
 /*
  * base class for all screen displays
@@ -27,10 +24,10 @@ class CScreenInfo : public CScreen {
     public:
 
         /** Constructor */
-        CScreenInfo(ILI9341_t3n &disp, int width, int height) : CScreen(disp, width, height) {};
+        CScreenInfo(ILI9341_t3n &disp) : CScreen(disp) {};
 
         /** Destructor */
-        // ~CScreen() {};
+        virtual ~CScreenInfo() {};
 
         /** Copy constructor disabled */
         CScreenInfo(const CScreenInfo &) = delete;
@@ -302,7 +299,6 @@ void CScreenInfo::Update(){
             updated |= UpdateSignal(i);
         }       
         
-
         // finalize the screen and send over SPI
         if (updated){
             DrawLines();

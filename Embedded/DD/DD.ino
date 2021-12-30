@@ -62,8 +62,7 @@ Adafruit_NeoPixel pixels_right = Adafruit_NeoPixel(pixels_right_cnt, pixels_righ
 #define TFTR_BL 7
     int display_right_brightness_percent = 100;
 
-#define DISPLAY_HEIGHT 240
-#define DISPLAY_WIDTH 320
+
 
 // used for light-sensor dimming
 const int display_brightness_percent_nighttime = 75;
@@ -109,9 +108,10 @@ EasyTimer debug(50); // debugging timer
 //#include "classes/ScreenController.h"
 #include "Screen.hpp"
 #include "ScreenInfo.hpp"
+#include "ScreensController.hpp"
 
-
-CScreenInfo testScreen(display_left, DISPLAY_WIDTH, DISPLAY_HEIGHT);
+CScreensController screensController(display_left, display_right);
+//CScreenInfo testScreen(display_left, DISPLAY_WIDTH, DISPLAY_HEIGHT);
 
 
 
@@ -171,12 +171,13 @@ void setup() {
   //led_startup(pixels_top, pixels_left, pixels_right, 1);
 
   
-  testScreen.SetSignal(1, &M400_rpm, "RPM:", "%.1f", 1000);
-  testScreen.SetSignal(2, &M400_oilPressure, "OILP:", "%.1f");
-  testScreen.SetSignal(3, &M400_oilTemp, "OILT:", "%.0f");
-  testScreen.SetSignal(4, &M400_engineTemp, "ENG:", "%.1f");
-  testScreen.Initialize();
+  // testScreen.SetSignal(1, &M400_rpm, "RPM:", "%.1f", 1000);
+  // testScreen.SetSignal(2, &M400_oilPressure, "OILP:", "%.1f");
+  // testScreen.SetSignal(3, &M400_oilTemp, "OILT:", "%.0f");
+  // testScreen.SetSignal(4, &M400_engineTemp, "ENG:", "%.1f");
+  // testScreen.Initialize();
   
+  screensController.Initialize();
 
 }
 
@@ -188,7 +189,9 @@ void loop() {
   // read any incoming CAN messages
   read_can();
   
-  testScreen.Update();
+  //testScreen.Update();
+
+  screensController.Update();
 
 }
 
