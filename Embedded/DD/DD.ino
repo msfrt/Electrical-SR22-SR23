@@ -171,8 +171,10 @@ void setup() {
   //led_startup(pixels_top, pixels_left, pixels_right, 1);
 
   
-  testScreen.SetSignal(1, &M400_rpm, "RPM:", "%04.1f", 1);
-  testScreen.SetSignal(3, &M400_rpm, "RPM:", "%04.1f", 1);
+  testScreen.SetSignal(1, &M400_rpm, "RPM:", "%.1f", 1000);
+  testScreen.SetSignal(2, &M400_oilPressure, "OILP:", "%.1f");
+  testScreen.SetSignal(3, &M400_oilTemp, "OILT:", "%.0f");
+  testScreen.SetSignal(4, &M400_engineTemp, "ENG:", "%.1f");
   testScreen.Initialize();
   
 

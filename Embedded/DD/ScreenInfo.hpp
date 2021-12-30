@@ -51,7 +51,6 @@ class CScreenInfo : public CScreen {
         const int mMarginY = 12;  ///< veritcal padding pixels
         const ILI9341_t3_font_t &mFont = LiberationMono_40_Bold;   ///< The font to use
         const int mFontWidth = 35;  ///< the font width in pixels (I think that you need to guess this)
-        const int mSpacing = 1;  ///< Spacing between the label and the value in characters. Set to 0 for no space
 
         /* 
          * Signals to display 
@@ -69,15 +68,6 @@ class CScreenInfo : public CScreen {
         String mLabel3 = "";
         String mLabel4 = "";
 
-        /* 
-         * the number of digits (including '.') that there is space to display.
-         * The digits per signal are automatically calculated, but default to 4
-         */
-        const int mIndeciesPerLine = 9;  /// the number of digits that can fit horizontally accross the screen
-        int mDigitsSig1 = 4;
-        int mDigitsSig2 = 4;
-        int mDigitsSig3 = 4;
-        int mDigitsSig4 = 4;
 
         /* 
          * additional scaling that you may want to do. For example, instead of 
@@ -104,11 +94,14 @@ class CScreenInfo : public CScreen {
 
         /*
          * These hold the signals' previous values.
+         * They can be any value now, since they will be overwritten.
+         * If you set to 0, it's likely that the screen will be blank upon startup because
+         * the signals also have a value of 0.
          */
-        float mPrevSig1 = 0;
-        float mPrevSig2 = 0;
-        float mPrevSig3 = 0;
-        float mPrevSig4 = 0;
+        float mPrevSig1 = 1337;
+        float mPrevSig2 = 1337;
+        float mPrevSig3 = 1337;
+        float mPrevSig4 = 1337;
 
 
 
@@ -193,28 +186,24 @@ void CScreenInfo::SetSignal(int pos, StateSignal *sig, String label, String form
             mLabel1 = label;
             mFormatSig1 = formatting;
             mDivisorSig1 = divisor;
-            mDigitsSig1 = mIndeciesPerLine - label.length();
             break;
         case 2:
             mSignal2 = sig;
             mLabel2 = label;
             mFormatSig2 = formatting;
             mDivisorSig2 = divisor;
-            mDigitsSig2 = mIndeciesPerLine - label.length();
             break;
         case 3:
             mSignal3 = sig;
             mLabel3 = label;
             mFormatSig3 = formatting;
             mDivisorSig3 = divisor;
-            mDigitsSig3 = mIndeciesPerLine - label.length();
             break;
         case 4:
             mSignal4 = sig;
             mLabel4 = label;
             mFormatSig4 = formatting;
             mDivisorSig4 = divisor;
-            mDigitsSig4 = mIndeciesPerLine - label.length();
             break;
     }
 
@@ -232,8 +221,6 @@ bool CScreenInfo::UpdateSignal(int position, bool override){
 
     // these pointers will point to whatever position's variables that we select
     StateSignal *signal = nullptr;
-    String *label = nullptr;
-    int *digits = nullptr;
     int *divisor = nullptr;
     String *format = nullptr;
     float *previousVal = nullptr;
@@ -241,32 +228,24 @@ bool CScreenInfo::UpdateSignal(int position, bool override){
     switch (position){
         case 1:
             signal = mSignal1;
-            label = &mLabel1;
-            digits = &mDigitsSig1;
             divisor = &mDivisorSig1;
             format = &mFormatSig1;
             previousVal = &mPrevSig1;
             break;
         case 2:
             signal = mSignal2;
-            label = &mLabel2;
-            digits = &mDigitsSig2;
             divisor = &mDivisorSig2;
             format = &mFormatSig2;
             previousVal = &mPrevSig2;
             break;
         case 3:
             signal = mSignal3;
-            label = &mLabel3;
-            digits = &mDigitsSig3;
             divisor = &mDivisorSig3;
             format = &mFormatSig3;
             previousVal = &mPrevSig3;
             break;
         case 4:
             signal = mSignal4;
-            label = &mLabel4;
-            digits = &mDigitsSig4;
             divisor = &mDivisorSig4;
             format = &mFormatSig4;
             previousVal = &mPrevSig4;
@@ -278,21 +257,36 @@ bool CScreenInfo::UpdateSignal(int position, bool override){
         return false;
     }
 
+
+    // if the value hasn't been updated, don't write again to the screen!
+    if (*previousVal == signal->value()){
+        return false;
+    } else {
+        // the value is NOT the same as last time, so update the previous value and continue writing to the screen
+        *previousVal = signal->value();
+    }
+
+
     mDisplay.setFont(mFont);
-    mDisplay.setTextColor(mColorPrimary, mColorBackground);
+    mDisplay.setTextColor(mColorPrimary);
 
     // calculate the formatted string
     sprintf(mFormatBuf, format->c_str(), signal->value() / *divisor);
 
     // calculate and set the cursor position based off of the signal and formatted string
+    int rowHeight = mHeight / 4;
     int xPos = mWidth - (strlen(mFormatBuf) * mFontWidth);
-    int yPos = (mHeight / 4) * (position - 1) + mMarginY;
+    int yPos = rowHeight * (position - 1) + mMarginY;
     mDisplay.setCursor(xPos, yPos);
 
-    
+    // fill the background (can't use text background because it's really large and overlaps other text. 
+    // We'll draw our own to avoid this.
+    mDisplay.fillRect(xPos, yPos - mMarginY, mWidth - xPos, rowHeight, mColorBackground);
+
+    // send it!
     mDisplay.print(mFormatBuf);
 
-
+    // return true because we update it
     return true;
 
 }
@@ -302,19 +296,20 @@ bool CScreenInfo::UpdateSignal(int position, bool override){
  * If the frame rate timer is all good, update the screen
  */
 void CScreenInfo::Update(){
-    UpdateSignal(1);
-    UpdateSignal(2);
-    UpdateSignal(3);
-    UpdateSignal(4);
-    DrawLines();
+    if (mFrameRateTimer.isup()){
+        bool updated = false;
+        for (int i=1; i<=4; i++){
+            updated |= UpdateSignal(i);
+        }       
+        
 
-    // push updates to the screen
-    mDisplay.updateScreen();
+        // finalize the screen and send over SPI
+        if (updated){
+            DrawLines();
+            mDisplay.updateScreen();
+        }
+    }
 }
-
-
-
-
 
 
 #endif

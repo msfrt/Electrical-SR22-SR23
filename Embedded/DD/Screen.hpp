@@ -74,7 +74,7 @@ void CScreen::Update(){
 
 /**
  * Change the maximum frequency that the screen can update
- * \param freq - the maximum frequency in 
+ * \param freq - the maximum frequency for screen updates
  */
 void CScreen::SetMaxFrameRate(uint8_t freq){
     if (freq == 0){
