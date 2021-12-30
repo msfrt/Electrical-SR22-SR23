@@ -51,7 +51,7 @@ class CScreenInfo : public CScreen {
         const int mMarginY = 12;  ///< veritcal padding pixels
         const ILI9341_t3_font_t &mFont = LiberationMono_40_Bold;   ///< The font to use
         const int mFontWidth = 35;  ///< the font width in pixels (I think that you need to guess this)
-
+        const int mSpacing = 1;  ///< Spacing between the label and the value in characters. Set to 0 for no space
 
         /* 
          * Signals to display 
@@ -96,10 +96,11 @@ class CScreenInfo : public CScreen {
         String mFormatSig2 = "%-4.2f";
         String mFormatSig3 = "%-4.2f";
         String mFormatSig4 = "%-4.2f";
-        // char mFormatSig1[10] = "%-4.2f";
-        // char mFormatSig2[10] = "%-4.2f";
-        // char mFormatSig3[10] = "%-4.2f";
-        // char mFormatSig4[10] = "%-4.2f";
+        
+        /**
+         * Character buffer used for string formatting
+         */
+        char mFormatBuf[10] = "\0\0\0\0\0\0\0\0\0";
 
         /*
          * These hold the signals' previous values.
@@ -125,6 +126,7 @@ class CScreenInfo : public CScreen {
  */
 void CScreenInfo::Initialize(){
     CScreen::Initialize(); 
+    DrawLabels();
 }
 
 
@@ -139,13 +141,16 @@ void CScreenInfo::DrawLabels(){
         mDisplay.setCursor(mMarginX, mMarginY + rowHeight * i);
         switch (i){
             case 0:
-                mDisplay.println(this->label1);
+                mDisplay.print(mLabel1);
                 break;
-            case 0:
+            case 1:
+                mDisplay.print(mLabel2);
                 break;
-            case 0:
+            case 2:
+                mDisplay.print(mLabel3);
                 break;
-            case 0:
+            case 3:
+                mDisplay.print(mLabel4); 
                 break;
         }
     }
@@ -238,7 +243,7 @@ bool CScreenInfo::UpdateSignal(int position, bool override){
             signal = mSignal1;
             label = &mLabel1;
             digits = &mDigitsSig1;
-            divisor = &mDigitsSig1;
+            divisor = &mDivisorSig1;
             format = &mFormatSig1;
             previousVal = &mPrevSig1;
             break;
@@ -246,7 +251,7 @@ bool CScreenInfo::UpdateSignal(int position, bool override){
             signal = mSignal2;
             label = &mLabel2;
             digits = &mDigitsSig2;
-            divisor = &mDigitsSig2;
+            divisor = &mDivisorSig2;
             format = &mFormatSig2;
             previousVal = &mPrevSig2;
             break;
@@ -254,7 +259,7 @@ bool CScreenInfo::UpdateSignal(int position, bool override){
             signal = mSignal3;
             label = &mLabel3;
             digits = &mDigitsSig3;
-            divisor = &mDigitsSig3;
+            divisor = &mDivisorSig3;
             format = &mFormatSig3;
             previousVal = &mPrevSig3;
             break;
@@ -262,7 +267,7 @@ bool CScreenInfo::UpdateSignal(int position, bool override){
             signal = mSignal4;
             label = &mLabel4;
             digits = &mDigitsSig4;
-            divisor = &mDigitsSig4;
+            divisor = &mDivisorSig4;
             format = &mFormatSig4;
             previousVal = &mPrevSig4;
             break;
@@ -274,9 +279,19 @@ bool CScreenInfo::UpdateSignal(int position, bool override){
     }
 
     mDisplay.setFont(mFont);
-    mDisplay.setTextColor(ILI9341_WHITE, ILI9341_BLACK);
+    mDisplay.setTextColor(mColorPrimary, mColorBackground);
+
+    // calculate the formatted string
+    sprintf(mFormatBuf, format->c_str(), signal->value() / *divisor);
+
+    // calculate and set the cursor position based off of the signal and formatted string
+    int xPos = mWidth - (strlen(mFormatBuf) * mFontWidth);
+    int yPos = (mHeight / 4) * (position - 1) + mMarginY;
+    mDisplay.setCursor(xPos, yPos);
+
     
-    mDisplay.println(*label);
+    mDisplay.print(mFormatBuf);
+
 
     return true;
 

@@ -168,11 +168,13 @@ void setup() {
 
   // fun LED startup sequence. Last parameter is time multiplier. 0 is fastest, 5 is pretty darn slow.
   // if you set it higher than 5, I have respect for your patience
-  led_startup(pixels_top, pixels_left, pixels_right, 1);
+  //led_startup(pixels_top, pixels_left, pixels_right, 1);
 
-  testScreen.Initialize();
+  
   testScreen.SetSignal(1, &M400_rpm, "RPM:", "%04.1f", 1);
   testScreen.SetSignal(3, &M400_rpm, "RPM:", "%04.1f", 1);
+  testScreen.Initialize();
+  
 
 }
 
