@@ -111,6 +111,7 @@ EasyTimer debug(50); // debugging timer
 #include "Screen.hpp"
 #include "ScreenInfo.hpp"
 #include "ScreensController.hpp"
+#include "LightBar.hpp"
 
 CScreensController screensController(display_left, display_right);
 //CScreenInfo testScreen(display_left, DISPLAY_WIDTH, DISPLAY_HEIGHT);
