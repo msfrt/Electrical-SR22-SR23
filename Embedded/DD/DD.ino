@@ -73,6 +73,10 @@ ILI9341_t3n display_left = ILI9341_t3n(TFTL_CS, TFTL_DC, TFTL_RST);
 ILI9341_t3n display_right = ILI9341_t3n(TFTR_CS, TFTR_DC, TFTR_RST);
 
 
+// keep track of the time elapsed between loop iterations
+unsigned long previousUpdateTime = 0;
+
+
 // pins for the steering wheel buttons
 const int button1_pin = 14;
 const int button2_pin = 15;
@@ -101,8 +105,6 @@ EasyTimer debug(50); // debugging timer
 // include externally-written functions
 #include "led_startup.hpp"
 
-// include images
-#include "sr_bitmap.hpp"
 
 // classes for control
 //#include "classes/ScreenController.h"
@@ -179,19 +181,31 @@ void setup() {
   
   screensController.Initialize();
 
+  previousUpdateTime = millis();
+
+  debug.set_delay_millis(10000);
+
 }
 
 
-
-
 void loop() {
+
+  unsigned long elapsed = millis() - previousUpdateTime;
+  previousUpdateTime = millis();
+  
 
   // read any incoming CAN messages
   read_can();
   
   //testScreen.Update();
 
-  screensController.Update();
+  screensController.Update(elapsed);
+
+
+  if (debug.isup()){
+    screensController.OnButtonPress();
+  }
+  
 
 }
 

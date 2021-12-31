@@ -35,7 +35,8 @@ class CScreenInfo : public CScreen {
         void operator=(const CScreenInfo &) = delete;
 
         virtual void Initialize() override;
-        virtual void Update() override;
+        virtual void Update(unsigned long &elapsed) override;
+        virtual void Update(unsigned long &elapsed, bool override);
 
         void SetSignal(int pos, StateSignal *sig, String label, String formatting, int divisor = 1);
 
@@ -117,6 +118,8 @@ class CScreenInfo : public CScreen {
 void CScreenInfo::Initialize(){
     CScreen::Initialize(); 
     DrawLabels();
+    unsigned long elapsed = 0;
+    Update(elapsed, true);
 }
 
 
@@ -208,7 +211,6 @@ void CScreenInfo::SetSignal(int pos, StateSignal *sig, String label, String form
 
 
 
-
 /**
  * Update an individual signal based upon its position
  \param position The signal position on screen (1-4)
@@ -256,7 +258,7 @@ bool CScreenInfo::UpdateSignal(int position, bool override){
 
 
     // if the value hasn't been updated, don't write again to the screen!
-    if (*previousVal == signal->value()){
+    if (*previousVal == signal->value() && !override){
         return false;
     } else {
         // the value is NOT the same as last time, so update the previous value and continue writing to the screen
@@ -291,16 +293,29 @@ bool CScreenInfo::UpdateSignal(int position, bool override){
 
 /**
  * If the frame rate timer is all good, update the screen
+ * 
+ * \param elapsed The time elapsed in milliseconds since the update was last called
  */
-void CScreenInfo::Update(){
+void CScreenInfo::Update(unsigned long &elapsed){
+    Update(elapsed, false);
+}
+
+
+/**
+ * If the frame rate timer is all good, update the screen
+ * 
+ * \param elapsed The time elapsed in milliseconds since the update was last called
+ * \param override Update the screen info even if the value has not changed (default is false)
+ */
+void CScreenInfo::Update(unsigned long &elapsed, bool override){
     if (mFrameRateTimer.isup()){
         bool updated = false;
         for (int i=1; i<=4; i++){
-            updated |= UpdateSignal(i);
+            updated |= UpdateSignal(i, override);
         }       
         
         // finalize the screen and send over SPI
-        if (updated){
+        if (updated || override){
             DrawLines();
             mDisplay.updateScreen();
         }

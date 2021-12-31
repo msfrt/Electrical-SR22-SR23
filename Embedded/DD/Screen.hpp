@@ -49,7 +49,7 @@ class CScreen {
         void operator=(const CScreen &) = delete;
 
         virtual void Initialize();
-        virtual void Update();
+        virtual void Update(unsigned long &elapased);
         void SetMaxFrameRate(uint8_t freq);
 
 
@@ -69,8 +69,10 @@ void CScreen::Initialize(){
 
 /**
  * If the frame rate timer is all good, update the screen
+ *
+ * \param elapsed The time in milliseconds elapsed since last called
  */
-void CScreen::Update(){
+void CScreen::Update(unsigned long &elapased){
     if (mFrameRateTimer.isup()){
         mDisplay.updateScreen();
     }
