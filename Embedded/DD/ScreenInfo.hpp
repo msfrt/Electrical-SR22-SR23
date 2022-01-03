@@ -119,7 +119,7 @@ void CScreenInfo::Initialize(){
     CScreen::Initialize(); 
     DrawLabels();
     unsigned long elapsed = 0;
-    Update(elapsed, true);
+    CScreenInfo::Update(elapsed, true);
 }
 
 
@@ -223,6 +223,7 @@ bool CScreenInfo::UpdateSignal(int position, bool override){
     int *divisor = nullptr;
     String *format = nullptr;
     float *previousVal = nullptr;
+    String *label = nullptr;
 
     switch (position){
         case 1:
@@ -230,24 +231,28 @@ bool CScreenInfo::UpdateSignal(int position, bool override){
             divisor = &mDivisorSig1;
             format = &mFormatSig1;
             previousVal = &mPrevSig1;
+            label = &mLabel1;
             break;
         case 2:
             signal = mSignal2;
             divisor = &mDivisorSig2;
             format = &mFormatSig2;
             previousVal = &mPrevSig2;
+            label = &mLabel2;
             break;
         case 3:
             signal = mSignal3;
             divisor = &mDivisorSig3;
             format = &mFormatSig3;
             previousVal = &mPrevSig3;
+            label = &mLabel3;
             break;
         case 4:
             signal = mSignal4;
             divisor = &mDivisorSig4;
             format = &mFormatSig4;
             previousVal = &mPrevSig4;
+            label = &mLabel4;
             break;
     }
 
@@ -257,12 +262,11 @@ bool CScreenInfo::UpdateSignal(int position, bool override){
     }
 
 
-    // if the value hasn't been updated, don't write again to the screen!
-    if (*previousVal == signal->value() && !override){
-        return false;
-    } else {
-        // the value is NOT the same as last time, so update the previous value and continue writing to the screen
+    // if the value is new or there is an override, continue. Otherwise stop the update.
+    if (*previousVal != signal->value() || override){
         *previousVal = signal->value();
+    } else {
+        return false;
     }
 
 
@@ -280,7 +284,8 @@ bool CScreenInfo::UpdateSignal(int position, bool override){
 
     // fill the background (can't use text background because it's really large and overlaps other text. 
     // We'll draw our own to avoid this.
-    mDisplay.fillRect(xPos, yPos - mMarginY, mWidth - xPos, rowHeight, mColorBackground);
+    int startPos = (*label).length() * mFontWidth;
+    mDisplay.fillRect(startPos, yPos - mMarginY, mWidth - startPos, rowHeight, mColorBackground);
 
     // send it!
     mDisplay.print(mFormatBuf);
@@ -308,7 +313,7 @@ void CScreenInfo::Update(unsigned long &elapsed){
  * \param override Update the screen info even if the value has not changed (default is false)
  */
 void CScreenInfo::Update(unsigned long &elapsed, bool override){
-    if (mFrameRateTimer.isup()){
+    if (mFrameRateTimer.isup() || override){
         bool updated = false;
         for (int i=1; i<=4; i++){
             updated |= UpdateSignal(i, override);

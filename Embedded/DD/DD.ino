@@ -111,11 +111,16 @@ EasyTimer debug(50); // debugging timer
 #include "Screen.hpp"
 #include "ScreenInfo.hpp"
 #include "ScreensController.hpp"
-#include "LightBar.hpp"
+#include "LightBarRPM.hpp"
+#include "LightBarBlink.hpp"
+
 
 CScreensController screensController(display_left, display_right);
 //CScreenInfo testScreen(display_left, DISPLAY_WIDTH, DISPLAY_HEIGHT);
 
+CLightBarRPM rpmbar(pixels_top, 0, pixels_top.numPixels(), M400_rpm, 7000, 12000, 2000);
+CLightBarBlink leftblink(pixels_left, 1, pixels_left.numPixels(), M400_tcPowerReduction, 1.0);
+CLightBarBlink rightblink(pixels_right, 1, pixels_right.numPixels(), M400_tcPowerReduction, 1.0);
 
 
 void setup() {
@@ -186,10 +191,20 @@ void setup() {
 
   debug.set_delay_millis(10000);
 
+  rpmbar.Initialize();
+  leftblink.Initialize();
+  rightblink.Initialize();
+  leftblink.SetColor(255, 255, 0);
+  rightblink.SetColor(255, 255, 0);
+
 }
 
 
+
+
 void loop() {
+
+ 
 
   unsigned long elapsed = millis() - previousUpdateTime;
   previousUpdateTime = millis();
@@ -201,6 +216,10 @@ void loop() {
   //testScreen.Update();
 
   screensController.Update(elapsed);
+
+  rpmbar.Update(elapsed);
+  leftblink.Update(elapsed);
+  rightblink.Update(elapsed);
 
 
   if (debug.isup()){

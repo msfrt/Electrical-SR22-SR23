@@ -10,8 +10,6 @@
  * base class for all screen displays
  */
 class CLightBar {
-
-    private:
          
 
     protected:
@@ -19,10 +17,35 @@ class CLightBar {
 
         void Clear();
 
+        /*
+         * Gets the index of the first LED to update
+         */
+        int GetFirstLEDIndex() const {return mFirstLED;}
+
+        /*
+         * Gets the index of the last LED to update
+         */
+        int GetLastLEDIndex() const {return mFirstLED + mNumLEDs - 1;}
+
+        /*
+         * Get the number of LEDs in this light bar
+         */
+        int GetNumLEDs() const {return mNumLEDs;}
+
+    private:
+
+        int mFirstLED;
+        int mNumLEDs;
+
     public:
 
-        /** Constructor */
-        CLightBar(Adafruit_NeoPixel &lights) : mLights(lights) {};
+        /**
+         * Constructor
+         * \param lights The neopixel lights object
+         * \param firstIndex The index of the first LED to use (LED indecies start at 0 in neopixels)
+         * \param numLEDS The number of LEDs to update
+         */
+        CLightBar(Adafruit_NeoPixel &lights, int firstIndex, int numLEDs) : mLights(lights), mFirstLED(firstIndex), mNumLEDs(numLEDs) {};
 
         /** Destructor */
         virtual ~CLightBar() {};
@@ -43,15 +66,17 @@ class CLightBar {
  * Initialize the lights by clearing them.
  */
 void CLightBar::Initialize(){
+    mLights.begin();
     Clear();
+    mLights.show();
 }
 
 /**
  * Initialize the lights by clearing them.
  */
 void CLightBar::Clear(){
-    for (int i = 0; i <= mLights.numPixels(); i++){
-        mLights.setPixelColor(i, 255, 0, 0);
+    for (int i = GetFirstLEDIndex(); i <= GetLastLEDIndex(); i++){
+        mLights.setPixelColor(i, 0, 0, 0);
     }
 }
 
