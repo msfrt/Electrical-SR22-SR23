@@ -20,7 +20,7 @@ class CScreensController {
 
         /// the different states that the screens can be in. Please note that states should include
         /// transitionary states, such as ScreenBegin before Screen or whatever
-        enum ScreenStates { StartupLeft, StartupRight, InfoScreen1, InfoScreen2, Titan };
+        enum ScreenStates { /*StartupLeft, StartupRight,*/ InfoScreen1, InfoScreen2, Titan };
 
         /**
          * Gets the current state of the screen
@@ -66,8 +66,8 @@ CScreensController::CScreensController(ILI9341_t3n &left, ILI9341_t3n &right) :
                                        mDisplayLeft(left), mDisplayRight(right){
 
     /* Startup screen */
-    mStartupScreenLeft  = new CScreenStartupAnim(mDisplayLeft);
-    mStartupScreenRight = new CScreenStartupAnim(mDisplayRight);
+    // mStartupScreenLeft  = new CScreenStartupAnim(mDisplayLeft);
+    // mStartupScreenRight = new CScreenStartupAnim(mDisplayRight);
     
     /* Info screen 1 */
     mInfoScreen1Left  = new CScreenInfo(mDisplayLeft);
@@ -124,7 +124,7 @@ CScreensController::~CScreensController(){
  */
 void CScreensController::Initialize(){
 
-    SetState(StartupLeft);
+    SetState(InfoScreen1);
 
 }
 
@@ -139,21 +139,20 @@ void CScreensController::Initialize(){
 void CScreensController::Update(unsigned long &elapsed){
 
     switch (mState){
-        case StartupLeft:
-            mStartupScreenLeft->Update(elapsed);
-            if (mStartupScreenLeft->IsCompleted()){
-                SetState(StartupRight);
-            }
-            break;
+        // case StartupLeft:
+        //     mStartupScreenLeft->Update(elapsed);
+        //     if (mStartupScreenLeft->IsCompleted()){
+        //         SetState(StartupRight);
+        //     }
+        //     break;
 
 
-        case StartupRight:
-            mStartupScreenRight->Update(elapsed); 
-            if (mStartupScreenRight->IsCompleted()){
-                SetState(InfoScreen1);
-            } 
-            break;
-
+        // case StartupRight:
+        //     mStartupScreenRight->Update(elapsed); 
+        //     if (mStartupScreenRight->IsCompleted()){
+        //         SetState(InfoScreen1);
+        //     } 
+        //     break;
 
         case InfoScreen1:
             mInfoScreen1Left->Update(elapsed);
@@ -180,10 +179,10 @@ void CScreensController::SetState(ScreenStates state){
      * State exiting actions
      */
     switch (mState){
-        case StartupLeft:
-            break;
-        case StartupRight:
-            break;
+        // case StartupLeft:
+        //     break;
+        // case StartupRight:
+        //     break;
         case InfoScreen1:
             break;
         case InfoScreen2:
@@ -204,12 +203,12 @@ void CScreensController::SetState(ScreenStates state){
      * State entering actions
      */
     switch (mState){
-        case StartupLeft:
-            mStartupScreenLeft->Initialize();
-            break;
-        case StartupRight:
-            mStartupScreenRight->Initialize();
-            break;
+        // case StartupLeft:
+        //     mStartupScreenLeft->Initialize();
+        //     break;
+        // case StartupRight:
+        //     mStartupScreenRight->Initialize();
+        //     break;
         case InfoScreen1:
             mInfoScreen1Left->Initialize();
             mInfoScreen1Right->Initialize();
@@ -232,12 +231,12 @@ void CScreensController::SetState(ScreenStates state){
 void CScreensController::OnButtonPress(){
 
     switch (mState){
-        case StartupLeft:
-            SetState(InfoScreen1);
-            break;
-        case StartupRight:
-            SetState(InfoScreen1);
-            break;
+        // case StartupLeft:
+        //     SetState(InfoScreen1);
+        //     break;
+        // case StartupRight:
+        //     SetState(InfoScreen1);
+        //     break;
         case InfoScreen1:
             SetState(InfoScreen2);
             break;

@@ -45,7 +45,7 @@ class CScreenStartupAnim : public CScreen {
 
         float mSpartyPosX = 0;   ///< current X position of sparty in pixels
         float mSpartyPosY = 0;   ///< current Y position of sparty in pixels
-        float mSpartySpeed = 200;  ///< Speed in pixels per second
+        float mSpartySpeed = 400;  ///< Speed in pixels per second
 
         int mStateRacingPosX = 0; ///< current X position of state racing in pixels
         int mStateRacingPosY = 0; ///< current Y position of state racing in pixels

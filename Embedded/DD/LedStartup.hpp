@@ -3,7 +3,7 @@
 
 #include <Adafruit_NeoPixel.h>
 
-void led_startup(Adafruit_NeoPixel &top, Adafruit_NeoPixel &left, Adafruit_NeoPixel &right, const int delay_mult){
+void LedStartup(Adafruit_NeoPixel &top, Adafruit_NeoPixel &left, Adafruit_NeoPixel &right, const int delay_mult){
 
   // light up side-bars white
   for (int i = left.numPixels() - 1; i >= 0; i--){

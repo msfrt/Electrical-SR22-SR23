@@ -103,7 +103,7 @@ EasyTimer debug(50); // debugging timer
 // #endif
 
 // include externally-written functions
-#include "led_startup.hpp"
+#include "LedStartup.hpp"
 
 
 // classes for control
@@ -113,14 +113,12 @@ EasyTimer debug(50); // debugging timer
 #include "ScreensController.hpp"
 #include "LightBarRPM.hpp"
 #include "LightBarBlink.hpp"
+#include "LightBarController.hpp"
 
 
 CScreensController screensController(display_left, display_right);
+CLightBarController lightsController(pixels_left, pixels_top, pixels_right);
 //CScreenInfo testScreen(display_left, DISPLAY_WIDTH, DISPLAY_HEIGHT);
-
-CLightBarRPM rpmbar(pixels_top, 0, pixels_top.numPixels(), M400_rpm, 7000, 12000, 2000);
-CLightBarBlink leftblink(pixels_left, 1, pixels_left.numPixels(), M400_tcPowerReduction, 1.0);
-CLightBarBlink rightblink(pixels_right, 1, pixels_right.numPixels(), M400_tcPowerReduction, 1.0);
 
 
 void setup() {
@@ -168,34 +166,31 @@ void setup() {
   // clear screen
   display_left.fillScreen(ILI9341_BLACK);
   display_right.fillScreen(ILI9341_BLACK);
+
+  // Set the state racing bitmap
+  #include "images/StateRacingBitmap.hpp"
+  // draw state racing bitmap
+  int stateRacingPosY = (DISPLAY_HEIGHT - stateRacingBitmapHeight) / 2;
+  int stateRacingPosX = (DISPLAY_WIDTH  - stateRacingBitmapWidth ) / 2;
+  display_left.drawBitmap(stateRacingPosX, stateRacingPosY, stateRacingBitmap, stateRacingBitmapWidth, stateRacingBitmapHeight, ILI9341_WHITE);
+  display_right.drawBitmap(stateRacingPosX, stateRacingPosY, stateRacingBitmap, stateRacingBitmapWidth, stateRacingBitmapHeight, ILI9341_WHITE);
+
+
+  // quick led startup animation
+  LedStartup(pixels_top, pixels_left, pixels_right, 1);
   
 
   // initialize buttons
   pinMode(button1_pin, INPUT_PULLUP);
   pinMode(button2_pin, INPUT_PULLUP);
-
-  // fun LED startup sequence. Last parameter is time multiplier. 0 is fastest, 5 is pretty darn slow.
-  // if you set it higher than 5, I have respect for your patience
-  //led_startup(pixels_top, pixels_left, pixels_right, 1);
-
-  
-  // testScreen.SetSignal(1, &M400_rpm, "RPM:", "%.1f", 1000);
-  // testScreen.SetSignal(2, &M400_oilPressure, "OILP:", "%.1f");
-  // testScreen.SetSignal(3, &M400_oilTemp, "OILT:", "%.0f");
-  // testScreen.SetSignal(4, &M400_engineTemp, "ENG:", "%.1f");
-  // testScreen.Initialize();
   
   screensController.Initialize();
+  lightsController.Initialize();
 
   previousUpdateTime = millis();
 
   debug.set_delay_millis(10000);
 
-  rpmbar.Initialize();
-  leftblink.Initialize();
-  rightblink.Initialize();
-  leftblink.SetColor(255, 255, 0);
-  rightblink.SetColor(255, 255, 0);
 
 }
 
@@ -216,14 +211,13 @@ void loop() {
   //testScreen.Update();
 
   screensController.Update(elapsed);
+  lightsController.Update(elapsed);
 
-  rpmbar.Update(elapsed);
-  leftblink.Update(elapsed);
-  rightblink.Update(elapsed);
 
 
   if (debug.isup()){
     screensController.OnButtonPress();
+    lightsController.OnButtonPress();
   }
   
 
