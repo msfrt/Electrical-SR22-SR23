@@ -19,15 +19,16 @@ class CLightBarBlink : public CLightBar {
 
     private:
          
-        StateSignal &mSignal;   ///< The RPM signal
-        int mMin;   ///< The minimum bound for the bar to start flashing
-
-        BarStates mState = Off;   ///< The current state of LED light output
-
         EasyTimer mBlinkTimer = EasyTimer(40);   ///< The rate at which the lights during upshift should blink
         bool mLightsOn = false;  ///< used during the blinking
 
-        int CalculatePWM(int &totalBarPWMs);
+
+    protected:
+
+        BarStates mState = Off;   ///< The current state of LED light output
+
+        StateSignal *mSignal = nullptr;   ///< The signal (if applicable)
+        int mMin = 0;   ///< The minimum bound for the bar to start flashing
 
         ///< colors!
         int mR = 255;
@@ -35,13 +36,10 @@ class CLightBarBlink : public CLightBar {
         int mB = 255;
 
 
-    protected:
-
-
     public:
 
         /** Constructor */
-        CLightBarBlink(Adafruit_NeoPixel &lights, int firstIndex, int numLEDs, StateSignal &signal, int min);
+        CLightBarBlink(Adafruit_NeoPixel &lights, int firstIndex, int numLEDs);
 
         /** Destructor */
         virtual ~CLightBarBlink() {};
@@ -64,6 +62,13 @@ class CLightBarBlink : public CLightBar {
          */
         void SetFrequency(int frequency) {mBlinkTimer.set_frequency(frequency);}
 
+        /**
+         * Attach (set) a signal so that the lights blink whenever the signal's value exceeds the minimum value
+         * \param sig a pointer to the state signal to look at
+         * \param mMinValue The minimum value to look at
+         */
+        void AttachSignal(StateSignal *sig, int min) {mSignal=sig; mMin=min;};
+
 };
 
 /*
@@ -71,10 +76,9 @@ class CLightBarBlink : public CLightBar {
  * \param lights The neopixel light object
  * \param first index The first index of the neopixels to use
  * \param numLEDs The number of LEDs to use
- * \param signal The signal to determine the blinking state
  */
-CLightBarBlink::CLightBarBlink(Adafruit_NeoPixel &lights, int firstIndex, int numLEDs, StateSignal &signal, int min) : 
-            CLightBar(lights, firstIndex, numLEDs), mSignal(signal), mMin(min) {};
+CLightBarBlink::CLightBarBlink(Adafruit_NeoPixel &lights, int firstIndex, int numLEDs) : 
+            CLightBar(lights, firstIndex, numLEDs) {};
 
 
 
@@ -95,8 +99,8 @@ void CLightBarBlink::Initialize(){
 void CLightBarBlink::Update(unsigned long &elapsed){
 
 
-    // first, determine the state
-    if (mSignal.value() >= mMin){
+    // if there is no signal set OR the signal's threshold has been reached, blink
+    if (!mSignal || mSignal->value() >= mMin){
         mState = Blinking;
     } else {
         mState = Off;

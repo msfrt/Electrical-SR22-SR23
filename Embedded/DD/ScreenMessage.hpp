@@ -42,12 +42,7 @@ class CScreenMessage : public CScreen {
          * \param message The message (max 8 characters) to display on the screen
          */
         void SetMessage(String message) {mMessage = message;}
-
-        /**
-         * Returns true when the screen duration has completed
-         */
-        bool IsCompleted() const {return mCompleted;}
-
+        
     private:
 
         /*
@@ -63,10 +58,6 @@ class CScreenMessage : public CScreen {
 
         String mMessage = "yessir!!";   ///< The message to be displayed on the screen upon a call to Initialize()
         String mLabel = "Message:"; ///< The label to display on the top of the screen
-
-        unsigned long mDisplayDuration = 5000;   ///< The duration of the message in milliseconds
-        unsigned long mDisplayTime;    ///< Used to store the time that the screen started at
-        bool mCompleted = false;    ///< Turns true when the time is done
 };
 
 
@@ -99,22 +90,12 @@ void CScreenMessage::Initialize(){
     }
 
     mDisplay.setCursor((mMaxChars - realLength) * ((mWidth / 2) / mMaxChars), mHeight/2 - mFontHeight/2);
-    Serial.print(mMessage.length());
-    Serial.print("   ");
-    Serial.print((mMaxChars - mMessage.length()) * ((mWidth / 2) / mMaxChars));
-    Serial.print("   ");
-    Serial.println(mHeight/2 - mFontHeight/2);
     mDisplay.setFont(LiberationMono_48_Bold);
     mDisplay.print(mMessage);
-
-    // keep track of when the screen started
-    mDisplayTime = millis();
 
     // push updates to the screen
     unsigned long elapsed = 0;
     CScreen::Update(elapsed);
-
-    mCompleted = false;
 }
 
 
@@ -129,10 +110,6 @@ void CScreenMessage::Initialize(){
 void CScreenMessage::Update(unsigned long &elapsed){
     // do nothing here, since everything is controlled in the initialization function
 
-    // check to see if the display duration has been met.
-    if (millis() - mDisplayTime > mDisplayDuration){
-        mCompleted = true;
-    }
 
 }
 

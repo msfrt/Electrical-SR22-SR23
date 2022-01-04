@@ -15,8 +15,6 @@ class CLightBar {
     protected:
         Adafruit_NeoPixel &mLights;  ///< The low-level object that actually interfaces with the hardware
 
-        void Clear();
-
         /*
          * Gets the index of the first LED to update
          */
@@ -57,6 +55,7 @@ class CLightBar {
 
         virtual void Initialize();
         virtual void Update(unsigned long &elapased);
+        void Clear();
 
 };
 

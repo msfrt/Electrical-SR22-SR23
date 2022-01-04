@@ -2,8 +2,8 @@
 #define CLIGHTBARCONTROLLER_HPP
 
 #include "LightBarBlink.hpp"
+#include "LightBarBlinkSinusoidal.hpp"
 #include "LightBarRPM.hpp"
-#include "LightBarStartupSides1.hpp"
 #include "CAN/CAN1.hpp"
 #include "CAN/CAN2.hpp"
 
@@ -34,6 +34,7 @@ class CLightBarController {
         void Update(unsigned long &elapsed);
         void Initialize();
         void OnButtonPress();
+        void OnNotificationRecieved(int R, int G, int B);
 
     private:
 
@@ -46,7 +47,8 @@ class CLightBarController {
         LEDStates mState;  ///< screen states
         unsigned long mStateStartTime = 0;  ///< The time in milliseconds that the current state started
 
-
+        unsigned int mNotificationDuration = 5000;   ///< How long to show the notification lights in milliseconds when a notification is recieved
+        int mNotificationBlinkFrequency = 10;  ///< The frequency of blinking for notifications
 
         CLightBarRPM *mRPMBarGearN  = nullptr;
         CLightBarRPM *mRPMBarGear1  = nullptr;
@@ -56,9 +58,12 @@ class CLightBarController {
         CLightBarRPM *mRPMBarGear5  = nullptr;
         CLightBarBlink *mTCBarLeft  = nullptr;
         CLightBarBlink *mTCBarRight = nullptr;
+
+        CLightBarBlinkSinusoidal *mCoolingLightLeft  = nullptr;
+        CLightBarBlinkSinusoidal *mCoolingLightRight = nullptr;
         
-        CLightBarBlink *mNoficationBarLeft  = nullptr;
-        CLightBarBlink *mNoficationBarRight = nullptr;
+        CLightBarBlink *mNotificationBarLeft  = nullptr;
+        CLightBarBlink *mNotificationBarRight = nullptr;
 
 
 };
@@ -104,12 +109,27 @@ CLightBarController::CLightBarController(Adafruit_NeoPixel &left, Adafruit_NeoPi
     downshiftRPM = 9855;
     mRPMBarGear5 = new CLightBarRPM(mTopLEDs, 0, mTopLEDs.numPixels(), M400_rpm, minRPM, maxRPM, downshiftRPM);
     
-    mTCBarLeft  = new CLightBarBlink(mLeftLEDs, 1, 3, M400_tcPowerReduction, 1);
-    mTCBarLeft->SetColor(255, 0, 255);
+    mCoolingLightLeft  = new CLightBarBlinkSinusoidal(mLeftLEDs, 0, 1);
+    mCoolingLightLeft->AttachSignal(&PDM_coolingOverrideActive, 1);
+    mCoolingLightLeft->SetColor(0, 255, 255);  // aqua!
 
-    mTCBarRight = new CLightBarBlink(mRightLEDs, 1, 3, M400_tcPowerReduction, 1);
-    mTCBarRight->SetColor(255, 0, 255);
+    mCoolingLightRight  = new CLightBarBlinkSinusoidal(mRightLEDs, 0, 1);
+    mCoolingLightRight->AttachSignal(&PDM_coolingOverrideActive, 1);
+    mCoolingLightRight->SetColor(0, 255, 255);  // aqua!
     
+    mTCBarLeft  = new CLightBarBlink(mLeftLEDs, 1, 3);
+    mTCBarLeft->AttachSignal(&M400_tcPowerReduction, 1);
+    mTCBarLeft->SetColor(150, 0, 255);
+
+    mTCBarRight = new CLightBarBlink(mRightLEDs, 1, 3);
+    mTCBarRight->AttachSignal(&M400_tcPowerReduction, 1);
+    mTCBarRight->SetColor(150, 0, 255);
+
+    /* Notification bars */
+    mNotificationBarLeft = new CLightBarBlink(mLeftLEDs, 0, mLeftLEDs.numPixels());
+    mNotificationBarLeft->SetFrequency(mNotificationBlinkFrequency);
+    mNotificationBarRight = new CLightBarBlink(mRightLEDs, 0, mRightLEDs.numPixels());
+    mNotificationBarRight->SetFrequency(mNotificationBlinkFrequency);
 
 }
 
@@ -129,6 +149,11 @@ CLightBarController::~CLightBarController(){
     delete mRPMBarGear5;
     delete mTCBarLeft;
     delete mTCBarRight;
+    delete mCoolingLightLeft;
+    delete mCoolingLightRight;
+
+    delete mNotificationBarLeft;
+    delete mNotificationBarRight;
 
 }
 
@@ -158,9 +183,19 @@ void CLightBarController::Update(unsigned long &elapsed){
         case Normal:
             mTCBarLeft->Update(elapsed);
             mTCBarRight->Update(elapsed);
+            mCoolingLightLeft->Update(elapsed);
+            mCoolingLightRight->Update(elapsed);
             mRPMBarGearN->Update(elapsed);
             break;
         case Notification:
+            mRPMBarGearN->Update(elapsed); // keep updating RPM bar
+            mNotificationBarLeft->Update(elapsed);
+            mNotificationBarRight->Update(elapsed);
+
+            // if the notification duration has expired, go back to normal operation
+            if (millis() - mStateStartTime > mNotificationDuration){
+                SetState(Normal);
+            }
             break;
     }
 
@@ -180,6 +215,9 @@ void CLightBarController::SetState(LEDStates state){
         case Normal:
             break;
         case Notification:
+            // get rid of the lights for any light that was previously unused by other modes
+            mNotificationBarLeft->Clear();
+            mNotificationBarRight->Clear();
             break;
     }
 
@@ -197,9 +235,13 @@ void CLightBarController::SetState(LEDStates state){
         case Normal:
             mTCBarLeft->Initialize();
             mTCBarRight->Initialize();
+            mCoolingLightLeft->Initialize();
+            mCoolingLightRight->Initialize();
             mRPMBarGearN->Initialize();
             break;
         case Notification:
+            mNotificationBarLeft->Initialize();
+            mNotificationBarRight->Initialize();
             break;
     }
     
@@ -219,6 +261,17 @@ void CLightBarController::OnButtonPress(){
             SetState(Normal);
             break;
     }
+}
+
+
+
+/**
+ * Set the colors when the notification light 
+ */
+void CLightBarController::OnNotificationRecieved(int R, int G, int B){
+    mNotificationBarLeft->SetColor(R, G, B);
+    mNotificationBarRight->SetColor(R, G, B);
+    SetState(Notification);
 }
 
 

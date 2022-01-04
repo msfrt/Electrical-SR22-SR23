@@ -191,6 +191,8 @@ void setup() {
 
   debug.set_delay_millis(10000);
 
+  //cbus2.mailboxStatus();
+
 
 }
 
@@ -221,6 +223,14 @@ void loop() {
     displayString += (char) CMD_driverMessageChar7.value();
     displayString.trim();
     screensController.OnMessage(displayString);
+  }
+
+  // notification light message recieved
+  if (CMD_driverNotificationLightR.is_updated()){
+    int R = CMD_driverNotificationLightR.value();
+    int G = CMD_driverNotificationLightG.value();
+    int B = CMD_driverNotificationLightB.value();
+    lightsController.OnNotificationRecieved(R, G, B);
   }
 
   screensController.Update(elapsed);

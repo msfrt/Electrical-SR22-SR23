@@ -46,6 +46,7 @@ class CScreensController {
         ScreenStates mStatePrev = InfoScreen1;  ///< Used to return to previous screen states after temporary states
         unsigned long mStateStartTime = 0;  ///< The time in milliseconds that the current state started
 
+        unsigned long mMessageDisplayDuration = 5000;  ///< The time in milliseconds to display a message when recieved
 
         /* Screen definitions */
         CScreenStartupAnim *mStartupScreenLeft  = nullptr;
@@ -194,7 +195,7 @@ void CScreensController::Update(unsigned long &elapsed){
             }
 
             // if the state is complete, set a new state
-            if (mMessageScreen->IsCompleted()){
+            if (millis() - mStateStartTime > mMessageDisplayDuration){
                 SetState(mStatePrev);
             }
 
