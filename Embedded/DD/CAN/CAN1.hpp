@@ -8,8 +8,8 @@
     
 ******************************************************************************/
 
-#ifndef CAN1_HPP
-#define CAN1_HPP
+#ifndef ELECTRICALSR22EMBEDDEDDDCANCAN1_HPP
+#define ELECTRICALSR22EMBEDDEDDDCANCAN1_HPP
 
 #include <FlexCAN_T4.h>
 #include <StateCAN.h>

@@ -1,3 +1,6 @@
+#ifndef _ILI9341_t3_font_LiberationMonoBoldItalic_C
+#define _ILI9341_t3_font_LiberationMonoBoldItalic_C
+
 #include "LiberationMonoBoldItalic.h"
 
 static const unsigned char LiberationMono_8_Bold_Italic_data[] = {
@@ -15959,3 +15962,5 @@ const ILI9341_t3_font_t LiberationMono_96_Bold_Italic = {
 
 
 
+
+#endif

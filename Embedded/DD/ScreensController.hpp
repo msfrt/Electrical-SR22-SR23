@@ -3,6 +3,7 @@
 
 #include "ScreenInfo.hpp"
 #include "ScreenStartupAnim.hpp"
+#include "ScreenMessage.hpp"
 
 class CScreensController {
 
@@ -20,7 +21,7 @@ class CScreensController {
 
         /// the different states that the screens can be in. Please note that states should include
         /// transitionary states, such as ScreenBegin before Screen or whatever
-        enum ScreenStates { /*StartupLeft, StartupRight,*/ InfoScreen1, InfoScreen2, Titan };
+        enum ScreenStates { /*StartupLeft, StartupRight,*/ InfoScreen1, InfoScreen2, Notification, Titan };
 
         /**
          * Gets the current state of the screen
@@ -31,6 +32,8 @@ class CScreensController {
         void Update(unsigned long &elapsed);
         void Initialize();
         void OnButtonPress();
+        void OnMessage(String message);
+
 
     private:
 
@@ -54,6 +57,8 @@ class CScreensController {
         CScreenInfo *mInfoScreen2Left  = nullptr;
         CScreenInfo *mInfoScreen2Right = nullptr;
 
+        CScreenMessage *mMessageScreen = nullptr;
+
 };
 
 
@@ -71,10 +76,10 @@ CScreensController::CScreensController(ILI9341_t3n &left, ILI9341_t3n &right) :
     
     /* Info screen 1 */
     mInfoScreen1Left  = new CScreenInfo(mDisplayLeft);
-        mInfoScreen1Left->SetSignal(1, &M400_groundSpeed, "SPD:", "%04.1f");
-        mInfoScreen1Left->SetSignal(2, &PDM_pdmVoltAvg,   "BAT:", "%04.1f");
-        mInfoScreen1Left->SetSignal(3, &ATCCF_brakeBias,  "BIAS:", "%02.0f%%");
-        mInfoScreen1Left->SetSignal(4, &PDM_fanLeftPWM,   "FANS:", "%03.0f");
+        mInfoScreen1Left->SetSignal(1, &M400_groundSpeed,     "SPD:", "%04.1f");
+        mInfoScreen1Left->SetSignal(2, &PDM_pdmVoltAvg,       "BAT:", "%04.1f");
+        mInfoScreen1Left->SetSignal(3, &ATCCF_brakeBias,      "BIAS:", "%02.0f%%");
+        mInfoScreen1Left->SetSignal(4, &PDM_fanLeftDutyCycle, "FANS:", "%03.0f");
 
     mInfoScreen1Right = new CScreenInfo(mDisplayRight);
         mInfoScreen1Right->SetSignal(1, &M400_rpm,         "RPM:",  "%.1f", 1000);
@@ -84,12 +89,16 @@ CScreensController::CScreensController(ILI9341_t3n &left, ILI9341_t3n &right) :
 
     /* Info screen 2 */
     mInfoScreen2Left  = new CScreenInfo(mDisplayLeft);
-        mInfoScreen2Left->SetSignal(1, &M400_groundSpeed, "SPD:", "%.1f");
-        mInfoScreen2Left->SetSignal(2, &PDM_pdmVoltAvg,   "YUH:", "%.1f");
-        mInfoScreen2Left->SetSignal(3, &ATCCF_brakeBias,  "FCK:", "%.1f");
-        mInfoScreen2Left->SetSignal(4, &PDM_fanLeftPWM,   "TWO:", "%.1f");
+        mInfoScreen2Left->SetSignal(1, &M400_groundSpeed,     "SPD:", "%.1f");
+        mInfoScreen2Left->SetSignal(2, &PDM_pdmVoltAvg,       "YUH:", "%.1f");
+        mInfoScreen2Left->SetSignal(3, &ATCCF_brakeBias,      "FCK:", "%.1f");
+        mInfoScreen2Left->SetSignal(4, &PDM_fanLeftDutyCycle, "TWO:", "%.1f");
     // keep the same screen on the right side
     mInfoScreen2Right = mInfoScreen1Right;
+
+
+    /* message screen */
+    mMessageScreen = new CScreenMessage(mDisplayLeft);
 
 
 }
@@ -103,8 +112,8 @@ CScreensController::CScreensController(ILI9341_t3n &left, ILI9341_t3n &right) :
 CScreensController::~CScreensController(){
 
     /* startup screens */
-    delete mStartupScreenLeft;
-    delete mStartupScreenRight;
+    // delete mStartupScreenLeft;
+    // delete mStartupScreenRight;
 
     /* Screen 1 */
     delete mInfoScreen1Left;
@@ -112,6 +121,9 @@ CScreensController::~CScreensController(){
 
     /* Screen 2 */
     delete mInfoScreen2Left;
+
+    /* message display */
+    delete mMessageScreen;
     
 
 }
@@ -158,10 +170,36 @@ void CScreensController::Update(unsigned long &elapsed){
             mInfoScreen1Left->Update(elapsed);
             mInfoScreen1Right->Update(elapsed);
             break;
+
         case InfoScreen2:
             mInfoScreen2Left->Update(elapsed);
             mInfoScreen2Right->Update(elapsed);
             break;
+
+        case Notification:
+            mMessageScreen->Update(elapsed);
+
+            // update the last state's right screen, too!
+            switch (mStatePrev){
+                case InfoScreen1:
+                    mInfoScreen1Right->Update(elapsed);
+                    break;
+                case InfoScreen2:
+                    mInfoScreen2Right->Update(elapsed);
+                    break;
+                case Notification:
+                    break;
+                case Titan:
+                    break;
+            }
+
+            // if the state is complete, set a new state
+            if (mMessageScreen->IsCompleted()){
+                SetState(mStatePrev);
+            }
+
+            break;
+
         case Titan:
             break;
     }
@@ -186,6 +224,14 @@ void CScreensController::SetState(ScreenStates state){
         case InfoScreen1:
             break;
         case InfoScreen2:
+            break;
+        case Notification:
+            // in order to prevent getting stuck in the Notification state,
+            // set the state to the previous state. That way, it's like
+            // the notifaction state never existed, since after the next 10ish lines
+            // of code, the previous state will be two states ago, and the current state
+            // will be the last previous state... confusing but yeah
+            mState = mStatePrev;
             break;
         case Titan:
             break;
@@ -217,6 +263,9 @@ void CScreensController::SetState(ScreenStates state){
             mInfoScreen2Left->Initialize();
             mInfoScreen2Right->Initialize();
             break;
+        case Notification:
+            mMessageScreen->Initialize();
+            break;
         case Titan:
             break;
     }
@@ -243,9 +292,26 @@ void CScreensController::OnButtonPress(){
         case InfoScreen2:
             SetState(InfoScreen1);
             break;
+        case Notification:
+            SetState(mStatePrev);
         case Titan:
             break;
     }
+}
+
+
+
+/**
+ * What to do when a message is recieved
+ * \param message The message to display
+ */
+void CScreensController::OnMessage(String message){
+
+    if (mMessageScreen){
+        mMessageScreen->SetMessage(message);
+    }
+    SetState(Notification);
+
 }
 
 

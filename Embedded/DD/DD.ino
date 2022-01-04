@@ -208,7 +208,20 @@ void loop() {
   // read any incoming CAN messages
   read_can();
   
-  //testScreen.Update();
+  // if there is a new message to display to the driver, assemble and display it
+  if (CMD_driverMessageChar0.is_updated()){
+    String displayString = "";
+    displayString += (char) CMD_driverMessageChar0.value();
+    displayString += (char) CMD_driverMessageChar1.value();
+    displayString += (char) CMD_driverMessageChar2.value();
+    displayString += (char) CMD_driverMessageChar3.value();
+    displayString += (char) CMD_driverMessageChar4.value();
+    displayString += (char) CMD_driverMessageChar5.value();
+    displayString += (char) CMD_driverMessageChar6.value();
+    displayString += (char) CMD_driverMessageChar7.value();
+    displayString.trim();
+    screensController.OnMessage(displayString);
+  }
 
   screensController.Update(elapsed);
   lightsController.Update(elapsed);

@@ -8,20 +8,35 @@
     
 ******************************************************************************/
 
-#ifndef CAN2_HPP
-#define CAN2_HPP
+#ifndef ELECTRICALSR22EMBEDDEDDDCANCAN2_HPP
+#define ELECTRICALSR22EMBEDDEDDDCANCAN2_HPP
 
 #include <FlexCAN_T4.h>
 #include <StateCAN.h>
 
-// Message: CURRSENS_10 [0x384]
-StateSignal CURRSENS_counterMsg900(4, false, 1, 0.0, 0, 15, 0.0, 0);
-StateSignal CURRSENS_rectCurrent(16, true, 100, 0.0, -100, 100, 0.0, 0);
+// Message: CMD_11 [0xd3]
+StateSignal CMD_driverNotificationLightR(8, false, 1, 0.0, 0, 255, 0.0, 0);
+StateSignal CMD_driverNotificationLightG(8, false, 1, 0.0, 0, 255, 0.0, 0);
+StateSignal CMD_driverNotificationLightB(8, false, 1, 0.0, 0, 255, 0.0, 0);
+
+// Message: ATCCR_17 [0x1d3]
+StateSignal ATCCR_counterMsg467(4, false, 1, 0.0, 0, 15, 0.0, 0);
+StateSignal ATCCR_egt4(16, true, 10, 0.0, 0, 1000, 0.0, 0);
+StateSignal ATCCR_rectifierCurrent(16, true, 10, 0.0, -200, 200, 0.0, 0);
+StateSignal ATCCR_shiftingPressure(16, true, 10, 0.0, -5, 200, 0.0, 0);
+
+// Message: ATCCR_16 [0x1d2]
+StateSignal ATCCR_counterMsg466(4, false, 1, 0.0, 0, 15, 0.0, 0);
+StateSignal ATCCR_egt1(16, true, 10, 0.0, 0, 1000, 0.0, 0);
+StateSignal ATCCR_egt2(16, true, 10, 0.0, 0, 1000, 0.0, 0);
+StateSignal ATCCR_egt3(16, true, 10, 0.0, 0, 1000, 0.0, 0);
 
 // Message: ATCCR_15 [0x1d1]
+StateSignal ATCCR_counterMsg465(4, false, 1, 0.0, 0, 15, 0.0, 0);
 StateSignal ATCCR_uptime(32, false, 1, 0.0, 0, 4294967295, 0.0, 0);
+StateSignal ATCCR_coolantTempRadMiddle(16, true, 10, 0.0, 0, 120, 0.0, 0);
 
-// Message: ATCCF_16 [0x120]
+// Message: ATCCF_16 [0x1a0]
 StateSignal ATCCF_uptime(32, false, 1, 0.0, 0, 4294967295, 0.0, 0);
 
 // Message: PDM_26 [0x114]
@@ -31,6 +46,7 @@ StateSignal PDM_uptime(32, false, 1, 0.0, 0, 4294967295, 0.0, 0);
 StateSignal PDM_OBD_oilPressure(1, false, 1, 0.0, 0, 0, 0.0, 0);
 StateSignal PDM_OBD_oilTemp(1, false, 1, 0.0, 0, 0, 0.0, 0);
 StateSignal PDM_OBD_fuelPressure(1, false, 1, 0.0, 0, 0, 0.0, 0);
+StateSignal PDM_coolingOverrideActive(1, false, 1, 0.0, 0, 0, 0.0, 0);
 StateSignal PDM_engineState(8, true, 1, 0.0, 0, 3, 0.0, 0);
 
 // Message: PDM_25 [0x113]
@@ -39,199 +55,181 @@ StateSignal PDM_carMiles(16, true, 10, 0.0, 0, 0, 0.0, 0);
 StateSignal PDM_engineHours(16, true, 1, 0.0, -32768, 32767, 0.0, 0);
 StateSignal PDM_engineMinutes(16, true, 1, 0.0, -32768, 32767, 0.0, 0);
 
-// Message: PDM_31 [0x119]
-StateSignal PDM_driverDisplayLEDs(8, true, 1, 0.0, -128, 127, 0.0, 0);
-
 // Message: PDM_24 [0x112]
 StateSignal PDM_counterMsg274(4, false, 1, 0.0, 0, 15, 0.0, 0);
-StateSignal PDM_fanLeftPWM(8, false, 1, 0.0, 0, 255, 0.0, 0);
-StateSignal PDM_fanRightPWM(8, false, 1, 0.0, 0, 255, 0.0, 0);
+StateSignal PDM_fanLeftDutyCycle(8, false, 1, 0.0, 0, 100, 0.0, 0);
+StateSignal PDM_fanRightDutyCycle(8, false, 1, 0.0, 0, 100, 0.0, 0);
 StateSignal PDM_wpPWM(8, false, 1, 0.0, 0, 255, 0.0, 0);
-StateSignal PDM_teensyTemp(16, true, 10, 0.0, -3276, 3276, 0.0, 0);
+StateSignal PDM_teensyTemp(16, true, 10, 0.0, -5, 20, 0.0, 0);
 
 // Message: TCGPS_10 [0xa0]
 StateSignal TCGPS_counterMsg160(4, false, 1, 0.0, 0, 15, 0.0, 0);
 StateSignal TCGPS_boardTemp(16, true, 10, 0.0, 0, 150, 0.0, 0);
 StateSignal TCGPS_teensyTemp(16, true, 10, 0.0, 0, 150, 0.0, 0);
 
-// Message: DD_10 [0xd2]
+// Message: DD_10 [0x2c6]
 StateSignal DD_counterMsg210(4, false, 1, 0.0, 0, 15, 0.0, 0);
-StateSignal DD_gearCalc(8, true, 1, 0.0, -128, 127, 0.0, 0);
 StateSignal DD_boardTemp(16, true, 10, 0.0, 0, 150, 0.0, 0);
 StateSignal DD_teensyTemp(16, true, 10, 0.0, 0, 150, 0.0, 0);
-StateSignal DD_requestDRS(16, true, 1, 0.0, 0, 5, 0.0, 0);
 
-// Message: USER_12 [0x2c8]
-StateSignal USER_driverMessageChar0(8, false, 1, 0.0, 0, 0, 0.0, 0);
-StateSignal USER_driverMessageChar1(8, false, 1, 0.0, 0, 0, 0.0, 0);
-StateSignal USER_driverMessageChar2(8, false, 1, 0.0, 0, 0, 0.0, 0);
-StateSignal USER_driverMessageChar3(8, false, 1, 0.0, 0, 0, 0.0, 0);
-StateSignal USER_driverMessageChar4(8, false, 1, 0.0, 0, 0, 0.0, 0);
-StateSignal USER_driverMessageChar5(8, false, 1, 0.0, 0, 0, 0.0, 0);
-StateSignal USER_driverMessageChar6(8, false, 1, 0.0, 0, 0, 0.0, 0);
-StateSignal USER_driverMessageChar7(8, false, 1, 0.0, 0, 0, 0.0, 0);
-
-// Message: USER_11 [0x2c7]
-StateSignal USER_driverSignal(8, true, 1, 0.0, -128, 127, 0.0, 0);
+// Message: CMD_12 [0xd4]
+StateSignal CMD_driverMessageChar0(8, false, 1, 0.0, 0, 0, 0.0, 0);
+StateSignal CMD_driverMessageChar1(8, false, 1, 0.0, 0, 0, 0.0, 0);
+StateSignal CMD_driverMessageChar2(8, false, 1, 0.0, 0, 0, 0.0, 0);
+StateSignal CMD_driverMessageChar3(8, false, 1, 0.0, 0, 0, 0.0, 0);
+StateSignal CMD_driverMessageChar4(8, false, 1, 0.0, 0, 0, 0.0, 0);
+StateSignal CMD_driverMessageChar5(8, false, 1, 0.0, 0, 0, 0.0, 0);
+StateSignal CMD_driverMessageChar6(8, false, 1, 0.0, 0, 0, 0.0, 0);
+StateSignal CMD_driverMessageChar7(8, false, 1, 0.0, 0, 0, 0.0, 0);
 
 // Message: ATCCF_15 [0x19f]
 StateSignal ATCCF_counterMsg415(4, false, 1, 0.0, 0, 15, 0.0, 0);
-StateSignal ATCCF_boardTemp(16, true, 10, 0.0, -3276, 3276, 0.0, 0);
-StateSignal ATCCF_teensyTemp(16, true, 10, 0.0, -3276, 3276, 0.0, 0);
+StateSignal ATCCF_boardTemp(16, true, 10, 0.0, -5, 100, 0.0, 0);
+StateSignal ATCCF_teensyTemp(16, true, 10, 0.0, -5, 100, 0.0, 0);
 
-// Message: USER_10 [0x2c6]
-StateSignal USER_fanLeftOverride(8, true, 1, 0.0, -128, 127, 0.0, 0);
-StateSignal USER_fanRightOverride(8, true, 1, 0.0, -128, 127, 0.0, 0);
-StateSignal USER_wpOverride(8, true, 1, 0.0, -128, 127, 0.0, 0);
-StateSignal USER_brakeLightOverride(8, true, 1, 0.0, -128, 127, 0.0, 0);
-
-// Message: PDM_30 [0x118]
-StateSignal PDM_driverMessageChar0(8, false, 1, 0.0, 0, 0, 0.0, 0);
-StateSignal PDM_driverMessageChar1(8, false, 1, 0.0, 0, 0, 0.0, 0);
-StateSignal PDM_driverMessageChar2(8, false, 1, 0.0, 0, 0, 0.0, 0);
-StateSignal PDM_driverMessageChar3(8, false, 1, 0.0, 0, 0, 0.0, 0);
-StateSignal PDM_driverMessageChar4(8, false, 1, 0.0, 0, 0, 0.0, 0);
-StateSignal PDM_driverMessageChar5(8, false, 1, 0.0, 0, 0, 0.0, 0);
-StateSignal PDM_driverMessageChar6(8, false, 1, 0.0, 0, 0, 0.0, 0);
-StateSignal PDM_driverMessageChar7(8, false, 1, 0.0, 0, 0, 0.0, 0);
+// Message: CMD_10 [0xd2]
+StateSignal CMD_fanLeftOverride(8, true, 1, 0.0, 0, 100, 0.0, 0);
+StateSignal CMD_fanRightOverride(8, true, 1, 0.0, 0, 100, 0.0, 0);
+StateSignal CMD_wpOverride(8, true, 1, 0.0, 0, 100, 0.0, 0);
+StateSignal CMD_brakeLightOverride(8, true, 1, 0.0, 0, 100, 0.0, 0);
 
 // Message: PDM_23 [0x111]
 StateSignal PDM_counterMsg273(4, false, 1, 0.0, 0, 15, 0.0, 0);
-StateSignal PDM_boardTemp(16, true, 10, 0.0, -3276, 3276, 0.0, 0);
-StateSignal PDM_brakelightVoltAvg(16, true, 1000, 0.0, -32, 32, 0.0, 0);
-StateSignal PDM_starterRelayVoltAvg(16, true, 1000, 0.0, -32, 32, 0.0, 0);
+StateSignal PDM_boardTemp(16, true, 10, 0.0, -5, 100, 0.0, 0);
+StateSignal PDM_brakelightVoltAvg(16, true, 1000, 0.0, -5, 100, 0.0, 0);
+StateSignal PDM_starterRelayVoltAvg(16, true, 1000, 0.0, -5, 20, 0.0, 0);
 
 // Message: PDM_22 [0x110]
 StateSignal PDM_counterMsg272(4, false, 1, 0.0, 0, 15, 0.0, 0);
-StateSignal PDM_keepAliveVoltAvg(16, true, 1000, 0.0, -32, 32, 0.0, 0);
-StateSignal PDM_keepAliveVoltMax(16, true, 1000, 0.0, -32, 32, 0.0, 0);
-StateSignal PDM_keepAliveVoltMin(16, true, 1000, 0.0, -32, 32, 0.0, 0);
+StateSignal PDM_keepAliveVoltAvg(16, true, 1000, 0.0, -5, 20, 0.0, 0);
+StateSignal PDM_keepAliveVoltMax(16, true, 1000, 0.0, -5, 20, 0.0, 0);
+StateSignal PDM_keepAliveVoltMin(16, true, 1000, 0.0, -5, 20, 0.0, 0);
 
 // Message: PDM_21 [0x10f]
 StateSignal PDM_counterMsg271(4, false, 1, 0.0, 0, 15, 0.0, 0);
-StateSignal PDM_dataVoltAvg(16, true, 1000, 0.0, -32, 32, 0.0, 0);
-StateSignal PDM_dataVoltMax(16, true, 1000, 0.0, -32, 32, 0.0, 0);
-StateSignal PDM_dataVoltMin(16, true, 1000, 0.0, -32, 32, 0.0, 0);
+StateSignal PDM_dataVoltAvg(16, true, 1000, 0.0, -5, 20, 0.0, 0);
+StateSignal PDM_dataVoltMax(16, true, 1000, 0.0, -5, 20, 0.0, 0);
+StateSignal PDM_dataVoltMin(16, true, 1000, 0.0, -5, 20, 0.0, 0);
 
 // Message: PDM_20 [0x10e]
 StateSignal PDM_counterMsg270(4, false, 1, 0.0, 0, 15, 0.0, 0);
-StateSignal PDM_mainVoltAvg(16, true, 1000, 0.0, -32, 32, 0.0, 0);
-StateSignal PDM_mainVoltMax(16, true, 1000, 0.0, -32, 32, 0.0, 0);
-StateSignal PDM_mainVoltMin(16, true, 1000, 0.0, -32, 32, 0.0, 0);
+StateSignal PDM_mainVoltAvg(16, true, 1000, 0.0, -5, 20, 0.0, 0);
+StateSignal PDM_mainVoltMax(16, true, 1000, 0.0, -5, 20, 0.0, 0);
+StateSignal PDM_mainVoltMin(16, true, 1000, 0.0, -5, 20, 0.0, 0);
 
 // Message: PDM_19 [0x10d]
 StateSignal PDM_counterMsg269(4, false, 1, 0.0, 0, 15, 0.0, 0);
-StateSignal PDM_fuelVoltAvg(16, true, 1000, 0.0, -32, 32, 0.0, 0);
-StateSignal PDM_fuelVoltMax(16, true, 1000, 0.0, -32, 32, 0.0, 0);
-StateSignal PDM_fuelVoltMin(16, true, 1000, 0.0, -32, 32, 0.0, 0);
+StateSignal PDM_fuelVoltAvg(16, true, 1000, 0.0, -5, 20, 0.0, 0);
+StateSignal PDM_fuelVoltMax(16, true, 1000, 0.0, -5, 20, 0.0, 0);
+StateSignal PDM_fuelVoltMin(16, true, 1000, 0.0, -5, 20, 0.0, 0);
 
 // Message: PDM_18 [0x10c]
 StateSignal PDM_counterMsg268(4, false, 1, 0.0, 0, 15, 0.0, 0);
-StateSignal PDM_fuelCurrentAvg(16, true, 100, 0.0, -327, 327, 0.0, 0);
-StateSignal PDM_fuelCurrentMax(16, true, 100, 0.0, -327, 327, 0.0, 0);
-StateSignal PDM_fuelCurrentMin(16, true, 100, 0.0, -327, 327, 0.0, 0);
+StateSignal PDM_fuelCurrentAvg(16, true, 100, 0.0, -5, 20, 0.0, 0);
+StateSignal PDM_fuelCurrentMax(16, true, 100, 0.0, -5, 20, 0.0, 0);
+StateSignal PDM_fuelCurrentMin(16, true, 100, 0.0, -5, 20, 0.0, 0);
 
 // Message: PDM_17 [0x10b]
 StateSignal PDM_counterMsg267(4, false, 1, 0.0, 0, 15, 0.0, 0);
-StateSignal PDM_wpVoltAvg(16, true, 1000, 0.0, -32, 32, 0.0, 0);
-StateSignal PDM_wpVoltMax(16, true, 1000, 0.0, -32, 32, 0.0, 0);
-StateSignal PDM_wpVoltMin(16, true, 1000, 0.0, -32, 32, 0.0, 0);
+StateSignal PDM_wpVoltAvg(16, true, 1000, 0.0, -5, 20, 0.0, 0);
+StateSignal PDM_wpVoltMax(16, true, 1000, 0.0, -5, 20, 0.0, 0);
+StateSignal PDM_wpVoltMin(16, true, 1000, 0.0, -5, 20, 0.0, 0);
 
 // Message: PDM_16 [0x10a]
 StateSignal PDM_counterMsg266(4, false, 1, 0.0, 0, 15, 0.0, 0);
-StateSignal PDM_wpCurrentAvg(16, true, 100, 0.0, -327, 327, 0.0, 0);
-StateSignal PDM_wpCurrentMax(16, true, 100, 0.0, -327, 327, 0.0, 0);
-StateSignal PDM_wpCurrentMin(16, true, 100, 0.0, -327, 327, 0.0, 0);
+StateSignal PDM_wpCurrentAvg(16, true, 100, 0.0, -5, 20, 0.0, 0);
+StateSignal PDM_wpCurrentMax(16, true, 100, 0.0, -5, 20, 0.0, 0);
+StateSignal PDM_wpCurrentMin(16, true, 100, 0.0, -5, 20, 0.0, 0);
 
 // Message: PDM_15 [0x109]
 StateSignal PDM_counterMsg265(4, false, 1, 0.0, 0, 15, 0.0, 0);
-StateSignal PDM_fanLeftVoltAvg(16, true, 1000, 0.0, -32, 32, 0.0, 0);
-StateSignal PDM_fanLeftVoltMax(16, true, 1000, 0.0, -32, 32, 0.0, 0);
-StateSignal PDM_fanLeftVoltMin(16, true, 1000, 0.0, -32, 32, 0.0, 0);
+StateSignal PDM_fanLeftVoltAvg(16, true, 1000, 0.0, -5, 20, 0.0, 0);
+StateSignal PDM_fanLeftVoltMax(16, true, 1000, 0.0, -5, 20, 0.0, 0);
+StateSignal PDM_fanLeftVoltMin(16, true, 1000, 0.0, -5, 20, 0.0, 0);
 
 // Message: PDM_14 [0x108]
 StateSignal PDM_counterMsg264(4, false, 1, 0.0, 0, 15, 0.0, 0);
-StateSignal PDM_fanLeftCurrentAvg(16, true, 100, 0.0, -327, 327, 0.0, 0);
-StateSignal PDM_fanLeftCurrentMax(16, true, 100, 0.0, -327, 327, 0.0, 0);
-StateSignal PDM_fanLeftCurrentMin(16, true, 100, 0.0, -327, 327, 0.0, 0);
+StateSignal PDM_fanLeftCurrentAvg(16, true, 100, 0.0, -5, 20, 0.0, 0);
+StateSignal PDM_fanLeftCurrentMax(16, true, 100, 0.0, -5, 20, 0.0, 0);
+StateSignal PDM_fanLeftCurrentMin(16, true, 100, 0.0, -5, 20, 0.0, 0);
 
 // Message: PDM_11 [0x105]
 StateSignal PDM_counterMsg261(4, false, 1, 0.0, 0, 15, 0.0, 0);
-StateSignal PDM_pdmVoltAvg(16, true, 1000, 0.0, -32, 32, 0.0, 0);
-StateSignal PDM_pdmVoltMax(16, true, 1000, 0.0, -32, 32, 0.0, 0);
-StateSignal PDM_pdmVoltMin(16, true, 1000, 0.0, -32, 32, 0.0, 0);
+StateSignal PDM_pdmVoltAvg(16, true, 1000, 0.0, -5, 20, 0.0, 0);
+StateSignal PDM_pdmVoltMax(16, true, 1000, 0.0, -5, 20, 0.0, 0);
+StateSignal PDM_pdmVoltMin(16, true, 1000, 0.0, -5, 20, 0.0, 0);
 
 // Message: PDM_13 [0x107]
 StateSignal PDM_counterMsg263(4, false, 1, 0.0, 0, 15, 0.0, 0);
-StateSignal PDM_fanRightVoltAvg(16, true, 1000, 0.0, -32, 32, 0.0, 0);
-StateSignal PDM_fanRightVoltMax(16, true, 1000, 0.0, -32, 32, 0.0, 0);
-StateSignal PDM_fanRightVoltMin(16, true, 1000, 0.0, -32, 32, 0.0, 0);
+StateSignal PDM_fanRightVoltAvg(16, true, 1000, 0.0, -5, 20, 0.0, 0);
+StateSignal PDM_fanRightVoltMax(16, true, 1000, 0.0, -5, 20, 0.0, 0);
+StateSignal PDM_fanRightVoltMin(16, true, 1000, 0.0, -5, 20, 0.0, 0);
 
 // Message: PDM_12 [0x106]
 StateSignal PDM_counterMsg262(4, false, 1, 0.0, 0, 15, 0.0, 0);
-StateSignal PDM_fanRightCurrentAvg(16, true, 100, 0.0, -327, 327, 0.0, 0);
-StateSignal PDM_fanRightCurrentMax(16, true, 100, 0.0, -327, 327, 0.0, 0);
-StateSignal PDM_fanRightCurrentMin(16, true, 100, 0.0, -327, 327, 0.0, 0);
+StateSignal PDM_fanRightCurrentAvg(16, true, 100, 0.0, -5, 20, 0.0, 0);
+StateSignal PDM_fanRightCurrentMax(16, true, 100, 0.0, -5, 20, 0.0, 0);
+StateSignal PDM_fanRightCurrentMin(16, true, 100, 0.0, -5, 20, 0.0, 0);
 
 // Message: PDM_10 [0x104]
 StateSignal PDM_counterMsg260(4, false, 1, 0.0, 0, 15, 0.0, 0);
 StateSignal PDM_dataLog(1, false, 1, 0.0, 0, 1, 0.0, 0);
-StateSignal PDM_pdmCurrentAvg(16, true, 100, 0.0, -327, 327, 0.0, 0);
-StateSignal PDM_pdmCurrentMax(16, true, 100, 0.0, -327, 327, 0.0, 0);
-StateSignal PDM_pdmCurrentMin(16, true, 100, 0.0, -327, 327, 0.0, 0);
+StateSignal PDM_pdmCurrentAvg(16, true, 100, 0.0, -5, 20, 0.0, 0);
+StateSignal PDM_pdmCurrentMax(16, true, 100, 0.0, -5, 20, 0.0, 0);
+StateSignal PDM_pdmCurrentMin(16, true, 100, 0.0, -5, 20, 0.0, 0);
 
 // Message: ATCCR_14 [0x1d0]
 StateSignal ATCCR_counterMsg464(4, false, 1, 0.0, 0, 15, 0.0, 0);
-StateSignal ATCCR_tireTempRRI(16, true, 10, 0.0, -3276, 3276, 0.0, 0);
-StateSignal ATCCR_tireTempRRM(16, true, 10, 0.0, -3276, 3276, 0.0, 0);
-StateSignal ATCCR_tireTempRRO(16, true, 10, 0.0, -3276, 3276, 0.0, 0);
+StateSignal ATCCR_tireTempRRI(16, true, 10, 0.0, 0, 100, 0.0, 0);
+StateSignal ATCCR_tireTempRRM(16, true, 10, 0.0, 0, 100, 0.0, 0);
+StateSignal ATCCR_tireTempRRO(16, true, 10, 0.0, 0, 100, 0.0, 0);
 
 // Message: ATCCR_13 [0x1cf]
 StateSignal ATCCR_counterMsg463(4, false, 1, 0.0, 0, 15, 0.0, 0);
-StateSignal ATCCR_tireTempRLI(16, true, 10, 0.0, -3276, 3276, 0.0, 0);
-StateSignal ATCCR_tireTempRLM(16, true, 10, 0.0, -3276, 3276, 0.0, 0);
-StateSignal ATCCR_tireTempRLO(16, true, 10, 0.0, -3276, 3276, 0.0, 0);
+StateSignal ATCCR_tireTempRLI(16, true, 10, 0.0, 0, 100, 0.0, 0);
+StateSignal ATCCR_tireTempRLM(16, true, 10, 0.0, 0, 100, 0.0, 0);
+StateSignal ATCCR_tireTempRLO(16, true, 10, 0.0, 0, 100, 0.0, 0);
 
 // Message: ATCCR_12 [0x1ce]
 StateSignal ATCCR_counterMsg462(4, false, 1, 0.0, 0, 15, 0.0, 0);
-StateSignal ATCCR_teensyTemp(16, true, 10, 0.0, -3276, 3276, 0.0, 0);
-StateSignal ATCCR_coolantTempRadInlet(16, true, 10, 0.0, -3276, 3276, 0.0, 0);
-StateSignal ATCCR_coolantTempRadOutlet(16, true, 10, 0.0, -3276, 3276, 0.0, 0);
+StateSignal ATCCR_teensyTemp(16, true, 10, 0.0, -5, 100, 0.0, 0);
+StateSignal ATCCR_coolantTempRadInlet(16, true, 10, 0.0, 0, 120, 0.0, 0);
+StateSignal ATCCR_coolantTempRadOutlet(16, true, 10, 0.0, 0, 120, 0.0, 0);
 
 // Message: ATCCR_11 [0x1cd]
 StateSignal ATCCR_counterMsg461(4, false, 1, 0.0, 0, 15, 0.0, 0);
-StateSignal ATCCR_boardTemp(16, true, 10, 0.0, -3276, 3276, 0.0, 0);
-StateSignal ATCCR_rotorTempRL(16, true, 10, 0.0, -3276, 3276, 0.0, 0);
-StateSignal ATCCR_rotorTempRR(16, true, 10, 0.0, -3276, 3276, 0.0, 0);
+StateSignal ATCCR_boardTemp(16, true, 10, 0.0, -5, 100, 0.0, 0);
+StateSignal ATCCR_rotorTempRL(16, true, 10, 0.0, 0, 1000, 0.0, 0);
+StateSignal ATCCR_rotorTempRR(16, true, 10, 0.0, 0, 1000, 0.0, 0);
 
 // Message: ATCCR_10 [0x1cc]
 StateSignal ATCCR_counterMsg460(4, false, 1, 0.0, 0, 15, 0.0, 0);
-StateSignal ATCCR_suspensionTravelRL(16, true, 1000, 0.0, -32, 32, 0.0, 0);
-StateSignal ATCCR_suspensionTravelRR(16, true, 1000, 0.0, -32, 32, 0.0, 0);
+StateSignal ATCCR_batteryCurrent(16, true, 10, 0.0, -200, 200, 0.0, 0);
+StateSignal ATCCR_suspensionTravelRL(16, true, 1000, 0.0, -4, 4, 0.0, 0);
+StateSignal ATCCR_suspensionTravelRR(16, true, 1000, 0.0, -4, 4, 0.0, 0);
 
 // Message: ATCCF_14 [0x19e]
 StateSignal ATCCF_counterMsg414(4, false, 1, 0.0, 0, 15, 0.0, 0);
-StateSignal ATCCF_tireTempFRI(16, true, 10, 0.0, -3276, 3276, 0.0, 0);
-StateSignal ATCCF_tireTempFRM(16, true, 10, 0.0, -3276, 3276, 0.0, 0);
-StateSignal ATCCF_tireTempFRO(16, true, 10, 0.0, -3276, 3276, 0.0, 0);
+StateSignal ATCCF_tireTempFRI(16, true, 10, 0.0, 0, 100, 0.0, 0);
+StateSignal ATCCF_tireTempFRM(16, true, 10, 0.0, 0, 100, 0.0, 0);
+StateSignal ATCCF_tireTempFRO(16, true, 10, 0.0, 0, 100, 0.0, 0);
 
 // Message: ATCCF_13 [0x19d]
 StateSignal ATCCF_counterMsg413(4, false, 1, 0.0, 0, 15, 0.0, 0);
-StateSignal ATCCF_tireTempFLI(16, true, 10, 0.0, -3276, 3276, 0.0, 0);
-StateSignal ATCCF_tireTempFLM(16, true, 10, 0.0, -3276, 3276, 0.0, 0);
-StateSignal ATCCF_tireTempFLO(16, true, 10, 0.0, -3276, 3276, 0.0, 0);
+StateSignal ATCCF_tireTempFLI(16, true, 10, 0.0, 0, 100, 0.0, 0);
+StateSignal ATCCF_tireTempFLM(16, true, 10, 0.0, 0, 100, 0.0, 0);
+StateSignal ATCCF_tireTempFLO(16, true, 10, 0.0, 0, 100, 0.0, 0);
 
 // Message: ATCCF_12 [0x19c]
 StateSignal ATCCF_counterMsg412(4, false, 1, 0.0, 0, 15, 0.0, 0);
-StateSignal ATCCF_coolantTempRadMiddle(16, true, 10, 0.0, -3276, 3276, 0.0, 0);
-StateSignal ATCCF_rotorTempFL(16, true, 10, 0.0, -3276, 3276, 0.0, 0);
-StateSignal ATCCF_rotorTempFR(16, true, 10, 0.0, -3276, 3276, 0.0, 0);
+StateSignal ATCCF_rotorTempFL(16, true, 10, 0.0, 0, 1000, 0.0, 0);
+StateSignal ATCCF_rotorTempFR(16, true, 10, 0.0, 0, 1000, 0.0, 0);
 
 // Message: ATCCF_11 [0x19b]
 StateSignal ATCCF_counterMsg411(4, false, 1, 0.0, 0, 15, 0.0, 0);
-StateSignal ATCCF_brakePressureF(16, true, 10, 0.0, -3276, 3276, 0.0, 0);
-StateSignal ATCCF_brakePressureR(16, true, 10, 0.0, -3276, 3276, 0.0, 0);
-StateSignal ATCCF_steeringWheelAngle(16, true, 10, 0.0, -3276, 3276, 0.0, 0);
+StateSignal ATCCF_brakePressureF(16, true, 10, 0.0, 0, 2000, 0.0, 0);
+StateSignal ATCCF_brakePressureR(16, true, 10, 0.0, 0, 2000, 0.0, 0);
+StateSignal ATCCF_steeringWheelAngle(16, true, 10, 0.0, -180, 180, 0.0, 0);
 
 // Message: ATCCF_10 [0x19a]
 StateSignal ATCCF_counterMsg410(4, false, 1, 0.0, 0, 15, 0.0, 0);
@@ -250,13 +248,40 @@ StateSignal ATCCF_suspensionTravelFR(16, true, 1000, 0.0, -32, 32, 0.0, 0);
 
 
 /*
- * Decode a CAN frame for the message CURRSENS_10
+ * Decode a CAN frame for the message CMD_11
  * \param imsg A reference to the incoming CAN message frame
  */
-void read_CURRSENS_10(CAN_message_t &imsg) {
+void read_CMD_11(CAN_message_t &imsg) {
 
-	CURRSENS_counterMsg900.set_can_value(((imsg.buf[0] & 0b00001111)));
-	CURRSENS_rectCurrent.set_can_value((imsg.buf[2]) | (imsg.buf[3] << 8));
+	CMD_driverNotificationLightR.set_can_value((imsg.buf[0]));
+	CMD_driverNotificationLightG.set_can_value((imsg.buf[1]));
+	CMD_driverNotificationLightB.set_can_value((imsg.buf[2]));
+
+}
+
+/*
+ * Decode a CAN frame for the message ATCCR_17
+ * \param imsg A reference to the incoming CAN message frame
+ */
+void read_ATCCR_17(CAN_message_t &imsg) {
+
+	ATCCR_counterMsg467.set_can_value(((imsg.buf[0] & 0b00001111)));
+	ATCCR_egt4.set_can_value((imsg.buf[2]) | (imsg.buf[3] << 8));
+	ATCCR_rectifierCurrent.set_can_value((imsg.buf[4]) | (imsg.buf[5] << 8));
+	ATCCR_shiftingPressure.set_can_value((imsg.buf[6]) | (imsg.buf[7] << 8));
+
+}
+
+/*
+ * Decode a CAN frame for the message ATCCR_16
+ * \param imsg A reference to the incoming CAN message frame
+ */
+void read_ATCCR_16(CAN_message_t &imsg) {
+
+	ATCCR_counterMsg466.set_can_value(((imsg.buf[0] & 0b00001111)));
+	ATCCR_egt1.set_can_value((imsg.buf[2]) | (imsg.buf[3] << 8));
+	ATCCR_egt2.set_can_value((imsg.buf[4]) | (imsg.buf[5] << 8));
+	ATCCR_egt3.set_can_value((imsg.buf[6]) | (imsg.buf[7] << 8));
 
 }
 
@@ -266,7 +291,9 @@ void read_CURRSENS_10(CAN_message_t &imsg) {
  */
 void read_ATCCR_15(CAN_message_t &imsg) {
 
-	ATCCR_uptime.set_can_value((imsg.buf[0]) | (imsg.buf[1] << 8) | (imsg.buf[2] << 16) | (imsg.buf[3] << 24));
+	ATCCR_counterMsg465.set_can_value(((imsg.buf[0] & 0b00001111)));
+	ATCCR_uptime.set_can_value((imsg.buf[2]) | (imsg.buf[3] << 8) | (imsg.buf[4] << 16) | (imsg.buf[5] << 24));
+	ATCCR_coolantTempRadMiddle.set_can_value((imsg.buf[6]) | (imsg.buf[7] << 8));
 
 }
 
@@ -299,6 +326,7 @@ void read_PDM_09(CAN_message_t &imsg) {
 	PDM_OBD_oilPressure.set_can_value(((imsg.buf[0] & 0b00000001)));
 	PDM_OBD_oilTemp.set_can_value(((imsg.buf[1] & 0b00000001)));
 	PDM_OBD_fuelPressure.set_can_value(((imsg.buf[2] & 0b00000001)));
+	PDM_coolingOverrideActive.set_can_value(((imsg.buf[3] & 0b00000001)));
 	PDM_engineState.set_can_value((imsg.buf[7]));
 
 }
@@ -317,24 +345,14 @@ void read_PDM_25(CAN_message_t &imsg) {
 }
 
 /*
- * Decode a CAN frame for the message PDM_31
- * \param imsg A reference to the incoming CAN message frame
- */
-void read_PDM_31(CAN_message_t &imsg) {
-
-	PDM_driverDisplayLEDs.set_can_value((imsg.buf[0]));
-
-}
-
-/*
  * Decode a CAN frame for the message PDM_24
  * \param imsg A reference to the incoming CAN message frame
  */
 void read_PDM_24(CAN_message_t &imsg) {
 
 	PDM_counterMsg274.set_can_value(((imsg.buf[0] & 0b00001111)));
-	PDM_fanLeftPWM.set_can_value((imsg.buf[2]));
-	PDM_fanRightPWM.set_can_value((imsg.buf[3]));
+	PDM_fanLeftDutyCycle.set_can_value((imsg.buf[2]));
+	PDM_fanRightDutyCycle.set_can_value((imsg.buf[3]));
 	PDM_wpPWM.set_can_value((imsg.buf[4]));
 	PDM_teensyTemp.set_can_value((imsg.buf[6]) | (imsg.buf[7] << 8));
 
@@ -359,37 +377,25 @@ void read_TCGPS_10(CAN_message_t &imsg) {
 void read_DD_10(CAN_message_t &imsg) {
 
 	DD_counterMsg210.set_can_value(((imsg.buf[0] & 0b00001111)));
-	DD_gearCalc.set_can_value((imsg.buf[1]));
 	DD_boardTemp.set_can_value((imsg.buf[2]) | (imsg.buf[3] << 8));
 	DD_teensyTemp.set_can_value((imsg.buf[4]) | (imsg.buf[5] << 8));
-	DD_requestDRS.set_can_value((imsg.buf[6]) | (imsg.buf[7] << 8));
 
 }
 
 /*
- * Decode a CAN frame for the message USER_12
+ * Decode a CAN frame for the message CMD_12
  * \param imsg A reference to the incoming CAN message frame
  */
-void read_USER_12(CAN_message_t &imsg) {
+void read_CMD_12(CAN_message_t &imsg) {
 
-	USER_driverMessageChar0.set_can_value((imsg.buf[0]));
-	USER_driverMessageChar1.set_can_value((imsg.buf[1]));
-	USER_driverMessageChar2.set_can_value((imsg.buf[2]));
-	USER_driverMessageChar3.set_can_value((imsg.buf[3]));
-	USER_driverMessageChar4.set_can_value((imsg.buf[4]));
-	USER_driverMessageChar5.set_can_value((imsg.buf[5]));
-	USER_driverMessageChar6.set_can_value((imsg.buf[6]));
-	USER_driverMessageChar7.set_can_value((imsg.buf[7]));
-
-}
-
-/*
- * Decode a CAN frame for the message USER_11
- * \param imsg A reference to the incoming CAN message frame
- */
-void read_USER_11(CAN_message_t &imsg) {
-
-	USER_driverSignal.set_can_value((imsg.buf[0]));
+	CMD_driverMessageChar0.set_can_value((imsg.buf[0]));
+	CMD_driverMessageChar1.set_can_value((imsg.buf[1]));
+	CMD_driverMessageChar2.set_can_value((imsg.buf[2]));
+	CMD_driverMessageChar3.set_can_value((imsg.buf[3]));
+	CMD_driverMessageChar4.set_can_value((imsg.buf[4]));
+	CMD_driverMessageChar5.set_can_value((imsg.buf[5]));
+	CMD_driverMessageChar6.set_can_value((imsg.buf[6]));
+	CMD_driverMessageChar7.set_can_value((imsg.buf[7]));
 
 }
 
@@ -406,32 +412,15 @@ void read_ATCCF_15(CAN_message_t &imsg) {
 }
 
 /*
- * Decode a CAN frame for the message USER_10
+ * Decode a CAN frame for the message CMD_10
  * \param imsg A reference to the incoming CAN message frame
  */
-void read_USER_10(CAN_message_t &imsg) {
+void read_CMD_10(CAN_message_t &imsg) {
 
-	USER_fanLeftOverride.set_can_value((imsg.buf[0]));
-	USER_fanRightOverride.set_can_value((imsg.buf[1]));
-	USER_wpOverride.set_can_value((imsg.buf[2]));
-	USER_brakeLightOverride.set_can_value((imsg.buf[3]));
-
-}
-
-/*
- * Decode a CAN frame for the message PDM_30
- * \param imsg A reference to the incoming CAN message frame
- */
-void read_PDM_30(CAN_message_t &imsg) {
-
-	PDM_driverMessageChar0.set_can_value((imsg.buf[0]));
-	PDM_driverMessageChar1.set_can_value((imsg.buf[1]));
-	PDM_driverMessageChar2.set_can_value((imsg.buf[2]));
-	PDM_driverMessageChar3.set_can_value((imsg.buf[3]));
-	PDM_driverMessageChar4.set_can_value((imsg.buf[4]));
-	PDM_driverMessageChar5.set_can_value((imsg.buf[5]));
-	PDM_driverMessageChar6.set_can_value((imsg.buf[6]));
-	PDM_driverMessageChar7.set_can_value((imsg.buf[7]));
+	CMD_fanLeftOverride.set_can_value((imsg.buf[0]));
+	CMD_fanRightOverride.set_can_value((imsg.buf[1]));
+	CMD_wpOverride.set_can_value((imsg.buf[2]));
+	CMD_brakeLightOverride.set_can_value((imsg.buf[3]));
 
 }
 
@@ -677,6 +666,7 @@ void read_ATCCR_11(CAN_message_t &imsg) {
 void read_ATCCR_10(CAN_message_t &imsg) {
 
 	ATCCR_counterMsg460.set_can_value(((imsg.buf[0] & 0b00001111)));
+	ATCCR_batteryCurrent.set_can_value((imsg.buf[2]) | (imsg.buf[3] << 8));
 	ATCCR_suspensionTravelRL.set_can_value((imsg.buf[4]) | (imsg.buf[5] << 8));
 	ATCCR_suspensionTravelRR.set_can_value((imsg.buf[6]) | (imsg.buf[7] << 8));
 
@@ -715,7 +705,6 @@ void read_ATCCF_13(CAN_message_t &imsg) {
 void read_ATCCF_12(CAN_message_t &imsg) {
 
 	ATCCF_counterMsg412.set_can_value(((imsg.buf[0] & 0b00001111)));
-	ATCCF_coolantTempRadMiddle.set_can_value((imsg.buf[2]) | (imsg.buf[3] << 8));
 	ATCCF_rotorTempFL.set_can_value((imsg.buf[4]) | (imsg.buf[5] << 8));
 	ATCCF_rotorTempFR.set_can_value((imsg.buf[6]) | (imsg.buf[7] << 8));
 
@@ -767,15 +756,23 @@ void decode_CAN2(CAN_message_t &imsg) {
 
 	switch (imsg.id) {
 
-		case 900:
-			read_CURRSENS_10(imsg);
+		case 211:
+			read_CMD_11(imsg);
+			break;
+
+		case 467:
+			read_ATCCR_17(imsg);
+			break;
+
+		case 466:
+			read_ATCCR_16(imsg);
 			break;
 
 		case 465:
 			read_ATCCR_15(imsg);
 			break;
 
-		case 288:
+		case 416:
 			read_ATCCF_16(imsg);
 			break;
 
@@ -791,10 +788,6 @@ void decode_CAN2(CAN_message_t &imsg) {
 			read_PDM_25(imsg);
 			break;
 
-		case 281:
-			read_PDM_31(imsg);
-			break;
-
 		case 274:
 			read_PDM_24(imsg);
 			break;
@@ -803,28 +796,20 @@ void decode_CAN2(CAN_message_t &imsg) {
 			read_TCGPS_10(imsg);
 			break;
 
-		case 210:
+		case 710:
 			read_DD_10(imsg);
 			break;
 
-		case 712:
-			read_USER_12(imsg);
-			break;
-
-		case 711:
-			read_USER_11(imsg);
+		case 212:
+			read_CMD_12(imsg);
 			break;
 
 		case 415:
 			read_ATCCF_15(imsg);
 			break;
 
-		case 710:
-			read_USER_10(imsg);
-			break;
-
-		case 280:
-			read_PDM_30(imsg);
+		case 210:
+			read_CMD_10(imsg);
 			break;
 
 		case 273:
