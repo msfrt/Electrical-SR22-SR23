@@ -4,6 +4,7 @@
 #include "ScreenInfo.hpp"
 #include "ScreenStartupAnim.hpp"
 #include "ScreenMessage.hpp"
+#include "ScreenNumber.hpp"
 
 class CScreensController {
 
@@ -21,7 +22,7 @@ class CScreensController {
 
         /// the different states that the screens can be in. Please note that states should include
         /// transitionary states, such as ScreenBegin before Screen or whatever
-        enum ScreenStates { /*StartupLeft, StartupRight,*/ InfoScreen1, InfoScreen2, Notification, Titan };
+        enum ScreenStates { /*StartupLeft, StartupRight,*/ GearInfo, InfoScreen1, InfoScreen2, Notification, Titan };
 
         /**
          * Gets the current state of the screen
@@ -43,7 +44,7 @@ class CScreensController {
         void SetState(ScreenStates state);
 
         ScreenStates mState;  ///< screen states
-        ScreenStates mStatePrev = InfoScreen1;  ///< Used to return to previous screen states after temporary states
+        ScreenStates mStatePrev = GearInfo;  ///< Used to return to previous screen states after temporary states
         unsigned long mStateStartTime = 0;  ///< The time in milliseconds that the current state started
 
         unsigned long mMessageDisplayDuration = 5000;  ///< The time in milliseconds to display a message when recieved
@@ -60,6 +61,8 @@ class CScreensController {
 
         CScreenMessage *mMessageScreen = nullptr;
 
+        CScreenNumber *mGearScreen = nullptr;
+
 };
 
 
@@ -71,35 +74,36 @@ class CScreensController {
 CScreensController::CScreensController(ILI9341_t3n &left, ILI9341_t3n &right) : 
                                        mDisplayLeft(left), mDisplayRight(right){
 
-    /* Startup screen */
-    // mStartupScreenLeft  = new CScreenStartupAnim(mDisplayLeft);
-    // mStartupScreenRight = new CScreenStartupAnim(mDisplayRight);
+    /* gear screen */
+    mGearScreen = new CScreenNumber(mDisplayLeft, M400_gear, "GEAR:");
     
     /* Info screen 1 */
     mInfoScreen1Left  = new CScreenInfo(mDisplayLeft);
-        mInfoScreen1Left->SetSignal(1, &M400_groundSpeed,     "SPD:", "%04.1f");
-        mInfoScreen1Left->SetSignal(2, &PDM_pdmVoltAvg,       "BAT:", "%04.1f");
-        mInfoScreen1Left->SetSignal(3, &ATCCF_brakeBias,      "BIAS:", "%02.0f%%");
-        mInfoScreen1Left->SetSignal(4, &PDM_fanLeftDutyCycle, "FANS:", "%03.0f");
+        mInfoScreen1Left->SetSignal(1, &M400_groundSpeed,     "SPD:", "%4.1f");
+        mInfoScreen1Left->SetSignal(2, &PDM_pdmVoltAvg,       "BAT:", "%4.1f");
+        mInfoScreen1Left->SetSignal(3, &ATCCF_brakeBias,      "BIAS:", "%2.0f%%");
+        mInfoScreen1Left->SetSignal(4, &PDM_fanLeftDutyCycle, "FANS:", "%3.0f");
 
     mInfoScreen1Right = new CScreenInfo(mDisplayRight);
-        mInfoScreen1Right->SetSignal(1, &M400_rpm,         "RPM:",  "%.1f", 1000);
-        mInfoScreen1Right->SetSignal(2, &M400_oilPressure, "OILP:", "%.1f");
-        mInfoScreen1Right->SetSignal(3, &M400_oilTemp,     "OILT:", "%.0f");
-        mInfoScreen1Right->SetSignal(4, &M400_engineTemp,  "ENG:",  "%.1f");
+        mInfoScreen1Right->SetSignal(1, &M400_rpm,         "RPM:",   "%5.1f", 1000);
+        mInfoScreen1Right->SetSignal(2, &M400_oilPressure, "OILP:",  "%4.1f");
+        mInfoScreen1Right->SetSignal(3, &M400_oilTemp,     "OILT:",  "%4.0f");
+        mInfoScreen1Right->SetSignal(4, &C50_tcSet,        "TCSET:", "%3.0f");
 
     /* Info screen 2 */
     mInfoScreen2Left  = new CScreenInfo(mDisplayLeft);
-        mInfoScreen2Left->SetSignal(1, &M400_groundSpeed,     "SPD:", "%.1f");
-        mInfoScreen2Left->SetSignal(2, &PDM_pdmVoltAvg,       "YUH:", "%.1f");
-        mInfoScreen2Left->SetSignal(3, &ATCCF_brakeBias,      "FCK:", "%.1f");
-        mInfoScreen2Left->SetSignal(4, &PDM_fanLeftDutyCycle, "TWO:", "%.1f");
+        mInfoScreen2Left->SetSignal(1, &ATCCF_rotorTempFL, "FL:", "%5.1f");
+        mInfoScreen2Left->SetSignal(2, &ATCCF_rotorTempFR, "FR:", "%5.1f");
+        mInfoScreen2Left->SetSignal(3, &ATCCR_rotorTempRL, "RL:", "%5.1f");
+        mInfoScreen2Left->SetSignal(4, &ATCCR_rotorTempRR, "RR:", "%5.1f");
     // keep the same screen on the right side
     mInfoScreen2Right = mInfoScreen1Right;
 
 
     /* message screen */
     mMessageScreen = new CScreenMessage(mDisplayLeft);
+
+
 
 
 }
@@ -112,9 +116,8 @@ CScreensController::CScreensController(ILI9341_t3n &left, ILI9341_t3n &right) :
  */
 CScreensController::~CScreensController(){
 
-    /* startup screens */
-    // delete mStartupScreenLeft;
-    // delete mStartupScreenRight;
+    /* gear */
+    delete mGearScreen;
 
     /* Screen 1 */
     delete mInfoScreen1Left;
@@ -137,7 +140,7 @@ CScreensController::~CScreensController(){
  */
 void CScreensController::Initialize(){
 
-    SetState(InfoScreen1);
+    SetState(GearInfo);
 
 }
 
@@ -166,6 +169,10 @@ void CScreensController::Update(unsigned long &elapsed){
         //         SetState(InfoScreen1);
         //     } 
         //     break;
+        case GearInfo:
+            mGearScreen->Update(elapsed);
+            mInfoScreen1Right->Update(elapsed);
+            break;
 
         case InfoScreen1:
             mInfoScreen1Left->Update(elapsed);
@@ -182,6 +189,7 @@ void CScreensController::Update(unsigned long &elapsed){
 
             // update the last state's right screen, too!
             switch (mStatePrev){
+                case GearInfo: // fall through
                 case InfoScreen1:
                     mInfoScreen1Right->Update(elapsed);
                     break;
@@ -222,6 +230,8 @@ void CScreensController::SetState(ScreenStates state){
         //     break;
         // case StartupRight:
         //     break;
+        case GearInfo:
+            break;
         case InfoScreen1:
             break;
         case InfoScreen2:
@@ -256,6 +266,10 @@ void CScreensController::SetState(ScreenStates state){
         // case StartupRight:
         //     mStartupScreenRight->Initialize();
         //     break;
+        case GearInfo:
+            mGearScreen->Initialize();
+            mInfoScreen1Right->Initialize();
+            break;
         case InfoScreen1:
             mInfoScreen1Left->Initialize();
             mInfoScreen1Right->Initialize();
@@ -287,11 +301,14 @@ void CScreensController::OnButtonPress(){
         // case StartupRight:
         //     SetState(InfoScreen1);
         //     break;
+        case GearInfo:
+            SetState(InfoScreen1);
+            break;
         case InfoScreen1:
             SetState(InfoScreen2);
             break;
         case InfoScreen2:
-            SetState(InfoScreen1);
+            SetState(GearInfo);
             break;
         case Notification:
             SetState(mStatePrev);

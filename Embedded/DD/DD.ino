@@ -238,10 +238,10 @@ void loop() {
 
 
 
-  if (debug.isup()){
-    screensController.OnButtonPress();
-    lightsController.OnButtonPress();
-  }
+  // if (debug.isup()){
+  //   screensController.OnButtonPress();
+  //   lightsController.OnButtonPress();
+  // }
   
 
 }

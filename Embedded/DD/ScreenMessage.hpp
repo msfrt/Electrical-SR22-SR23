@@ -42,7 +42,7 @@ class CScreenMessage : public CScreen {
          * \param message The message (max 8 characters) to display on the screen
          */
         void SetMessage(String message) {mMessage = message;}
-        
+
     private:
 
         /*
@@ -90,7 +90,7 @@ void CScreenMessage::Initialize(){
     }
 
     mDisplay.setCursor((mMaxChars - realLength) * ((mWidth / 2) / mMaxChars), mHeight/2 - mFontHeight/2);
-    mDisplay.setFont(LiberationMono_48_Bold);
+    mDisplay.setFont(mFont);
     mDisplay.print(mMessage);
 
     // push updates to the screen

@@ -88,8 +88,8 @@ void CLightBarBlinkSinusoidal::Update(unsigned long &elapsed){
         case Off:
             Clear();
             break;
+            
         case Blinking:
-
             // update elapsed time
             mCurrentTime += elapsed;
 
