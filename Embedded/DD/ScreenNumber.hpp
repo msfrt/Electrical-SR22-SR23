@@ -61,6 +61,7 @@ class CScreenNumber : public CScreen {
 
         String mFormat = "%d";  ///< THe format for the number printed
 
+        bool mOverride = false;  ///< Override writing to the display
 };
 
 
@@ -89,7 +90,8 @@ void CScreenNumber::Initialize(){
 
     // push updates to the screen
     unsigned long elapsed = 0;
-    CScreen::Update(elapsed);
+    mOverride = true;
+    CScreenNumber::Update(elapsed);
 }
 
 
@@ -104,7 +106,10 @@ void CScreenNumber::Initialize(){
 void CScreenNumber::Update(unsigned long &elapsed){
     // do nothing here, since everything is controlled in the initialization function
 
-    if (static_cast<int>(mSignal.value()) != mPrevVal){
+    if (static_cast<int>(mSignal.value()) != mPrevVal || mOverride){
+        // reset the override
+        mOverride = false;
+        
         // update the value
         mPrevVal = static_cast<int>(mSignal.value());
 
@@ -119,7 +124,6 @@ void CScreenNumber::Update(unsigned long &elapsed){
         int numLen = strlen(formatBuf);
         mDisplay.setCursor((mWidth - numLen*mFontWidth)/2, mHeight/2 - mFontHeight/2);
         mDisplay.print(formatBuf);
-        Serial.println(formatBuf);
         //mDisplay.print(round(mSignal.value()));
 
         CScreen::Update(elapsed);

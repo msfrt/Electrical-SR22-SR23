@@ -233,6 +233,11 @@ void loop() {
     lightsController.OnNotificationRecieved(R, G, B);
   }
 
+  // the laptrigger was set
+  if (TCGPS_laptrigger.is_updated() && static_cast<int>(TCGPS_laptrigger.value()) == 100){
+    screensController.OnNewLap();
+  }
+
   screensController.Update(elapsed);
   lightsController.Update(elapsed);
 

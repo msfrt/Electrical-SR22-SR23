@@ -31,6 +31,7 @@ class CScreen {
         uint16_t mColorSecondary  = ILI9341_GREEN;
         uint16_t mColorBackground = ILI9341_BLACK;
         uint16_t mColorWarning    = ILI9341_YELLOW;
+        uint16_t mColorSuccess    = ILI9341_GREEN;
         uint16_t mColorDanger     = ILI9341_RED;
 
 
