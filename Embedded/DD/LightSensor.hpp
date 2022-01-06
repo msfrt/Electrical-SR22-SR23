@@ -1,10 +1,10 @@
 #ifndef LIGHT_SENSOR_DIMMER
 #define LIGHT_SENSOR_DIMMER
 
-#define PRINT_LIGHT_VOLTAGE
+//#define PRINT_LIGHT_VOLTAGE
 
 // returns a brightness percent 0-100 that can be used for external scaling. returns -1 if there is no update.
-int brightness_sensor(const int &pin, const int analog_read_bits){
+int LightSensor(const int &pin, const int analog_read_bits){
   static unsigned int max_read_val = pow(2, analog_read_bits) - 1; // maximum analogRead possible
   static unsigned long running_total = 0;
   static unsigned long running_sample_count = 0;

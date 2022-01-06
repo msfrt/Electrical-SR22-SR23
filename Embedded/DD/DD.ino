@@ -43,8 +43,8 @@ const int pixels_top_cnt = 16; // number of LEDs
 const int pixels_left_cnt = 4;
 const int pixels_right_cnt = 4;
       int pixel_brightness_percent = 5; // 0 - 100; 100 is blinding... 4 is the minimum for all LED bar colors to work
-const int pixel_brightness_nighttime = 1;
-const int pixel_brightness_daytime = 55;
+const int pixel_brightness_nighttime = 1; // %
+const int pixel_brightness_daytime = 55; // %
 
 Adafruit_NeoPixel pixels_top =   Adafruit_NeoPixel(pixels_top_cnt,   pixels_top_pin,   NEO_GRB + NEO_KHZ800);
 Adafruit_NeoPixel pixels_left =  Adafruit_NeoPixel(pixels_left_cnt,  pixels_left_pin,  NEO_GRB + NEO_KHZ800);
@@ -98,8 +98,7 @@ const unsigned long button_delay = 300; // @GLOBAL_PARAM - milliseconds - used i
 #include "CAN/CAN2.hpp"
 
 
-#include "light_sensor.hpp"
-EasyTimer light_sensor_sample_timer(100);
+#include "LightSensor.hpp"
 const int light_sensor_pin = 20;
 
 
@@ -209,8 +208,6 @@ void setup() {
 
 void loop() {
 
- 
-
   unsigned long elapsed = millis() - previousUpdateTime;
   previousUpdateTime = millis();
   
@@ -219,6 +216,22 @@ void loop() {
   // Serial.println("Reading CAN:");
   read_can();
   // cbus1.events();
+
+
+  // sample the light sensor and update the brightness if percent returned is > -1
+  int lightPercentage = LightSensor(light_sensor_pin, READ_RESOLUTION_BITS);
+  if (lightPercentage > -1){
+      int pixelBrightnessPercent = map(lightPercentage, 0, 100, pixel_brightness_nighttime, pixel_brightness_daytime);
+      int displayBrightnessPercent = map(lightPercentage, 0, 100, display_brightness_percent_nighttime, display_brightness_percent_daytime);
+
+      // update brightness
+      analogWrite(TFTL_BL, map(displayBrightnessPercent, 0, 100, 0, 255));
+      analogWrite(TFTR_BL, map(displayBrightnessPercent, 0, 100, 0, 255));
+      pixels_top.setBrightness(map(pixelBrightnessPercent, 0, 100, 0, 255));
+      pixels_left.setBrightness(map(pixelBrightnessPercent, 0, 100, 0, 255));
+      pixels_right.setBrightness(map(pixelBrightnessPercent, 0, 100, 0, 255));
+  }
+
   
   // if there is a new message to display to the driver, assemble and display it
   if (CMD_driverMessageChar0.is_updated()){
