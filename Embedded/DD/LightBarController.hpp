@@ -36,6 +36,12 @@ class CLightBarController {
         void OnButtonPress();
         void OnNotificationRecieved(int R, int G, int B);
 
+        /**
+         *  Returns true if the a notification state is active
+         */
+        bool IsNotificationActive() const {return mState == Notification; }
+
+
     private:
 
         Adafruit_NeoPixel &mLeftLEDs;

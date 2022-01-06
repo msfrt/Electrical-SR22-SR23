@@ -36,6 +36,11 @@ class CScreensController {
         void OnButtonPress();
         void OnMessage(String message);
         void OnNewLap();
+        
+        /**
+         *  Returns true if the a notification/message state is active
+         */
+        bool IsNotificationActive() const {return mState == Notification || mState == LapTime; }
 
 
     private:

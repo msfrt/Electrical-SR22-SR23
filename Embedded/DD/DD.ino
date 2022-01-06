@@ -13,8 +13,8 @@
 #define READ_RESOLUTION_BITS 12
 
 // can bus decleration
-FlexCAN_T4<CAN1, RX_SIZE_256, TX_SIZE_16> cbus1;
-FlexCAN_T4<CAN2, RX_SIZE_256, TX_SIZE_16> cbus2;
+FlexCAN_T4<CAN1, RX_SIZE_256, TX_SIZE_16> can1;
+FlexCAN_T4<CAN2, RX_SIZE_256, TX_SIZE_16> can2;
 static CAN_message_t rxmsg;
 // each bus has a total of 64 mailboxes
 #define NUM_RX_STD_MAILBOXES 60
@@ -36,19 +36,19 @@ EasyTimer board_temp_sample_timer(10);
 
 
 // NeoPixel parameters
-const int pixels_top_pin = 3; // teensy pin #
-const int pixels_left_pin= 2;
-const int pixels_right_pin = 4;
-const int pixels_top_cnt = 16; // number of LEDs
-const int pixels_left_cnt = 4;
-const int pixels_right_cnt = 4;
-      int pixel_brightness_percent = 5; // 0 - 100; 100 is blinding... 4 is the minimum for all LED bar colors to work
-const int pixel_brightness_nighttime = 1; // %
-const int pixel_brightness_daytime = 55; // %
+const int pixelsTopPin = 3; // teensy pin #
+const int pixelsLeftPin= 2;
+const int pixelsRightPin = 4;
+const int pixelsTopCount = 16; // number of LEDs
+const int pixelsLeftCount = 4;
+const int pixelsRightCount = 4;
+      int pixelsBrightnessPercent = 5; // 0 - 100; 100 is blinding... 4 is the minimum for all LED bar colors to work
+const int pixelsBrightnessNight = 1; // %
+const int pixelsBrightnessDay = 55; // %
 
-Adafruit_NeoPixel pixels_top =   Adafruit_NeoPixel(pixels_top_cnt,   pixels_top_pin,   NEO_GRB + NEO_KHZ800);
-Adafruit_NeoPixel pixels_left =  Adafruit_NeoPixel(pixels_left_cnt,  pixels_left_pin,  NEO_GRB + NEO_KHZ800);
-Adafruit_NeoPixel pixels_right = Adafruit_NeoPixel(pixels_right_cnt, pixels_right_pin, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel pixelsTop =   Adafruit_NeoPixel(pixelsTopCount,   pixelsTopPin,   NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel pixelsLeft =  Adafruit_NeoPixel(pixelsLeftCount,  pixelsLeftPin,  NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel pixelsRight = Adafruit_NeoPixel(pixelsRightCount, pixelsRightPin, NEO_GRB + NEO_KHZ800);
 
 // TFT display paramters
 #define TFTL_DC 18
@@ -58,7 +58,7 @@ Adafruit_NeoPixel pixels_right = Adafruit_NeoPixel(pixels_right_cnt, pixels_righ
 #define TFTL_CLK 13
 #define TFTL_RST 19
 #define TFTL_BL 6
-    int display_left_brightness_percent = 100;
+    int displayLeft_brightness_percent = 100;
 
 
 #define TFTR_DC 5
@@ -68,17 +68,17 @@ Adafruit_NeoPixel pixels_right = Adafruit_NeoPixel(pixels_right_cnt, pixels_righ
 #define TFTR_CLK 13
 #define TFTR_RST 17
 #define TFTR_BL 7
-    int display_right_brightness_percent = 100;
+    int displayRight_brightness_percent = 100;
 
 
 
 // used for light-sensor dimming
-const int display_brightness_percent_nighttime = 75;
-const int display_brightness_percent_daytime = 100;
+const int displayBrightnessPercentNight = 75;
+const int displayBrightnessPercentDay = 100;
 
 
-ILI9341_t3n display_left = ILI9341_t3n(TFTL_CS, TFTL_DC, TFTL_RST);
-ILI9341_t3n display_right = ILI9341_t3n(TFTR_CS, TFTR_DC, TFTR_RST);
+ILI9341_t3n displayLeft = ILI9341_t3n(TFTL_CS, TFTL_DC, TFTL_RST);
+ILI9341_t3n displayRight = ILI9341_t3n(TFTR_CS, TFTR_DC, TFTR_RST);
 
 
 // keep track of the time elapsed between loop iterations
@@ -86,11 +86,15 @@ unsigned long previousUpdateTime = 0;
 
 
 // pins for the steering wheel buttons
-const int button1_pin = 14;
-const int button2_pin = 15;
-unsigned long button1_time = 0;
-unsigned long button2_time = 0 ;
-const unsigned long button_delay = 300; // @GLOBAL_PARAM - milliseconds - used in check_button to avoid double-presses
+const int button1Pin = 14;
+const int button2Pin = 15;
+int button1State = HIGH;
+int button2State = LOW;
+int button1StatePrev = HIGH;
+int button2StatePrev = LOW;
+unsigned long button1Time = 0;
+unsigned long button2Time = 0 ;
+const unsigned long buttonDebounceDelay = 100; // @GLOBAL_PARAM - milliseconds - used in check_button to avoid double-presses
 
 
 // CAN message and read definitions
@@ -99,7 +103,7 @@ const unsigned long button_delay = 300; // @GLOBAL_PARAM - milliseconds - used i
 
 
 #include "LightSensor.hpp"
-const int light_sensor_pin = 20;
+const int lightSensorPin = 20;
 
 
 EasyTimer debug(50); // debugging timer
@@ -123,9 +127,9 @@ EasyTimer debug(50); // debugging timer
 #include "LightBarController.hpp"
 
 
-CScreensController screensController(display_left, display_right);
-CLightBarController lightsController(pixels_left, pixels_top, pixels_right);
-//CScreenInfo testScreen(display_left, DISPLAY_WIDTH, DISPLAY_HEIGHT);
+CScreensController screensController(displayLeft, displayRight);
+CLightBarController lightsController(pixelsLeft, pixelsTop, pixelsRight);
+//CScreenInfo testScreen(displayLeft, DISPLAY_WIDTH, DISPLAY_HEIGHT);
 
 
 void setup() {
@@ -141,10 +145,10 @@ void setup() {
   analogReadResolution(READ_RESOLUTION_BITS);
 
   // initilize CAN busses
-  cbus1.begin();
-  cbus1.setBaudRate(1000000);
-  cbus2.begin();
-  cbus2.setBaudRate(1000000);
+  can1.begin();
+  can1.setBaudRate(1000000);
+  can2.begin();
+  can2.setBaudRate(1000000);
   set_mailboxes();
 
 
@@ -153,44 +157,44 @@ void setup() {
   Serial.begin(115200);
 
   // init top pixels
-  pixels_top.setBrightness(map(pixel_brightness_percent, 0, 100, 0, 255));
-  pixels_top.begin();
-  pixels_top.show();
+  pixelsTop.setBrightness(map(pixelsBrightnessPercent, 0, 100, 0, 255));
+  pixelsTop.begin();
+  pixelsTop.show();
   // init right pixels
-  pixels_right.setBrightness(map(pixel_brightness_percent, 0, 100, 0, 255));
-  pixels_right.begin();
-  pixels_right.show();
+  pixelsRight.setBrightness(map(pixelsBrightnessPercent, 0, 100, 0, 255));
+  pixelsRight.begin();
+  pixelsRight.show();
   // init left pixels
-  pixels_left.setBrightness(map(pixel_brightness_percent, 0, 100, 0, 255));
-  pixels_left.begin();
-  pixels_left.show();
+  pixelsLeft.setBrightness(map(pixelsBrightnessPercent, 0, 100, 0, 255));
+  pixelsLeft.begin();
+  pixelsLeft.show();
 
   // initialize screens
-  display_left.begin();
-  display_right.begin();
-  display_left.setRotation(3);
-  display_right.setRotation(1);
+  displayLeft.begin();
+  displayRight.begin();
+  displayLeft.setRotation(3);
+  displayRight.setRotation(1);
   // clear screen
-  display_left.fillScreen(ILI9341_BLACK);
-  display_right.fillScreen(ILI9341_BLACK);
+  displayLeft.fillScreen(ILI9341_BLACK);
+  displayRight.fillScreen(ILI9341_BLACK);
 
   // Set the state racing bitmap
   #include "images/StateRacingBitmap.hpp"
   // draw state racing bitmap
   int stateRacingPosY = (DISPLAY_HEIGHT - stateRacingBitmapHeight) / 2;
   int stateRacingPosX = (DISPLAY_WIDTH  - stateRacingBitmapWidth ) / 2;
-  display_left.drawBitmap(stateRacingPosX, stateRacingPosY, stateRacingBitmap, stateRacingBitmapWidth, stateRacingBitmapHeight, ILI9341_WHITE);
-  display_right.drawBitmap(stateRacingPosX, stateRacingPosY, stateRacingBitmap, stateRacingBitmapWidth, stateRacingBitmapHeight, ILI9341_WHITE);
+  displayLeft.drawBitmap(stateRacingPosX, stateRacingPosY, stateRacingBitmap, stateRacingBitmapWidth, stateRacingBitmapHeight, ILI9341_WHITE);
+  displayRight.drawBitmap(stateRacingPosX, stateRacingPosY, stateRacingBitmap, stateRacingBitmapWidth, stateRacingBitmapHeight, ILI9341_WHITE);
 
 
   // quick led startup animation
-  LedStartup(pixels_top, pixels_left, pixels_right, 1);
+  LedStartup(pixelsTop, pixelsLeft, pixelsRight, 1);
+  
+  // initialize buttons
+  pinMode(button1Pin, INPUT_PULLUP);
+  pinMode(button2Pin, INPUT_PULLUP);
   
 
-  // initialize buttons
-  pinMode(button1_pin, INPUT_PULLUP);
-  pinMode(button2_pin, INPUT_PULLUP);
-  
   screensController.Initialize();
   lightsController.Initialize();
 
@@ -198,7 +202,7 @@ void setup() {
 
   debug.set_delay_millis(10000);
 
-  cbus1.mailboxStatus();
+  can1.mailboxStatus();
 
 
 }
@@ -210,26 +214,46 @@ void loop() {
 
   unsigned long elapsed = millis() - previousUpdateTime;
   previousUpdateTime = millis();
+
+  // check the buttons. If neither are in a notification state, advance both. However, if one IS in a
+  // notification state, only advance that one to get rid of the notification
+  if (checkButton(button1Pin, button1State, button1StatePrev, button1Time, buttonDebounceDelay)){
+
+    // only the screen
+    if (screensController.IsNotificationActive() && !lightsController.IsNotificationActive()){
+      screensController.OnButtonPress();
+
+    // only the lights
+    } else if (!screensController.IsNotificationActive() && lightsController.IsNotificationActive()){
+      lightsController.OnButtonPress();
+
+    // both
+    } else {
+      screensController.OnButtonPress();
+      lightsController.OnButtonPress();
+
+    }
+  }
   
 
   // read any incoming CAN messages
   // Serial.println("Reading CAN:");
-  read_can();
-  // cbus1.events();
+  readCan();
+  // can1.events();
 
 
   // sample the light sensor and update the brightness if percent returned is > -1
-  int lightPercentage = LightSensor(light_sensor_pin, READ_RESOLUTION_BITS);
+  int lightPercentage = LightSensor(lightSensorPin, READ_RESOLUTION_BITS);
   if (lightPercentage > -1){
-      int pixelBrightnessPercent = map(lightPercentage, 0, 100, pixel_brightness_nighttime, pixel_brightness_daytime);
-      int displayBrightnessPercent = map(lightPercentage, 0, 100, display_brightness_percent_nighttime, display_brightness_percent_daytime);
+      int pixelBrightnessPercent = map(lightPercentage, 0, 100, pixelsBrightnessNight, pixelsBrightnessDay);
+      int displayBrightnessPercent = map(lightPercentage, 0, 100, displayBrightnessPercentNight, displayBrightnessPercentDay);
 
       // update brightness
       analogWrite(TFTL_BL, map(displayBrightnessPercent, 0, 100, 0, 255));
       analogWrite(TFTR_BL, map(displayBrightnessPercent, 0, 100, 0, 255));
-      pixels_top.setBrightness(map(pixelBrightnessPercent, 0, 100, 0, 255));
-      pixels_left.setBrightness(map(pixelBrightnessPercent, 0, 100, 0, 255));
-      pixels_right.setBrightness(map(pixelBrightnessPercent, 0, 100, 0, 255));
+      pixelsTop.setBrightness(map(pixelBrightnessPercent, 0, 100, 0, 255));
+      pixelsLeft.setBrightness(map(pixelBrightnessPercent, 0, 100, 0, 255));
+      pixelsRight.setBrightness(map(pixelBrightnessPercent, 0, 100, 0, 255));
   }
 
   
@@ -269,7 +293,7 @@ void loop() {
   if (debug.isup()){
     //screensController.OnButtonPress();
     //lightsController.OnButtonPress();
-    //cbus1.mailboxStatus();
+    //can1.mailboxStatus();
   }
   
 
@@ -292,64 +316,60 @@ void set_mailboxes(){
   // to view mailbox status, you can use the member function mailboxStatus(). Don't put it in a fast loop, though,
   // because you may actually affect how the chips moves things around
 
-  cbus1.setMaxMB(64);  // use all mailboxes of course
-  cbus2.setMaxMB(64);
+  can1.setMaxMB(64);  // use all mailboxes of course
+  can2.setMaxMB(64);
 
   for (int i=0; i<NUM_RX_STD_MAILBOXES; i++){
-    cbus1.setMB((FLEXCAN_MAILBOX)i, RX, STD);
-    cbus2.setMB((FLEXCAN_MAILBOX)i, RX, STD);
+    can1.setMB((FLEXCAN_MAILBOX)i, RX, STD);
+    can2.setMB((FLEXCAN_MAILBOX)i, RX, STD);
   }
   for (int i=NUM_RX_STD_MAILBOXES; i<(NUM_RX_STD_MAILBOXES + NUM_RX_EXT_MAILBOXES); i++){
-    cbus1.setMB((FLEXCAN_MAILBOX)i, RX, EXT);
-    cbus2.setMB((FLEXCAN_MAILBOX)i, RX, EXT);
+    can1.setMB((FLEXCAN_MAILBOX)i, RX, EXT);
+    can2.setMB((FLEXCAN_MAILBOX)i, RX, EXT);
   }
   for (int i=(NUM_RX_STD_MAILBOXES + NUM_RX_EXT_MAILBOXES); i<(NUM_RX_STD_MAILBOXES + NUM_RX_EXT_MAILBOXES + NUM_TX_MAILBOXES); i++){
-    cbus1.setMB((FLEXCAN_MAILBOX)i, TX, STD);
-    cbus2.setMB((FLEXCAN_MAILBOX)i, TX, STD);
+    can1.setMB((FLEXCAN_MAILBOX)i, TX, STD);
+    can2.setMB((FLEXCAN_MAILBOX)i, TX, STD);
   }
 
   // be sure to assign at least one mailbox to each message that you want to read.
   // filtering allows us to avoid using clock cycles to read messages that we have no interest in.
   // it also reserves a slot for messages as they are recieved.
-  cbus1.setMBFilter(REJECT_ALL);
-  cbus1.setMBFilter(MB0, TCGPS_laptrigger.get_msg_id());
-  cbus1.setMBFilter(MB1, C50_tcSet.get_msg_id());
-  cbus1.setMBFilter(MB2, M400_groundSpeed.get_msg_id());
-  cbus1.setMBFilter(MB3, M400_rpm.get_msg_id());
-  cbus1.setMBFilter(MB4, M400_oilPressure.get_msg_id());
-  cbus1.setMBFilter(MB5, M400_oilTemp.get_msg_id());
-  cbus1.setMBFilter(MB6, CMD_driverMessageChar0.get_msg_id());
-  cbus1.setMBFilter(MB7, CMD_driverNotificationLightR.get_msg_id());
-  cbus1.setMBFilter(MB8, 0);
-  cbus1.setMBFilter(MB9, 0);
-  cbus1.setMBFilter(MB10, 0);
-  cbus1.setMBFilter(MB11, 0);
-  cbus1.setMBFilter(MB12, 0);
-  cbus1.setMBFilter(MB13, 0);
-  cbus1.setMBFilter(MB14, 0);
+  can1.setMBFilter(REJECT_ALL);
+  can1.setMBFilter(MB0, TCGPS_laptrigger.get_msg_id());
+  can1.setMBFilter(MB1, C50_tcSet.get_msg_id());
+  can1.setMBFilter(MB2, M400_groundSpeed.get_msg_id());
+  can1.setMBFilter(MB3, M400_rpm.get_msg_id());
+  can1.setMBFilter(MB4, M400_oilPressure.get_msg_id());
+  can1.setMBFilter(MB5, M400_oilTemp.get_msg_id());
+  can1.setMBFilter(MB6, CMD_driverMessageChar0.get_msg_id());
+  can1.setMBFilter(MB7, CMD_driverNotificationLightR.get_msg_id());
+  can1.setMBFilter(MB8, 0);
+  can1.setMBFilter(MB9, 0);
+  can1.setMBFilter(MB10, 0);
+  can1.setMBFilter(MB11, 0);
+  can1.setMBFilter(MB12, 0);
+  can1.setMBFilter(MB13, 0);
+  can1.setMBFilter(MB14, 0);
 
 
+  can2.setMBFilter(REJECT_ALL);
+  can2.setMBFilter(MB0, PDM_pdmVoltAvg.get_msg_id());
+  can2.setMBFilter(MB1, ATCCF_brakeBias.get_msg_id());
+  can2.setMBFilter(MB2, ATCCF_rotorTempFL.get_msg_id()); // includes FR
+  can2.setMBFilter(MB3, ATCCR_rotorTempRL.get_msg_id());  // includes FR
+  can2.setMBFilter(MB4, PDM_coolingOverrideActive.get_msg_id());
+  can2.setMBFilter(MB5, 0);
+  can2.setMBFilter(MB6, 0);
+  can2.setMBFilter(MB7, 0);
+  can2.setMBFilter(MB8, 0);
+  can2.setMBFilter(MB9, 0);
+  can2.setMBFilter(MB10, 0);
+  can2.setMBFilter(MB11, 0);
+  can2.setMBFilter(MB12, 0);
+  can2.setMBFilter(MB13, 0);
+  can2.setMBFilter(MB14, 0);
   
-  cbus2.setMBFilter(REJECT_ALL);
-  cbus2.setMBFilter(MB0, PDM_pdmVoltAvg.get_msg_id());
-  cbus2.setMBFilter(MB1, ATCCF_brakeBias.get_msg_id());
-  cbus2.setMBFilter(MB2, ATCCF_rotorTempFL.get_msg_id()); // includes FR
-  cbus2.setMBFilter(MB3, ATCCR_rotorTempRL.get_msg_id());  // includes FR
-  cbus2.setMBFilter(MB4, PDM_coolingOverrideActive.get_msg_id());
-  cbus2.setMBFilter(MB5, 0);
-  cbus2.setMBFilter(MB6, 0);
-  cbus2.setMBFilter(MB7, 0);
-  cbus2.setMBFilter(MB8, 0);
-  cbus2.setMBFilter(MB9, 0);
-  cbus2.setMBFilter(MB10, 0);
-  cbus2.setMBFilter(MB11, 0);
-  cbus2.setMBFilter(MB12, 0);
-  cbus2.setMBFilter(MB13, 0);
-  cbus2.setMBFilter(MB14, 0);
-  
-
-  
-
 }
 
 
@@ -357,19 +377,58 @@ void set_mailboxes(){
  *  Reads a CAN message if available and then sends it to thr
  *  proper decoding funciton
  **/
-void read_can(){
+void readCan(){
 
   int count = 0;
-  while (cbus1.read(rxmsg) && count < MAX_CAN_FRAME_READ_PER_CYCLE){
+  while (can1.read(rxmsg) && count < MAX_CAN_FRAME_READ_PER_CYCLE){
     decode_CAN1(rxmsg);
     count++;
   }
 
   count = 0;
-  while (cbus2.read(rxmsg) && count < MAX_CAN_FRAME_READ_PER_CYCLE){
+  while (can2.read(rxmsg) && count < MAX_CAN_FRAME_READ_PER_CYCLE){
     decode_CAN2(rxmsg);
     count++;
   }
+
+}
+
+
+// debounce code taken from https://www.arduino.cc/en/Tutorial/BuiltInExamples/Debounce
+bool checkButton(int buttonPin, int &buttonState, int &buttonStatePrev, unsigned long &buttonPressTime, unsigned int debounceDelay){
+
+  bool returnVal = false;
+
+  int reading = digitalRead(buttonPin);
+
+  // check to see if you just pressed the button
+  // (i.e. the input went from LOW to HIGH), and you've waited long enough
+  // since the last press to ignore any noise:
+
+  // If the switch changed, due to noise or pressing:
+  if (reading != buttonStatePrev) {
+    // reset the debouncing timer
+    Serial.println("reset");
+    buttonPressTime = millis();
+  }
+
+  if ((millis() - buttonPressTime) > debounceDelay) {
+    // whatever the reading is at, it's been there for longer than the debounce
+    // delay, so take it as the actual current state:
+
+    // if the button state has changed:
+    if (reading != buttonState) {
+      buttonState = reading;
+
+      // only return true if the new button state is LOW
+      if (buttonState == LOW) {
+        returnVal = true;
+      }
+    }
+  }
+
+  buttonStatePrev = reading;
+  return returnVal;
 
 }
 
