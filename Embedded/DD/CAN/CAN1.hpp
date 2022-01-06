@@ -47,8 +47,8 @@ StateSignal C50_m400ExhaustGasTemp2(16, true, 10, 0.0, 0, 0, 0.0, 0, 120);
 StateSignal C50_tcSet(16, true, 1, 0.0, 0, 0, 0.0, 0, 120);
 StateSignal C50_m400ExhaustGasTemp3(16, true, 10, 0.0, 0, 0, 0.0, 0, 120);
 
-// Message: TCGPS_11 [0xa1]
-StateSignal TCGPS_laptrigger(8, true, 1, 0.0, 0, 0, 0.0, 0, 161);
+// Message: VCU_11 [0xa1]
+StateSignal VCU_laptrigger(8, true, 1, 0.0, 0, 0, 0.0, 0, 161);
 
 // Message: MM5_02 [0x17c]
 StateSignal MM5_Az(16, false, -7849, -4.1745795, 0, 0, 0.0, 0, 380);
@@ -229,12 +229,12 @@ void read_C50_m400Data(const CAN_message_t &imsg) {
 }
 
 /*
- * Decode a CAN frame for the message TCGPS_11
+ * Decode a CAN frame for the message VCU_11
  * \param imsg A reference to the incoming CAN message frame
  */
-void read_TCGPS_11(const CAN_message_t &imsg) {
+void read_VCU_11(const CAN_message_t &imsg) {
 
-	TCGPS_laptrigger.set_can_value((imsg.buf[0]));
+	VCU_laptrigger.set_can_value((imsg.buf[0]));
 
 }
 
@@ -489,7 +489,7 @@ void decode_CAN1(const CAN_message_t &imsg) {
 			break;
 
 		case 161:
-			read_TCGPS_11(imsg);
+			read_VCU_11(imsg);
 			break;
 
 		case 380:

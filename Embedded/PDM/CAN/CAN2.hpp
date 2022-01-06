@@ -57,10 +57,10 @@ StateSignal PDM_fanRightDutyCycle(8, false, 1, 0.0, 0, 100, 0.0, 0, 274);
 StateSignal PDM_wpPWM(8, false, 1, 0.0, 0, 255, 0.0, 0, 274);
 StateSignal PDM_teensyTemp(16, true, 10, 0.0, -5, 20, 0.0, 0, 274);
 
-// Message: TCGPS_10 [0xa0]
-StateSignal TCGPS_counterMsg160(4, false, 1, 0.0, 0, 15, 0.0, 0, 160);
-StateSignal TCGPS_boardTemp(16, true, 10, 0.0, 0, 150, 0.0, 0, 160);
-StateSignal TCGPS_teensyTemp(16, true, 10, 0.0, 0, 150, 0.0, 0, 160);
+// Message: VCU_10 [0xa0]
+StateSignal VCU_counterMsg160(4, false, 1, 0.0, 0, 15, 0.0, 0, 160);
+StateSignal VCU_boardTemp(16, true, 10, 0.0, 0, 150, 0.0, 0, 160);
+StateSignal VCU_teensyTemp(16, true, 10, 0.0, 0, 150, 0.0, 0, 160);
 
 // Message: DD_10 [0x2c6]
 StateSignal DD_counterMsg210(4, false, 1, 0.0, 0, 15, 0.0, 0, 710);
@@ -326,14 +326,14 @@ void read_PDM_24(const CAN_message_t &imsg) {
 }
 
 /*
- * Decode a CAN frame for the message TCGPS_10
+ * Decode a CAN frame for the message VCU_10
  * \param imsg A reference to the incoming CAN message frame
  */
-void read_TCGPS_10(const CAN_message_t &imsg) {
+void read_VCU_10(const CAN_message_t &imsg) {
 
-	TCGPS_counterMsg160.set_can_value(((imsg.buf[0] & 0b00001111)));
-	TCGPS_boardTemp.set_can_value((imsg.buf[2]) | (imsg.buf[3] << 8));
-	TCGPS_teensyTemp.set_can_value((imsg.buf[4]) | (imsg.buf[5] << 8));
+	VCU_counterMsg160.set_can_value(((imsg.buf[0] & 0b00001111)));
+	VCU_boardTemp.set_can_value((imsg.buf[2]) | (imsg.buf[3] << 8));
+	VCU_teensyTemp.set_can_value((imsg.buf[4]) | (imsg.buf[5] << 8));
 
 }
 
@@ -726,7 +726,7 @@ void decode_CAN2(const CAN_message_t &imsg) {
 			break;
 
 		case 160:
-			read_TCGPS_10(imsg);
+			read_VCU_10(imsg);
 			break;
 
 		case 710:

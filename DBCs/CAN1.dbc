@@ -70,8 +70,8 @@ BO_ 120 C50_m400Data: 8 Vector__XXX
  SG_ C50_m400ExhaustGasTemp2 m0 : 39|16@0- (0.1,0) [0|0] "" Vector__XXX
  SG_ C50_m400ExhaustGasTemp1 m0 : 23|16@0- (0.1,0) [0|0] "" Vector__XXX
 
-BO_ 161 TCGPS_11: 8 Vector__XXX
- SG_ TCGPS_laptrigger : 0|8@1- (1,0) [0|0] "bool" Vector__XXX
+BO_ 161 VCU_11: 8 Vector__XXX
+ SG_ VCU_laptrigger : 0|8@1- (1,0) [0|0] "bool" Vector__XXX
 
 BO_ 380 MM5_02: 8 MM5
  SG_ MM5_Az : 32|16@1+ (-0.0001274,-4.1745795) [0|0] "" Vector__XXX
@@ -169,7 +169,7 @@ CM_ BO_ 121 "gps lattitude and longitude";
 CM_ SG_ 121 C50_gps_long "Longitude in NDEG - +/-[degree][min].[sec/60]";
 CM_ SG_ 121 C50_gps_lat "Latitude in NDEG - +/-[degree][min].[sec/60] ";
 CM_ SG_ 120 C50rowCounterM400Data "Multiplexer Row Counter for M400 Custom Data Set 2";
-CM_ SG_ 161 TCGPS_laptrigger "100 = sucess";
+CM_ SG_ 161 VCU_laptrigger "100 = sucess";
 CM_ SG_ 101 M400_oilTemp "Oil Temp ";
 CM_ SG_ 101 M400_oilPressure "Oil Pressure ";
 CM_ SG_ 101 M400_manifoldPressure "Manifold Pressure ";

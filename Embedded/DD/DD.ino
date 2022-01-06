@@ -281,7 +281,7 @@ void loop() {
   }
 
   // the laptrigger was set
-  if (TCGPS_laptrigger.is_updated() && static_cast<int>(TCGPS_laptrigger.value()) == 100){
+  if (VCU_laptrigger.is_updated() && static_cast<int>(VCU_laptrigger.value()) == 100){
     screensController.OnNewLap();
   }
 
@@ -336,7 +336,7 @@ void set_mailboxes(){
   // filtering allows us to avoid using clock cycles to read messages that we have no interest in.
   // it also reserves a slot for messages as they are recieved.
   can1.setMBFilter(REJECT_ALL);
-  can1.setMBFilter(MB0, TCGPS_laptrigger.get_msg_id());
+  can1.setMBFilter(MB0, VCU_laptrigger.get_msg_id());
   can1.setMBFilter(MB1, C50_tcSet.get_msg_id());
   can1.setMBFilter(MB2, M400_groundSpeed.get_msg_id());
   can1.setMBFilter(MB3, M400_rpm.get_msg_id());
@@ -408,7 +408,6 @@ bool checkButton(int buttonPin, int &buttonState, int &buttonStatePrev, unsigned
   // If the switch changed, due to noise or pressing:
   if (reading != buttonStatePrev) {
     // reset the debouncing timer
-    Serial.println("reset");
     buttonPressTime = millis();
   }
 
