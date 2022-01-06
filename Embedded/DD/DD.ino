@@ -1,13 +1,14 @@
 // Dave Yonkers, 2022
 
 #include <Adafruit_NeoPixel.h>
-#include <StateCAN.h>
-#include <FlexCAN_T4.h>
-#include <EasyTimer.h>
 #include <BoardTemp.h>
-#include "SPI.h"
+#include <EasyTimer.h>
+#include <FlexCAN_T4.h>
+#include <StateCAN.h>
+
 #include "Adafruit_GFX.h"
 #include "ILI9341_t3n.h"
+#include "SPI.h"
 #define SPI0_DISP1
 
 #define READ_RESOLUTION_BITS 12
@@ -20,35 +21,38 @@ static CAN_message_t rxmsg;
 #define NUM_RX_STD_MAILBOXES 60
 #define NUM_RX_EXT_MAILBOXES 2
 #define NUM_TX_MAILBOXES 2
-// limit the number of messages each bus can read for each loop cycle. Typically, only one
-// message is recieved in the time that the loop can run, but a buildup can occur, and this
-// limit can poll the bus to read messages while not getting stuck in an infinite loop
+// limit the number of messages each bus can read for each loop cycle.
+// Typically, only one message is recieved in the time that the loop can run,
+// but a buildup can occur, and this limit can poll the bus to read messages
+// while not getting stuck in an infinite loop
 #define MAX_CAN_FRAME_READ_PER_CYCLE 5
 
 // BoardTemp(int pin, int read_bits, int temp_cal, int mv_cal);
 BoardTempDiode board_temp(21, READ_RESOLUTION_BITS, 26.2, 598);
 EasyTimer board_temp_sample_timer(10);
 
-
 // fonts :)
 #include "fonts/LiberationMonoBold.h"
 #include "fonts/LiberationMonoBoldItalic.h"
 
-
 // NeoPixel parameters
-const int pixelsTopPin = 3; // teensy pin #
-const int pixelsLeftPin= 2;
+const int pixelsTopPin = 3;  // teensy pin #
+const int pixelsLeftPin = 2;
 const int pixelsRightPin = 4;
-const int pixelsTopCount = 16; // number of LEDs
+const int pixelsTopCount = 16;  // number of LEDs
 const int pixelsLeftCount = 4;
 const int pixelsRightCount = 4;
-      int pixelsBrightnessPercent = 5; // 0 - 100; 100 is blinding... 4 is the minimum for all LED bar colors to work
-const int pixelsBrightnessNight = 1; // %
-const int pixelsBrightnessDay = 55; // %
+int pixelsBrightnessPercent = 5;      // 0 - 100; 100 is blinding... 4 is the
+                                      // minimum for all LED bar colors to work
+const int pixelsBrightnessNight = 1;  // %
+const int pixelsBrightnessDay = 55;   // %
 
-Adafruit_NeoPixel pixelsTop =   Adafruit_NeoPixel(pixelsTopCount,   pixelsTopPin,   NEO_GRB + NEO_KHZ800);
-Adafruit_NeoPixel pixelsLeft =  Adafruit_NeoPixel(pixelsLeftCount,  pixelsLeftPin,  NEO_GRB + NEO_KHZ800);
-Adafruit_NeoPixel pixelsRight = Adafruit_NeoPixel(pixelsRightCount, pixelsRightPin, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel pixelsTop =
+    Adafruit_NeoPixel(pixelsTopCount, pixelsTopPin, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel pixelsLeft =
+    Adafruit_NeoPixel(pixelsLeftCount, pixelsLeftPin, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel pixelsRight =
+    Adafruit_NeoPixel(pixelsRightCount, pixelsRightPin, NEO_GRB + NEO_KHZ800);
 
 // TFT display paramters
 #define TFTL_DC 18
@@ -58,8 +62,7 @@ Adafruit_NeoPixel pixelsRight = Adafruit_NeoPixel(pixelsRightCount, pixelsRightP
 #define TFTL_CLK 13
 #define TFTL_RST 19
 #define TFTL_BL 6
-    int displayLeft_brightness_percent = 100;
-
+int displayLeft_brightness_percent = 100;
 
 #define TFTR_DC 5
 #define TFTR_CS 9
@@ -68,22 +71,17 @@ Adafruit_NeoPixel pixelsRight = Adafruit_NeoPixel(pixelsRightCount, pixelsRightP
 #define TFTR_CLK 13
 #define TFTR_RST 17
 #define TFTR_BL 7
-    int displayRight_brightness_percent = 100;
-
-
+int displayRight_brightness_percent = 100;
 
 // used for light-sensor dimin_g
 const int displayBrightnessPercentNight = 75;
 const int displayBrightnessPercentDay = 100;
 
-
 ILI9341_t3n displayLeft = ILI9341_t3n(TFTL_CS, TFTL_DC, TFTL_RST);
 ILI9341_t3n displayRight = ILI9341_t3n(TFTR_CS, TFTR_DC, TFTR_RST);
 
-
 // keep track of the time elapsed between loop iterations
 unsigned long previousUpdateTime = 0;
-
 
 // pins for the steering wheel buttons
 const int button1Pin = 14;
@@ -93,20 +91,18 @@ int button2State = LOW;
 int button1StatePrev = HIGH;
 int button2StatePrev = LOW;
 unsigned long button1Time = 0;
-unsigned long button2Time = 0 ;
-const unsigned long buttonDebounceDelay = 100; // @GLOBAL_PARAM - milliseconds - used in check_button to avoid double-presses
-
+unsigned long button2Time = 0;
+const unsigned long buttonDebounceDelay =
+    100;  // @GLOBAL_PARAM - milliseconds - used in check_button to avoid
+          // double-presses
 
 // CAN message and read definitions
 #include "CAN/CAN1.hpp"
 #include "CAN/CAN2.hpp"
-
-
 #include "LightSensor.hpp"
 const int lightSensorPin = 20;
 
-
-EasyTimer debug(50); // debugging timer
+EasyTimer debug(50);  // debugging timer
 
 // used for dynamically changing clock speed :-)))
 // #if defined(__IMXRT1062__)
@@ -116,24 +112,20 @@ EasyTimer debug(50); // debugging timer
 // include externally-written functions
 #include "LedStartup.hpp"
 
-
 // classes for control
 //#include "classes/ScreenController.h"
+#include "LightBarBlink.hpp"
+#include "LightBarController.hpp"
+#include "LightBarRPM.hpp"
 #include "Screen.hpp"
 #include "ScreenInfo.hpp"
 #include "ScreensController.hpp"
-#include "LightBarRPM.hpp"
-#include "LightBarBlink.hpp"
-#include "LightBarController.hpp"
-
 
 ScreensController screensController(displayLeft, displayRight);
 LightBarController lightsController(pixelsLeft, pixelsTop, pixelsRight);
-//ScreenInfo testScreen(displayLeft, DISPLAY_WIDTH, DISPLAY_HEIGHT);
-
+// ScreenInfo testScreen(displayLeft, DISPLAY_WIDTH, DISPLAY_HEIGHT);
 
 void setup() {
-
   // dynamically change clock speed
   // #if defined(__IMXRT1062__)
   //   set_arm_clock(45000000);
@@ -150,8 +142,6 @@ void setup() {
   can2.begin();
   can2.setBaudRate(1000000);
   set_mailboxes();
-
-
 
   // initialze serial coms
   Serial.begin(115200);
@@ -178,22 +168,24 @@ void setup() {
   displayLeft.fillScreen(ILI9341_BLACK);
   displayRight.fillScreen(ILI9341_BLACK);
 
-  // Set the state racing bitmap
-  #include "images/StateRacingBitmap.hpp"
+// Set the state racing bitmap
+#include "images/StateRacingBitmap.hpp"
   // draw state racing bitmap
   int stateRacingPosY = (DISPLAY_HEIGHT - stateRacingBitmapHeight) / 2;
-  int stateRacingPosX = (DISPLAY_WIDTH  - stateRacingBitmapWidth ) / 2;
-  displayLeft.drawBitmap(stateRacingPosX, stateRacingPosY, stateRacingBitmap, stateRacingBitmapWidth, stateRacingBitmapHeight, ILI9341_WHITE);
-  displayRight.drawBitmap(stateRacingPosX, stateRacingPosY, stateRacingBitmap, stateRacingBitmapWidth, stateRacingBitmapHeight, ILI9341_WHITE);
-
+  int stateRacingPosX = (DISPLAY_WIDTH - stateRacingBitmapWidth) / 2;
+  displayLeft.drawBitmap(stateRacingPosX, stateRacingPosY, stateRacingBitmap,
+                         stateRacingBitmapWidth, stateRacingBitmapHeight,
+                         ILI9341_WHITE);
+  displayRight.drawBitmap(stateRacingPosX, stateRacingPosY, stateRacingBitmap,
+                          stateRacingBitmapWidth, stateRacingBitmapHeight,
+                          ILI9341_WHITE);
 
   // quick led startup animation
   LedStartup(pixelsTop, pixelsLeft, pixelsRight, 1);
-  
+
   // initialize buttons
   pinMode(button1Pin, INPUT_PULLUP);
   pinMode(button2Pin, INPUT_PULLUP);
-  
 
   screensController.Initialize();
   lightsController.Initialize();
@@ -203,62 +195,59 @@ void setup() {
   debug.set_delay_millis(10000);
 
   can1.mailboxStatus();
-
-
 }
 
-
-
-
 void loop() {
-
   unsigned long elapsed = millis() - previousUpdateTime;
   previousUpdateTime = millis();
 
-  // check the buttons. If neither are in a notification state, advance both. However, if one IS in a
-  // notification state, only advance that one to get rid of the notification
-  if (checkButton(button1Pin, button1State, button1StatePrev, button1Time, buttonDebounceDelay)){
-
+  // check the buttons. If neither are in a notification state, advance both.
+  // However, if one IS in a notification state, only advance that one to get
+  // rid of the notification
+  if (checkButton(button1Pin, button1State, button1StatePrev, button1Time,
+                  buttonDebounceDelay)) {
     // only the screen
-    if (screensController.IsNotificationActive() && !lightsController.IsNotificationActive()){
+    if (screensController.IsNotificationActive() &&
+        !lightsController.IsNotificationActive()) {
       screensController.OnButtonPress();
 
-    // only the lights
-    } else if (!screensController.IsNotificationActive() && lightsController.IsNotificationActive()){
+      // only the lights
+    } else if (!screensController.IsNotificationActive() &&
+               lightsController.IsNotificationActive()) {
       lightsController.OnButtonPress();
 
-    // both
+      // both
     } else {
       screensController.OnButtonPress();
       lightsController.OnButtonPress();
-
     }
   }
-  
 
   // read any incoming CAN messages
   // Serial.println("Reading CAN:");
   readCan();
   // can1.events();
 
-
-  // sample the light sensor and update the brightness if percent returned is > -1
+  // sample the light sensor and update the brightness if percent returned is >
+  // -1
   int lightPercentage = LightSensor(lightSensorPin, READ_RESOLUTION_BITS);
-  if (lightPercentage > -1){
-      int pixelBrightnessPercent = map(lightPercentage, 0, 100, pixelsBrightnessNight, pixelsBrightnessDay);
-      int displayBrightnessPercent = map(lightPercentage, 0, 100, displayBrightnessPercentNight, displayBrightnessPercentDay);
+  if (lightPercentage > -1) {
+    int pixelBrightnessPercent = map(
+        lightPercentage, 0, 100, pixelsBrightnessNight, pixelsBrightnessDay);
+    int displayBrightnessPercent =
+        map(lightPercentage, 0, 100, displayBrightnessPercentNight,
+            displayBrightnessPercentDay);
 
-      // update brightness
-      analogWrite(TFTL_BL, map(displayBrightnessPercent, 0, 100, 0, 255));
-      analogWrite(TFTR_BL, map(displayBrightnessPercent, 0, 100, 0, 255));
-      pixelsTop.setBrightness(map(pixelBrightnessPercent, 0, 100, 0, 255));
-      pixelsLeft.setBrightness(map(pixelBrightnessPercent, 0, 100, 0, 255));
-      pixelsRight.setBrightness(map(pixelBrightnessPercent, 0, 100, 0, 255));
+    // update brightness
+    analogWrite(TFTL_BL, map(displayBrightnessPercent, 0, 100, 0, 255));
+    analogWrite(TFTR_BL, map(displayBrightnessPercent, 0, 100, 0, 255));
+    pixelsTop.setBrightness(map(pixelBrightnessPercent, 0, 100, 0, 255));
+    pixelsLeft.setBrightness(map(pixelBrightnessPercent, 0, 100, 0, 255));
+    pixelsRight.setBrightness(map(pixelBrightnessPercent, 0, 100, 0, 255));
   }
 
-  
   // if there is a new message to display to the driver, assemble and display it
-  if (CMD_driverMessageChar0.is_updated()){
+  if (CMD_driverMessageChar0.is_updated()) {
     char displayStringChars[] = "\0\0\0\0\0\0\0\0\0";
     displayStringChars[0] = CMD_driverMessageChar0.value();
     displayStringChars[1] = CMD_driverMessageChar1.value();
@@ -273,7 +262,7 @@ void loop() {
   }
 
   // notification light message recieved
-  if (CMD_driverNotificationLightR.is_updated()){
+  if (CMD_driverNotificationLightR.is_updated()) {
     int R = CMD_driverNotificationLightR.value();
     int G = CMD_driverNotificationLightG.value();
     int B = CMD_driverNotificationLightB.value();
@@ -281,60 +270,59 @@ void loop() {
   }
 
   // the laptrigger was set
-  if (VCU_laptrigger.is_updated() && static_cast<int>(VCU_laptrigger.value()) == 100){
+  if (VCU_laptrigger.is_updated() &&
+      static_cast<int>(VCU_laptrigger.value()) == 100) {
     screensController.OnNewLap();
   }
 
   screensController.Update(elapsed);
   lightsController.Update(elapsed);
 
-
-
-  if (debug.isup()){
-    //screensController.OnButtonPress();
-    //lightsController.OnButtonPress();
-    //can1.mailboxStatus();
+  if (debug.isup()) {
+    // screensController.OnButtonPress();
+    // lightsController.OnButtonPress();
+    // can1.mailboxStatus();
   }
-  
-
 }
 
-
-void test_callback1(const CAN_message_t &imsg){
-  //Serial.println("Recieved 1");
+void test_callback1(const CAN_message_t &imsg) {
+  // Serial.println("Recieved 1");
   decode_CAN1(imsg);
 }
 
-void test_callback2(const CAN_message_t &imsg){
-  //Serial.println("Recieved 2");
+void test_callback2(const CAN_message_t &imsg) {
+  // Serial.println("Recieved 2");
   decode_CAN1(imsg);
 }
 
-
-void set_mailboxes(){
-
-  // to view mailbox status, you can use the member function mailboxStatus(). Don't put it in a fast loop, though,
-  // because you may actually affect how the chips moves things around
+void set_mailboxes() {
+  // to view mailbox status, you can use the member function mailboxStatus().
+  // Don't put it in a fast loop, though, because you may actually affect how
+  // the chips moves things around
 
   can1.setMaxMB(64);  // use all mailboxes of course
   can2.setMaxMB(64);
 
-  for (int i=0; i<NUM_RX_STD_MAILBOXES; i++){
+  for (int i = 0; i < NUM_RX_STD_MAILBOXES; i++) {
     can1.setMB((FLEXCAN_MAILBOX)i, RX, STD);
     can2.setMB((FLEXCAN_MAILBOX)i, RX, STD);
   }
-  for (int i=NUM_RX_STD_MAILBOXES; i<(NUM_RX_STD_MAILBOXES + NUM_RX_EXT_MAILBOXES); i++){
+  for (int i = NUM_RX_STD_MAILBOXES;
+       i < (NUM_RX_STD_MAILBOXES + NUM_RX_EXT_MAILBOXES); i++) {
     can1.setMB((FLEXCAN_MAILBOX)i, RX, EXT);
     can2.setMB((FLEXCAN_MAILBOX)i, RX, EXT);
   }
-  for (int i=(NUM_RX_STD_MAILBOXES + NUM_RX_EXT_MAILBOXES); i<(NUM_RX_STD_MAILBOXES + NUM_RX_EXT_MAILBOXES + NUM_TX_MAILBOXES); i++){
+  for (int i = (NUM_RX_STD_MAILBOXES + NUM_RX_EXT_MAILBOXES);
+       i < (NUM_RX_STD_MAILBOXES + NUM_RX_EXT_MAILBOXES + NUM_TX_MAILBOXES);
+       i++) {
     can1.setMB((FLEXCAN_MAILBOX)i, TX, STD);
     can2.setMB((FLEXCAN_MAILBOX)i, TX, STD);
   }
 
-  // be sure to assign at least one mailbox to each message that you want to read.
-  // filtering allows us to avoid using clock cycles to read messages that we have no interest in.
-  // it also reserves a slot for messages as they are recieved.
+  // be sure to assign at least one mailbox to each message that you want to
+  // read. filtering allows us to avoid using clock cycles to read messages that
+  // we have no interest in. it also reserves a slot for messages as they are
+  // recieved.
   can1.setMBFilter(REJECT_ALL);
   can1.setMBFilter(MB0, VCU_laptrigger.get_msg_id());
   can1.setMBFilter(MB1, C50_tcSet.get_msg_id());
@@ -352,11 +340,10 @@ void set_mailboxes(){
   can1.setMBFilter(MB13, 0);
   can1.setMBFilter(MB14, 0);
 
-
   can2.setMBFilter(REJECT_ALL);
   can2.setMBFilter(MB0, PDM_pdmVoltAvg.get_msg_id());
   can2.setMBFilter(MB1, ATCCF_brakeBias.get_msg_id());
-  can2.setMBFilter(MB2, ATCCF_rotorTempFL.get_msg_id()); // includes FR
+  can2.setMBFilter(MB2, ATCCF_rotorTempFL.get_msg_id());  // includes FR
   can2.setMBFilter(MB3, ATCCR_rotorTempRL.get_msg_id());  // includes FR
   can2.setMBFilter(MB4, PDM_coolingOverrideActive.get_msg_id());
   can2.setMBFilter(MB5, 0);
@@ -369,34 +356,30 @@ void set_mailboxes(){
   can2.setMBFilter(MB12, 0);
   can2.setMBFilter(MB13, 0);
   can2.setMBFilter(MB14, 0);
-  
 }
-
 
 /**
  *  Reads a CAN message if available and then sends it to thr
  *  proper decoding funciton
  **/
-void readCan(){
-
+void readCan() {
   int count = 0;
-  while (can1.read(rxmsg) && count < MAX_CAN_FRAME_READ_PER_CYCLE){
+  while (can1.read(rxmsg) && count < MAX_CAN_FRAME_READ_PER_CYCLE) {
     decode_CAN1(rxmsg);
     count++;
   }
 
   count = 0;
-  while (can2.read(rxmsg) && count < MAX_CAN_FRAME_READ_PER_CYCLE){
+  while (can2.read(rxmsg) && count < MAX_CAN_FRAME_READ_PER_CYCLE) {
     decode_CAN2(rxmsg);
     count++;
   }
-
 }
 
-
-// debounce code taken from https://www.arduino.cc/en/Tutorial/BuiltInExamples/Debounce
-bool checkButton(int buttonPin, int &buttonState, int &buttonStatePrev, unsigned long &buttonPressTime, unsigned int debounceDelay){
-
+// debounce code taken from
+// https://www.arduino.cc/en/Tutorial/BuiltInExamples/Debounce
+bool checkButton(int buttonPin, int &buttonState, int &buttonStatePrev,
+                 unsigned long &buttonPressTime, unsigned int debounceDelay) {
   bool returnVal = false;
 
   int reading = digitalRead(buttonPin);
@@ -428,7 +411,4 @@ bool checkButton(int buttonPin, int &buttonState, int &buttonStatePrev, unsigned
 
   buttonStatePrev = reading;
   return returnVal;
-
 }
-
-
