@@ -36,11 +36,6 @@ BS_:
 BU_: PDM ATCCR ATCCF
 
 
-BO_ 211 CMD_11: 8 Vector__XXX
- SG_ CMD_driverNotificationLightR : 0|8@1+ (1,0) [0|255] "" Vector__XXX
- SG_ CMD_driverNotificationLightG : 8|8@1+ (1,0) [0|255] "" Vector__XXX
- SG_ CMD_driverNotificationLightB : 16|8@1+ (1,0) [0|255] "" Vector__XXX
-
 BO_ 467 ATCCR_17: 8 Vector__XXX
  SG_ ATCCR_shiftingPressure : 48|16@1- (0.1,0) [-5|200] "PSI" Vector__XXX
  SG_ ATCCR_rectifierCurrent : 32|16@1- (0.1,0) [-200|200] "A" Vector__XXX
@@ -94,26 +89,10 @@ BO_ 710 DD_10: 8 Vector__XXX
  SG_ DD_teensyTemp : 32|16@1- (0.1,0) [0|150] "C" Vector__XXX
  SG_ DD_boardTemp : 16|16@1- (0.1,0) [0|150] "C" Vector__XXX
 
-BO_ 212 CMD_12: 8 Vector__XXX
- SG_ CMD_driverMessageChar7 : 56|8@1+ (1,0) [0|0] "" Vector__XXX
- SG_ CMD_driverMessageChar6 : 48|8@1+ (1,0) [0|0] "" Vector__XXX
- SG_ CMD_driverMessageChar5 : 40|8@1+ (1,0) [0|0] "" Vector__XXX
- SG_ CMD_driverMessageChar4 : 32|8@1+ (1,0) [0|0] "" Vector__XXX
- SG_ CMD_driverMessageChar3 : 24|8@1+ (1,0) [0|0] "" Vector__XXX
- SG_ CMD_driverMessageChar2 : 16|8@1+ (1,0) [0|0] "" Vector__XXX
- SG_ CMD_driverMessageChar0 : 0|8@1+ (1,0) [0|0] "" Vector__XXX
- SG_ CMD_driverMessageChar1 : 8|8@1+ (1,0) [0|0] "" Vector__XXX
-
 BO_ 415 ATCCF_15: 8 ATCCF
  SG_ ATCCF_boardTemp : 16|16@1- (0.1,0) [-5|100] "C" Vector__XXX
  SG_ ATCCF_teensyTemp : 32|16@1- (0.1,0) [-5|100] "C" Vector__XXX
  SG_ ATCCF_counterMsg415 : 0|4@1+ (1,0) [0|15] "" Vector__XXX
-
-BO_ 210 CMD_10: 8 Vector__XXX
- SG_ CMD_wpOverride : 16|8@1- (1,0) [0|100] "Duty %" Vector__XXX
- SG_ CMD_fanRightOverride : 8|8@1- (1,0) [0|100] "Duty %" Vector__XXX
- SG_ CMD_fanLeftOverride : 0|8@1- (1,0) [0|100] "Duty %" Vector__XXX
- SG_ CMD_brakeLightOverride : 24|8@1- (1,0) [0|100] "Duty %" Vector__XXX
 
 BO_ 273 PDM_23: 8 PDM
  SG_ PDM_starterRelayVoltAvg : 48|16@1- (0.001,0) [-5|20] "V" Vector__XXX
@@ -261,9 +240,6 @@ BO_ 410 ATCCF_10: 8 ATCCF
 
 
 
-CM_ SG_ 211 CMD_driverNotificationLightR "The R component of the driver display RBG notification signal";
-CM_ SG_ 211 CMD_driverNotificationLightG "The G component of the driver display RBG notification signal";
-CM_ SG_ 211 CMD_driverNotificationLightB "The B component of the driver display RBG notification signal";
 CM_ SG_ 467 ATCCR_shiftingPressure "Shifting manifold pressure";
 CM_ SG_ 467 ATCCR_counterMsg467 "Counter for Message 465";
 CM_ SG_ 466 ATCCR_counterMsg466 "Counter for Message 465";
@@ -298,21 +274,9 @@ CM_ SG_ 710 DD_counterMsg210 "Counter for Message 410
 ";
 CM_ SG_ 710 DD_teensyTemp "Driver Display Teensy chip temp";
 CM_ SG_ 710 DD_boardTemp "Driver display board temp";
-CM_ SG_ 212 CMD_driverMessageChar7 "The 8-char message that the driver display can read";
-CM_ SG_ 212 CMD_driverMessageChar6 "The 8-char message that the driver display can read";
-CM_ SG_ 212 CMD_driverMessageChar5 "The 8-char message that the driver display can read";
-CM_ SG_ 212 CMD_driverMessageChar4 "The 8-char message that the driver display can read";
-CM_ SG_ 212 CMD_driverMessageChar3 "The 8-char message that the driver display can read";
-CM_ SG_ 212 CMD_driverMessageChar2 "The 8-char message that the driver display can read";
-CM_ SG_ 212 CMD_driverMessageChar0 "The 8-char message that the driver display can read";
-CM_ SG_ 212 CMD_driverMessageChar1 "The 8-char message that the driver display can read";
 CM_ SG_ 415 ATCCF_boardTemp "Board Temp";
 CM_ SG_ 415 ATCCF_teensyTemp "PDM Teensy ECU Temp";
 CM_ SG_ 415 ATCCF_counterMsg415 "Counter for Message 415";
-CM_ SG_ 210 CMD_wpOverride "Manual override percentage";
-CM_ SG_ 210 CMD_fanRightOverride "Manual override percentage";
-CM_ SG_ 210 CMD_fanLeftOverride "Manual override percentage";
-CM_ SG_ 210 CMD_brakeLightOverride "Manual Brakelight Override";
 CM_ SG_ 273 PDM_starterRelayVoltAvg "Starter Relay Voltage Average";
 CM_ SG_ 273 PDM_counterMsg273 "Counter for Message 273";
 CM_ SG_ 273 PDM_brakelightVoltAvg "Brakelight Voltage Average";
