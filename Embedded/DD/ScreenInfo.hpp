@@ -18,21 +18,21 @@
 /*
  * base class for all screen displays
  */
-class CScreenInfo : public CScreen {
+class ScreenInfo : public Screen {
 
 
     public:
 
         /** Constructor */
-        CScreenInfo(ILI9341_t3n &disp) : CScreen(disp) {};
+        ScreenInfo(ILI9341_t3n &disp) : Screen(disp) {};
 
         /** Destructor */
-        virtual ~CScreenInfo() {};
+        virtual ~ScreenInfo() {};
 
         /** Copy constructor disabled */
-        CScreenInfo(const CScreenInfo &) = delete;
+        ScreenInfo(const ScreenInfo &) = delete;
         /** Assignment operator disabled */
-        void operator=(const CScreenInfo &) = delete;
+        void operator=(const ScreenInfo &) = delete;
 
         virtual void Initialize() override;
         virtual void Update(unsigned long &elapsed) override;
@@ -45,26 +45,26 @@ class CScreenInfo : public CScreen {
         /*
          * Constants that affect the spacing of objects on the displau
          */
-        const int mMarginX = 1;   ///< horizontal padding pixels
-        const int mMarginY = 12;  ///< veritcal padding pixels
-        const ILI9341_t3_font_t &mFont = LiberationMono_40_Bold;   ///< The font to use
-        const int mFontWidth = 35;  ///< the font width in pixels (I think that you need to guess this)
+        const int margin_x_ = 1;   ///< horizontal padding pixels
+        const int margin_y_ = 12;  ///< veritcal padding pixels
+        const ILI9341_t3_font_t &font_ = LiberationMono_40_Bold;   ///< The font to use
+        const int font_width_ = 35;  ///< the font width in pixels (I think that you need to guess this)
 
         /* 
          * Signals to display 
          */
-        StateSignal *mSignal1 = nullptr;
-        StateSignal *mSignal2 = nullptr;
-        StateSignal *mSignal3 = nullptr;
-        StateSignal *mSignal4 = nullptr;
+        StateSignal *signal_1_ = nullptr;
+        StateSignal *signal_2_ = nullptr;
+        StateSignal *signal_3_ = nullptr;
+        StateSignal *signal_4_ = nullptr;
 
         /* 
          * Labels placed to the left side of every number 
          */
-        String mLabel1 = "";
-        String mLabel2 = "";
-        String mLabel3 = "";
-        String mLabel4 = "";
+        String label_1_ = "";
+        String label_2_ = "";
+        String label_3_ = "";
+        String label_4_ = "";
 
 
         /* 
@@ -72,23 +72,23 @@ class CScreenInfo : public CScreen {
          * display 5 digits of RPM, we can set one of these scalers to 1000 to get 
          * rpm / 1000 
         */
-        int mDivisorSig1 = 1;
-        int mDivisorSig2 = 1;
-        int mDivisorSig3 = 1;
-        int mDivisorSig4 = 1;
+        int divisor_sig_1_ = 1;
+        int divisor_sig_2_ = 1;
+        int divisor_sig_3_ = 1;
+        int divisor_sig_4_ = 1;
 
         /*
          * sprintf formatting for each signal
          */
-        String mFormatSig1 = "%-4.2f";
-        String mFormatSig2 = "%-4.2f";
-        String mFormatSig3 = "%-4.2f";
-        String mFormatSig4 = "%-4.2f";
+        String format_sig_1_ = "%-4.2f";
+        String format_sig_2_ = "%-4.2f";
+        String format_sig_3_ = "%-4.2f";
+        String format_sig_4_ = "%-4.2f";
         
         /**
          * Character buffer used for string formatting
          */
-        char mFormatBuf[10] = "\0\0\0\0\0\0\0\0\0";
+        char format_buf_[10] = "\0\0\0\0\0\0\0\0\0";
 
         /*
          * These hold the signals' previous values.
@@ -96,10 +96,10 @@ class CScreenInfo : public CScreen {
          * If you set to 0, it's likely that the screen will be blank upon startup because
          * the signals also have a value of 0.
          */
-        float mPrevSig1 = 1337;
-        float mPrevSig2 = 1337;
-        float mPrevSig3 = 1337;
-        float mPrevSig4 = 1337;
+        float prev_sig_1_ = 1337;
+        float prev_sig_2_ = 1337;
+        float prev_sig_3_ = 1337;
+        float prev_sig_4_ = 1337;
 
 
 
@@ -115,35 +115,35 @@ class CScreenInfo : public CScreen {
  * Initialize the screen.
  * This draws the labels and updates the screen for the first time.
  */
-void CScreenInfo::Initialize(){
-    CScreen::Initialize(); 
+void ScreenInfo::Initialize(){
+    Screen::Initialize(); 
     DrawLabels();
     unsigned long elapsed = 0;
-    CScreenInfo::Update(elapsed, true);
+    ScreenInfo::Update(elapsed, true);
 }
 
 
 
-void CScreenInfo::DrawLabels(){
-    int rowHeight = mHeight / 4;
-    mDisplay.setTextColor(mColorPrimary, mColorBackground);
-    mDisplay.setTextWrap(false);
-    mDisplay.setFont(mFont);
+void ScreenInfo::DrawLabels(){
+    int row_height = display_height_ / 4;
+    display_.setTextColor(color_primary_, color_ackground_);
+    display_.setTextWrap(false);
+    display_.setFont(font_);
 
     for (int i=0; i<4; i++){
-        mDisplay.setCursor(mMarginX, mMarginY + rowHeight * i);
+        display_.setCursor(margin_x_, margin_y_ + row_height * i);
         switch (i){
             case 0:
-                mDisplay.print(mLabel1);
+                display_.print(label_1_);
                 break;
             case 1:
-                mDisplay.print(mLabel2);
+                display_.print(label_2_);
                 break;
             case 2:
-                mDisplay.print(mLabel3);
+                display_.print(label_3_);
                 break;
             case 3:
-                mDisplay.print(mLabel4); 
+                display_.print(label_4_); 
                 break;
         }
     }
@@ -154,13 +154,13 @@ void CScreenInfo::DrawLabels(){
 /**
  * Draws evenly spaced horizontal lines that divide the signals
  */
-void CScreenInfo::DrawLines(){
-    int rowHeight = mHeight / 4;
-    mDisplay.drawFastHLine(0,             0,     mWidth, mColorSecondary);
-    mDisplay.drawFastHLine(0, rowHeight    ,     mWidth, mColorSecondary);
-    mDisplay.drawFastHLine(0, rowHeight * 2,     mWidth, mColorSecondary);
-    mDisplay.drawFastHLine(0, rowHeight * 3,     mWidth, mColorSecondary);
-    mDisplay.drawFastHLine(0, rowHeight * 4 - 1, mWidth, mColorSecondary);
+void ScreenInfo::DrawLines(){
+    int row_height = display_height_ / 4;
+    display_.drawFastHLine(0,             0,     display_width_, color_secondary_);
+    display_.drawFastHLine(0, row_height    ,     display_width_, color_secondary_);
+    display_.drawFastHLine(0, row_height * 2,     display_width_, color_secondary_);
+    display_.drawFastHLine(0, row_height * 3,     display_width_, color_secondary_);
+    display_.drawFastHLine(0, row_height * 4 - 1, display_width_, color_secondary_);
 }
 
 
@@ -177,33 +177,33 @@ void CScreenInfo::DrawLines(){
  *                  For example, divide RPM by 1000 to get 12,345 to display as 12.3 in screen.
  *                  Default value is 1 (no effect)
  */
-void CScreenInfo::SetSignal(int pos, StateSignal *sig, String label, String formatting, int divisor){
+void ScreenInfo::SetSignal(int pos, StateSignal *sig, String label, String formatting, int divisor){
 
     // create references to the objects that we want to change depending on the position
     switch (pos) {
         case 1:
-            mSignal1 = sig;
-            mLabel1 = label;
-            mFormatSig1 = formatting;
-            mDivisorSig1 = divisor;
+            signal_1_ = sig;
+            label_1_ = label;
+            format_sig_1_ = formatting;
+            divisor_sig_1_ = divisor;
             break;
         case 2:
-            mSignal2 = sig;
-            mLabel2 = label;
-            mFormatSig2 = formatting;
-            mDivisorSig2 = divisor;
+            signal_2_ = sig;
+            label_2_ = label;
+            format_sig_2_ = formatting;
+            divisor_sig_2_ = divisor;
             break;
         case 3:
-            mSignal3 = sig;
-            mLabel3 = label;
-            mFormatSig3 = formatting;
-            mDivisorSig3 = divisor;
+            signal_3_ = sig;
+            label_3_ = label;
+            format_sig_3_ = formatting;
+            divisor_sig_3_ = divisor;
             break;
         case 4:
-            mSignal4 = sig;
-            mLabel4 = label;
-            mFormatSig4 = formatting;
-            mDivisorSig4 = divisor;
+            signal_4_ = sig;
+            label_4_ = label;
+            format_sig_4_ = formatting;
+            divisor_sig_4_ = divisor;
             break;
     }
 
@@ -216,43 +216,43 @@ void CScreenInfo::SetSignal(int pos, StateSignal *sig, String label, String form
  \param position The signal position on screen (1-4)
  \param override Update the screen info even if the value has not changed (default is false)
  */
-bool CScreenInfo::UpdateSignal(int position, bool override){
+bool ScreenInfo::UpdateSignal(int position, bool override){
 
     // these pointers will point to whatever position's variables that we select
     StateSignal *signal = nullptr;
     int *divisor = nullptr;
     String *format = nullptr;
-    float *previousVal = nullptr;
+    float *previous_val = nullptr;
     String *label = nullptr;
 
     switch (position){
         case 1:
-            signal = mSignal1;
-            divisor = &mDivisorSig1;
-            format = &mFormatSig1;
-            previousVal = &mPrevSig1;
-            label = &mLabel1;
+            signal = signal_1_;
+            divisor = &divisor_sig_1_;
+            format = &format_sig_1_;
+            previous_val = &prev_sig_1_;
+            label = &label_1_;
             break;
         case 2:
-            signal = mSignal2;
-            divisor = &mDivisorSig2;
-            format = &mFormatSig2;
-            previousVal = &mPrevSig2;
-            label = &mLabel2;
+            signal = signal_2_;
+            divisor = &divisor_sig_2_;
+            format = &format_sig_2_;
+            previous_val = &prev_sig_2_;
+            label = &label_2_;
             break;
         case 3:
-            signal = mSignal3;
-            divisor = &mDivisorSig3;
-            format = &mFormatSig3;
-            previousVal = &mPrevSig3;
-            label = &mLabel3;
+            signal = signal_3_;
+            divisor = &divisor_sig_3_;
+            format = &format_sig_3_;
+            previous_val = &prev_sig_3_;
+            label = &label_3_;
             break;
         case 4:
-            signal = mSignal4;
-            divisor = &mDivisorSig4;
-            format = &mFormatSig4;
-            previousVal = &mPrevSig4;
-            label = &mLabel4;
+            signal = signal_4_;
+            divisor = &divisor_sig_4_;
+            format = &format_sig_4_;
+            previous_val = &prev_sig_4_;
+            label = &label_4_;
             break;
     }
 
@@ -263,32 +263,32 @@ bool CScreenInfo::UpdateSignal(int position, bool override){
 
 
     // if the value is new or there is an override, continue. Otherwise stop the update.
-    if (*previousVal != signal->value() || override){
-        *previousVal = signal->value();
+    if (*previous_val != signal->value() || override){
+        *previous_val = signal->value();
     } else {
         return false;
     }
 
 
-    mDisplay.setFont(mFont);
-    mDisplay.setTextColor(mColorPrimary);
+    display_.setFont(font_);
+    display_.setTextColor(color_primary_);
 
     // calculate the formatted string
-    sprintf(mFormatBuf, format->c_str(), signal->value() / *divisor);
+    sprintf(format_buf_, format->c_str(), signal->value() / *divisor);
 
     // calculate and set the cursor position based off of the signal and formatted string
-    int rowHeight = mHeight / 4;
-    int xPos = mWidth - (strlen(mFormatBuf) * mFontWidth);
-    int yPos = rowHeight * (position - 1) + mMarginY;
-    mDisplay.setCursor(xPos, yPos);
+    int row_height = display_height_ / 4;
+    int x_pos = display_width_ - (strlen(format_buf_) * font_width_);
+    int y_pos = row_height * (position - 1) + margin_y_;
+    display_.setCursor(x_pos, y_pos);
 
     // fill the background (can't use text background because it's really large and overlaps other text. 
     // We'll draw our own to avoid this.
-    int startPos = (*label).length() * mFontWidth;
-    mDisplay.fillRect(startPos, yPos - mMarginY, mWidth - startPos, rowHeight, mColorBackground);
+    int startPos = (*label).length() * font_width_;
+    display_.fillRect(startPos, y_pos - margin_y_, display_width_ - startPos, row_height, color_ackground_);
 
     // send it!
-    mDisplay.print(mFormatBuf);
+    display_.print(format_buf_);
 
     // return true because we update it
     return true;
@@ -301,7 +301,7 @@ bool CScreenInfo::UpdateSignal(int position, bool override){
  * 
  * \param elapsed The time elapsed in milliseconds since the update was last called
  */
-void CScreenInfo::Update(unsigned long &elapsed){
+void ScreenInfo::Update(unsigned long &elapsed){
     Update(elapsed, false);
 }
 
@@ -312,8 +312,8 @@ void CScreenInfo::Update(unsigned long &elapsed){
  * \param elapsed The time elapsed in milliseconds since the update was last called
  * \param override Update the screen info even if the value has not changed (default is false)
  */
-void CScreenInfo::Update(unsigned long &elapsed, bool override){
-    if (mFrameRateTimer.isup() || override){
+void ScreenInfo::Update(unsigned long &elapsed, bool override){
+    if (frame_rate_timer_.isup() || override){
         bool updated = false;
         for (int i=1; i<=4; i++){
             updated |= UpdateSignal(i, override);
@@ -322,7 +322,7 @@ void CScreenInfo::Update(unsigned long &elapsed, bool override){
         // finalize the screen and send over SPI
         if (updated || override){
             DrawLines();
-            mDisplay.updateScreen();
+            display_.updateScreen();
         }
     }
 }

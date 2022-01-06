@@ -11,7 +11,7 @@
 
 /*
  * light bar for a blinking display */
-class CLightBarBlink : public CLightBar {
+class LightBarBlink : public LightBar {
 
     public:
 
@@ -19,35 +19,35 @@ class CLightBarBlink : public CLightBar {
 
     private:
          
-        EasyTimer mBlinkTimer = EasyTimer(40);   ///< The rate at which the lights during upshift should blink
-        bool mLightsOn = false;  ///< used during the blinking
+        EasyTimer blink_timer_ = EasyTimer(40);   ///< The rate at which the lights during upshift should blink
+        bool lights_on_ = false;  ///< used during the blinking
 
 
     protected:
 
-        BarStates mState = Off;   ///< The current state of LED light output
+        BarStates state_ = Off;   ///< The current state of LED light output
 
-        StateSignal *mSignal = nullptr;   ///< The signal (if applicable)
-        int mMin = 0;   ///< The minimum bound for the bar to start flashing
+        StateSignal *signal_ = nullptr;   ///< The signal (if applicable)
+        int min_ = 0;   ///< The minimum bound for the bar to start flashing
 
         ///< colors!
-        int mR = 255;
-        int mG = 255;
-        int mB = 255;
+        int r_ = 255;
+        int g_ = 255;
+        int b_ = 255;
 
 
     public:
 
         /** Constructor */
-        CLightBarBlink(Adafruit_NeoPixel &lights, int firstIndex, int numLEDs);
+        LightBarBlink(Adafruit_NeoPixel &lights, int first_index, int num_leds);
 
         /** Destructor */
-        virtual ~CLightBarBlink() {};
+        virtual ~LightBarBlink() {};
 
         /** Copy constructor disabled */
-        CLightBarBlink(const CLightBarBlink &) = delete;
+        LightBarBlink(const LightBarBlink &) = delete;
         /** Assignment operator disabled */
-        void operator=(const CLightBarBlink &) = delete;
+        void operator=(const LightBarBlink &) = delete;
 
         virtual void Initialize() override;
         virtual void Update(unsigned long &elapased) override;
@@ -55,19 +55,19 @@ class CLightBarBlink : public CLightBar {
         /* SetColor
          * Sets the color of the blinking lights
          */
-        void SetColor(int r, int g, int b) {mR=r; mG=g; mB=b;}
+        void SetColor(int r, int g, int b) {r_=r; g_=g; b_=b;}
 
         /**
          * Updates the frequency of the blinking
          */
-        void SetFrequency(int frequency) {mBlinkTimer.set_frequency(frequency);}
+        void SetFrequency(int frequency) {blink_timer_.set_frequency(frequency);}
 
         /**
          * Attach (set) a signal so that the lights blink whenever the signal's value exceeds the minimum value
          * \param sig a pointer to the state signal to look at
-         * \param mMinValue The minimum value to look at
+         * \param min_Value The minimum value to look at
          */
-        void AttachSignal(StateSignal *sig, int min) {mSignal=sig; mMin=min;};
+        void AttachSignal(StateSignal *sig, int min) {signal_=sig; min_=min;};
 
 };
 
@@ -75,18 +75,18 @@ class CLightBarBlink : public CLightBar {
  * Constructor
  * \param lights The neopixel light object
  * \param first index The first index of the neopixels to use
- * \param numLEDs The number of LEDs to use
+ * \param num_leds The number of LEDs to use
  */
-CLightBarBlink::CLightBarBlink(Adafruit_NeoPixel &lights, int firstIndex, int numLEDs) : 
-            CLightBar(lights, firstIndex, numLEDs) {};
+LightBarBlink::LightBarBlink(Adafruit_NeoPixel &lights, int first_index, int num_leds) : 
+            LightBar(lights, first_index, num_leds) {};
 
 
 
 /**
  * Initialize the lights by clearing them.
  */
-void CLightBarBlink::Initialize(){
-    CLightBar::Initialize();
+void LightBarBlink::Initialize(){
+    LightBar::Initialize();
 }
 
 
@@ -96,30 +96,30 @@ void CLightBarBlink::Initialize(){
  *
  * \param elapsed The time in milliseconds elapsed since last called
  */
-void CLightBarBlink::Update(unsigned long &elapsed){
+void LightBarBlink::Update(unsigned long &elapsed){
 
 
     // if there is no signal set OR the signal's threshold has been reached, blink
-    if (!mSignal || mSignal->value() >= mMin){
-        mState = Blinking;
+    if (!signal_ || signal_->value() >= min_){
+        state_ = Blinking;
     } else {
-        mState = Off;
+        state_ = Off;
     }
    
 
-    switch (mState){
+    switch (state_){
         case Off:
             Clear();
             break;
         case Blinking:
-            if (mBlinkTimer.isup()){
-                if (mLightsOn){
-                    mLightsOn = false;
+            if (blink_timer_.isup()){
+                if (lights_on_){
+                    lights_on_ = false;
                     Clear();
                 } else {
-                    mLightsOn = true;
+                    lights_on_ = true;
                     for (int led = GetFirstLEDIndex(); led <= GetLastLEDIndex(); led++){
-                        mLights.setPixelColor(led, mR, mG, mB);
+                        lights_.setPixelColor(led, r_, g_, b_);
                     }
                 }
             }
@@ -127,7 +127,7 @@ void CLightBarBlink::Update(unsigned long &elapsed){
     }
 
     // sends the update
-    CLightBar::Update(elapsed);
+    LightBar::Update(elapsed);
 
 }
 

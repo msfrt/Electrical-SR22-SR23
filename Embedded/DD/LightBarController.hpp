@@ -1,5 +1,5 @@
-#ifndef CLIGHTBARCONTROLLER_HPP
-#define CLIGHTBARCONTROLLER_HPP
+#ifndef LightBarCONTROLLER_HPP
+#define LightBarCONTROLLER_HPP
 
 #include "LightBarBlink.hpp"
 #include "LightBarBlinkSinusoidal.hpp"
@@ -7,19 +7,19 @@
 #include "CAN/CAN1.hpp"
 #include "CAN/CAN2.hpp"
 
-class CLightBarController {
+class LightBarController {
 
     public:
 
-        CLightBarController(Adafruit_NeoPixel &left, Adafruit_NeoPixel &top, Adafruit_NeoPixel &right);
+        LightBarController(Adafruit_NeoPixel &left, Adafruit_NeoPixel &top, Adafruit_NeoPixel &right);
 
         /** Destructor */
-        ~CLightBarController();
+        ~LightBarController();
 
         /** Copy constructor disabled */
-        CLightBarController(const CLightBarController &) = delete;
+        LightBarController(const LightBarController &) = delete;
         /** Assignment operator disabled */
-        void operator=(const CLightBarController &) = delete;
+        void operator=(const LightBarController &) = delete;
 
         /// the different states that the LEDs can be in. Please note that states should include
         /// transitionary states
@@ -29,7 +29,7 @@ class CLightBarController {
          * Gets the current state of the leds
          * @returns the led state
          */
-        int GetState() {return mState;}
+        int GetState() {return state_;}
 
         void Update(unsigned long &elapsed);
         void Initialize();
@@ -39,37 +39,37 @@ class CLightBarController {
         /**
          *  Returns true if the a notification state is active
          */
-        bool IsNotificationActive() const {return mState == Notification; }
+        bool IsNotificationActive() const {return state_ == Notification; }
 
 
     private:
 
-        Adafruit_NeoPixel &mLeftLEDs;
-        Adafruit_NeoPixel &mTopLEDs;
-        Adafruit_NeoPixel &mRightLEDs;
+        Adafruit_NeoPixel &left_leds_;
+        Adafruit_NeoPixel &top_leds_;
+        Adafruit_NeoPixel &right_leds_;
 
         void SetState(LEDStates state);
 
-        LEDStates mState;  ///< screen states
-        unsigned long mStateStartTime = 0;  ///< The time in milliseconds that the current state started
+        LEDStates state_;  ///< screen states
+        unsigned long state_start_time_ = 0;  ///< The time in milliseconds that the current state started
 
-        unsigned int mNotificationDuration = 5000;   ///< How long to show the notification lights in milliseconds when a notification is recieved
-        int mNotificationBlinkFrequency = 10;  ///< The frequency of blinking for notifications
+        unsigned int notification_duration_ = 5000;   ///< How long to show the notification lights in milliseconds when a notification is recieved
+        int notification_blink_frequency_ = 10;  ///< The frequency of blinking for notifications
 
-        CLightBarRPM *mRPMBarGearN  = nullptr;
-        CLightBarRPM *mRPMBarGear1  = nullptr;
-        CLightBarRPM *mRPMBarGear2  = nullptr;
-        CLightBarRPM *mRPMBarGear3  = nullptr;
-        CLightBarRPM *mRPMBarGear4  = nullptr;
-        CLightBarRPM *mRPMBarGear5  = nullptr;
-        CLightBarBlink *mTCBarLeft  = nullptr;
-        CLightBarBlink *mTCBarRight = nullptr;
+        LightBarRPM *rpm_signal_bar_gear_N_  = nullptr;
+        LightBarRPM *rpm_signal_bar_gear_1_  = nullptr;
+        LightBarRPM *rpm_signal_bar_gear_2_  = nullptr;
+        LightBarRPM *rpm_signal_bar_gear_3_  = nullptr;
+        LightBarRPM *rpm_signal_bar_gear_4_  = nullptr;
+        LightBarRPM *rpm_signal_bar_gear_5_  = nullptr;
+        LightBarBlink *tc_bar_left_  = nullptr;
+        LightBarBlink *tc_bar_right_ = nullptr;
 
-        CLightBarBlinkSinusoidal *mCoolingLightLeft  = nullptr;
-        CLightBarBlinkSinusoidal *mCoolingLightRight = nullptr;
+        LightBarBlinkSinusoidal *cooling_light_left_  = nullptr;
+        LightBarBlinkSinusoidal *cooling_light_right_ = nullptr;
         
-        CLightBarBlink *mNotificationBarLeft  = nullptr;
-        CLightBarBlink *mNotificationBarRight = nullptr;
+        LightBarBlink *notification_bar_left_  = nullptr;
+        LightBarBlink *notification_bar_right_ = nullptr;
 
 
 };
@@ -80,62 +80,62 @@ class CLightBarController {
  *
  * Constructs screens for all of the states and then sets the initial state
  */
-CLightBarController::CLightBarController(Adafruit_NeoPixel &left, Adafruit_NeoPixel &top, Adafruit_NeoPixel &right) : 
-                                         mLeftLEDs(left), mTopLEDs(top), mRightLEDs(right){
+LightBarController::LightBarController(Adafruit_NeoPixel &left, Adafruit_NeoPixel &top, Adafruit_NeoPixel &right) : 
+                                         left_leds_(left), top_leds_(top), right_leds_(right){
 
 
     /* Normal Operation */
-    int maxRPM = 13000;
-    int minRPM = 3000;
-    int downshiftRPM = -1;
-    mRPMBarGearN = new CLightBarRPM(mTopLEDs, 0, mTopLEDs.numPixels(), M400_rpm, minRPM, maxRPM, downshiftRPM);
+    int max_rpm = 13000;
+    int min_rpm = 3000;
+    int downshift_rpm = -1;
+    rpm_signal_bar_gear_N_ = new LightBarRPM(top_leds_, 0, top_leds_.numPixels(), M400_rpm, min_rpm, max_rpm, downshift_rpm);
 
-    maxRPM = 13224;
-    minRPM = maxRPM - 4000;
-    downshiftRPM = -1;
-    mRPMBarGear1 = new CLightBarRPM(mTopLEDs, 0, mTopLEDs.numPixels(), M400_rpm, minRPM, maxRPM, downshiftRPM);
+    max_rpm = 13224;
+    min_rpm = max_rpm - 4000;
+    downshift_rpm = -1;
+    rpm_signal_bar_gear_1_ = new LightBarRPM(top_leds_, 0, top_leds_.numPixels(), M400_rpm, min_rpm, max_rpm, downshift_rpm);
 
-    maxRPM = 11900;
-    minRPM = maxRPM - 4000;
-    downshiftRPM = 9362;
-    mRPMBarGear2 = new CLightBarRPM(mTopLEDs, 0, mTopLEDs.numPixels(), M400_rpm, minRPM, maxRPM, downshiftRPM);
+    max_rpm = 11900;
+    min_rpm = max_rpm - 4000;
+    downshift_rpm = 9362;
+    rpm_signal_bar_gear_2_ = new LightBarRPM(top_leds_, 0, top_leds_.numPixels(), M400_rpm, min_rpm, max_rpm, downshift_rpm);
 
-    maxRPM = 12000;
-    minRPM = 3000;
-    downshiftRPM = 9703;
-    mRPMBarGear3 = new CLightBarRPM(mTopLEDs, 0, mTopLEDs.numPixels(), M400_rpm, minRPM, maxRPM, downshiftRPM);
+    max_rpm = 12000;
+    min_rpm = 3000;
+    downshift_rpm = 9703;
+    rpm_signal_bar_gear_3_ = new LightBarRPM(top_leds_, 0, top_leds_.numPixels(), M400_rpm, min_rpm, max_rpm, downshift_rpm);
 
-    maxRPM = 12000;
-    minRPM = maxRPM - 4000;
-    downshiftRPM = 9783;
-    mRPMBarGear4 = new CLightBarRPM(mTopLEDs, 0, mTopLEDs.numPixels(), M400_rpm, minRPM, maxRPM, downshiftRPM);
+    max_rpm = 12000;
+    min_rpm = max_rpm - 4000;
+    downshift_rpm = 9783;
+    rpm_signal_bar_gear_4_ = new LightBarRPM(top_leds_, 0, top_leds_.numPixels(), M400_rpm, min_rpm, max_rpm, downshift_rpm);
 
-    maxRPM = 14000;
-    minRPM = maxRPM - 4000;
-    downshiftRPM = 9855;
-    mRPMBarGear5 = new CLightBarRPM(mTopLEDs, 0, mTopLEDs.numPixels(), M400_rpm, minRPM, maxRPM, downshiftRPM);
+    max_rpm = 14000;
+    min_rpm = max_rpm - 4000;
+    downshift_rpm = 9855;
+    rpm_signal_bar_gear_5_ = new LightBarRPM(top_leds_, 0, top_leds_.numPixels(), M400_rpm, min_rpm, max_rpm, downshift_rpm);
     
-    mCoolingLightLeft  = new CLightBarBlinkSinusoidal(mLeftLEDs, 0, 1);
-    mCoolingLightLeft->AttachSignal(&PDM_coolingOverrideActive, 1);
-    mCoolingLightLeft->SetColor(0, 255, 255);  // aqua!
+    cooling_light_left_  = new LightBarBlinkSinusoidal(left_leds_, 0, 1);
+    cooling_light_left_->AttachSignal(&PDM_coolingOverrideActive, 1);
+    cooling_light_left_->SetColor(0, 255, 255);  // aqua!
 
-    mCoolingLightRight  = new CLightBarBlinkSinusoidal(mRightLEDs, 0, 1);
-    mCoolingLightRight->AttachSignal(&PDM_coolingOverrideActive, 1);
-    mCoolingLightRight->SetColor(0, 255, 255);  // aqua!
+    cooling_light_right_  = new LightBarBlinkSinusoidal(right_leds_, 0, 1);
+    cooling_light_right_->AttachSignal(&PDM_coolingOverrideActive, 1);
+    cooling_light_right_->SetColor(0, 255, 255);  // aqua!
     
-    mTCBarLeft  = new CLightBarBlink(mLeftLEDs, 1, 3);
-    mTCBarLeft->AttachSignal(&M400_tcPowerReduction, 1);
-    mTCBarLeft->SetColor(150, 0, 255);
+    tc_bar_left_  = new LightBarBlink(left_leds_, 1, 3);
+    tc_bar_left_->AttachSignal(&M400_tcPowerReduction, 1);
+    tc_bar_left_->SetColor(150, 0, 255);
 
-    mTCBarRight = new CLightBarBlink(mRightLEDs, 1, 3);
-    mTCBarRight->AttachSignal(&M400_tcPowerReduction, 1);
-    mTCBarRight->SetColor(150, 0, 255);
+    tc_bar_right_ = new LightBarBlink(right_leds_, 1, 3);
+    tc_bar_right_->AttachSignal(&M400_tcPowerReduction, 1);
+    tc_bar_right_->SetColor(150, 0, 255);
 
     /* Notification bars */
-    mNotificationBarLeft = new CLightBarBlink(mLeftLEDs, 0, mLeftLEDs.numPixels());
-    mNotificationBarLeft->SetFrequency(mNotificationBlinkFrequency);
-    mNotificationBarRight = new CLightBarBlink(mRightLEDs, 0, mRightLEDs.numPixels());
-    mNotificationBarRight->SetFrequency(mNotificationBlinkFrequency);
+    notification_bar_left_ = new LightBarBlink(left_leds_, 0, left_leds_.numPixels());
+    notification_bar_left_->SetFrequency(notification_blink_frequency_);
+    notification_bar_right_ = new LightBarBlink(right_leds_, 0, right_leds_.numPixels());
+    notification_bar_right_->SetFrequency(notification_blink_frequency_);
 
 }
 
@@ -145,21 +145,21 @@ CLightBarController::CLightBarController(Adafruit_NeoPixel &left, Adafruit_NeoPi
  *
  * Destructs all dynamically allocated things
  */
-CLightBarController::~CLightBarController(){
+LightBarController::~LightBarController(){
 
-    delete mRPMBarGearN;
-    delete mRPMBarGear1;
-    delete mRPMBarGear2;
-    delete mRPMBarGear3;
-    delete mRPMBarGear4;
-    delete mRPMBarGear5;
-    delete mTCBarLeft;
-    delete mTCBarRight;
-    delete mCoolingLightLeft;
-    delete mCoolingLightRight;
+    delete rpm_signal_bar_gear_N_;
+    delete rpm_signal_bar_gear_1_;
+    delete rpm_signal_bar_gear_2_;
+    delete rpm_signal_bar_gear_3_;
+    delete rpm_signal_bar_gear_4_;
+    delete rpm_signal_bar_gear_5_;
+    delete tc_bar_left_;
+    delete tc_bar_right_;
+    delete cooling_light_left_;
+    delete cooling_light_right_;
 
-    delete mNotificationBarLeft;
-    delete mNotificationBarRight;
+    delete notification_bar_left_;
+    delete notification_bar_right_;
 
 }
 
@@ -169,7 +169,7 @@ CLightBarController::~CLightBarController(){
  *
  * Sets the first state for the controller
  */
-void CLightBarController::Initialize(){
+void LightBarController::Initialize(){
 
     SetState(Normal);
 
@@ -183,23 +183,23 @@ void CLightBarController::Initialize(){
  * the updates are processed and the screens are written. 
  * \param elapsed The time in milliseconds since the update method was last called
  */
-void CLightBarController::Update(unsigned long &elapsed){
+void LightBarController::Update(unsigned long &elapsed){
 
-    switch (mState){
+    switch (state_){
         case Normal:
-            mTCBarLeft->Update(elapsed);
-            mTCBarRight->Update(elapsed);
-            mCoolingLightLeft->Update(elapsed);
-            mCoolingLightRight->Update(elapsed);
-            mRPMBarGearN->Update(elapsed);
+            tc_bar_left_->Update(elapsed);
+            tc_bar_right_->Update(elapsed);
+            cooling_light_left_->Update(elapsed);
+            cooling_light_right_->Update(elapsed);
+            rpm_signal_bar_gear_N_->Update(elapsed);
             break;
         case Notification:
-            mRPMBarGearN->Update(elapsed); // keep updating RPM bar
-            mNotificationBarLeft->Update(elapsed);
-            mNotificationBarRight->Update(elapsed);
+            rpm_signal_bar_gear_N_->Update(elapsed); // keep updating RPM bar
+            notification_bar_left_->Update(elapsed);
+            notification_bar_right_->Update(elapsed);
 
             // if the notification duration has expired, go back to normal operation
-            if (millis() - mStateStartTime > mNotificationDuration){
+            if (millis() - state_start_time_ > notification_duration_){
                 SetState(Normal);
             }
             break;
@@ -212,42 +212,42 @@ void CLightBarController::Update(unsigned long &elapsed){
  *
  * \param state The state to set 
  */
-void CLightBarController::SetState(LEDStates state){
+void LightBarController::SetState(LEDStates state){
 
     /*
      * State exiting actions
      */
-    switch (mState){
+    switch (state_){
         case Normal:
             break;
         case Notification:
             // get rid of the lights for any light that was previously unused by other modes
-            mNotificationBarLeft->Clear();
-            mNotificationBarRight->Clear();
+            notification_bar_left_->Clear();
+            notification_bar_right_->Clear();
             break;
     }
 
     /*
      * Set the state
      */
-    mState = state;       // move new input state to current state
-    mStateStartTime = millis();  // update state start time
+    state_ = state;       // move new input state to current state
+    state_start_time_ = millis();  // update state start time
 
 
     /*
      * State entering actions
      */
-    switch (mState){
+    switch (state_){
         case Normal:
-            mTCBarLeft->Initialize();
-            mTCBarRight->Initialize();
-            mCoolingLightLeft->Initialize();
-            mCoolingLightRight->Initialize();
-            mRPMBarGearN->Initialize();
+            tc_bar_left_->Initialize();
+            tc_bar_right_->Initialize();
+            cooling_light_left_->Initialize();
+            cooling_light_right_->Initialize();
+            rpm_signal_bar_gear_N_->Initialize();
             break;
         case Notification:
-            mNotificationBarLeft->Initialize();
-            mNotificationBarRight->Initialize();
+            notification_bar_left_->Initialize();
+            notification_bar_right_->Initialize();
             break;
     }
     
@@ -258,9 +258,9 @@ void CLightBarController::SetState(LEDStates state){
  * Called when the control button is pressed. This can either change the screen state
  * or disable the current notification screen.
  */
-void CLightBarController::OnButtonPress(){
+void LightBarController::OnButtonPress(){
 
-    switch (mState){
+    switch (state_){
         case Normal:
             break;
         case Notification:
@@ -274,9 +274,9 @@ void CLightBarController::OnButtonPress(){
 /**
  * Set the colors when the notification light 
  */
-void CLightBarController::OnNotificationRecieved(int R, int G, int B){
-    mNotificationBarLeft->SetColor(R, G, B);
-    mNotificationBarRight->SetColor(R, G, B);
+void LightBarController::OnNotificationRecieved(int R, int G, int B){
+    notification_bar_left_->SetColor(R, G, B);
+    notification_bar_right_->SetColor(R, G, B);
     SetState(Notification);
 }
 

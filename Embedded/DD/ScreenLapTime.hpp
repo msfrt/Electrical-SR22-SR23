@@ -18,21 +18,21 @@
 /*
  * base class for all screen displays
  */
-class CScreenLapTime : public CScreen {
+class ScreenLapTime : public Screen {
 
 
     public:
 
         /** Constructor */
-        CScreenLapTime(ILI9341_t3n &disp) : CScreen(disp) {};
+        ScreenLapTime(ILI9341_t3n &disp) : Screen(disp) {};
 
         /** Destructor */
-        virtual ~CScreenLapTime() {};
+        virtual ~ScreenLapTime() {};
 
         /** Copy constructor disabled */
-        CScreenLapTime(const CScreenLapTime &) = delete;
+        ScreenLapTime(const ScreenLapTime &) = delete;
         /** Assignment operator disabled */
-        void operator=(const CScreenLapTime &) = delete;
+        void operator=(const ScreenLapTime &) = delete;
 
         virtual void Initialize() override;
         virtual void Update(unsigned long &elapsed) override;
@@ -44,19 +44,19 @@ class CScreenLapTime : public CScreen {
         /*
          * Constants that affect the spacing of objects on the displau
          */
-        const int mMarginX = 1;   ///< horizontal padding pixels
-        const int mMarginY = 12;  ///< veritcal padding pixels
-        const ILI9341_t3_font_t &mFontLabel = LiberationMono_32_Bold_Italic;   ///< The font for the screen label
-        const int mFontLabelHeight = 32;   ///< The label's pixel height
-        const int mFontLabelWidth = 26;   ///< The label's pixel width
-        const ILI9341_t3_font_t &mFontPrimary = LiberationMono_48_Bold;   ///< The font for lap time
-        const int mFontPrimaryHeight = 48;   ///< The font pixel height
-        const int mFontPrimaryWidth = 40;   ///< The font pixel height
-        String mLabel ="LAP TIME:";   ///< The screen's label
+        const int margin_x_ = 1;   ///< horizontal padding pixels
+        const int margin_y_ = 12;  ///< veritcal padding pixels
+        const ILI9341_t3_font_t &font_label_ = LiberationMono_32_Bold_Italic;   ///< The font for the screen label
+        const int font_label_height_ = 32;   ///< The label's pixel height
+        const int font_label_width_ = 26;   ///< The label's pixel width
+        const ILI9341_t3_font_t &font_primary_ = LiberationMono_48_Bold;   ///< The font for lap time
+        const int font_primary_height_ = 48;   ///< The font pixel height
+        const int font_primary_width_ = 40;   ///< The font pixel height
+        String label_ ="LAP TIME:";   ///< The screen's label
         
-        float mBestLapTime = 9999999999;   ///< Will hold the best laptime in seconds
-        float mLastLapTime = 9999999999;   ///< Will hold the last laptime in seconds
-        unsigned long mLastLapMillis = 0;   ///< Will hold the milliseconds clock time that the last lap happened
+        float best_lap_time_ = 9999999999;   ///< Will hold the best laptime in seconds
+        float last_lap_time_ = 9999999999;   ///< Will hold the last laptime in seconds
+        unsigned long last_lap_millis_ = 0;   ///< Will hold the milliseconds clock time that the last lap happened
 };
 
 
@@ -67,69 +67,69 @@ class CScreenLapTime : public CScreen {
  * This is called ONLY when there is a new laptime recieved
  * This draws the labels, calculates values, and updates the screen for the first time.
  */
-void CScreenLapTime::Initialize(){
+void ScreenLapTime::Initialize(){
 
     // before doing any screen mumbo jumbo, calculate the times
-    float currentLapTime = static_cast<float>(millis() - mLastLapMillis) / 1000.0;
-    mLastLapMillis = millis();
+    float current_lap_time = static_cast<float>(millis() - last_lap_millis_) / 1000.0;
+    last_lap_millis_ = millis();
 
-    CScreen::Initialize(); 
+    Screen::Initialize(); 
     
     // borders
-    mDisplay.drawFastHLine(0,           0, mWidth, mColorSecondary);
-    mDisplay.drawFastHLine(0, mHeight - 1, mWidth, mColorSecondary);
-    // mDisplay.drawFastHLine(0, mHeight / 2, mWidth, mColorSecondary);
-    // mDisplay.drawFastVLine(mWidth / 2, mHeight / 2, mHeight / 2, mColorSecondary);
+    display_.drawFastHLine(0,           0, display_width_, color_secondary_);
+    display_.drawFastHLine(0, display_height_ - 1, display_width_, color_secondary_);
+    // display_.drawFastHLine(0, display_height_ / 2, display_width_, color_secondary_);
+    // display_.drawFastVLine(display_width_ / 2, display_height_ / 2, display_height_ / 2, color_secondary_);
 
     // print the screen label
-    mDisplay.setCursor(2, 5);
-    mDisplay.setFont(mFontLabel);
-    mDisplay.setTextColor(mColorPrimary);
-    mDisplay.print(mLabel);
+    display_.setCursor(2, 5);
+    display_.setFont(font_label_);
+    display_.setTextColor(color_primary_);
+    display_.print(label_);
 
     // display the lap time
-    char formatBuf[10];
-    sprintf(formatBuf, "%.2f", currentLapTime);
-    mDisplay.setCursor((mWidth - strlen(formatBuf)*mFontPrimaryWidth)/2, mMarginY + mFontLabelHeight + 30);
-    mDisplay.setFont(mFontPrimary);
-    mDisplay.print(formatBuf);
+    char format_buffer[10];
+    sprintf(format_buffer, "%.2f", current_lap_time);
+    display_.setCursor((display_width_ - strlen(format_buffer)*font_primary_width_)/2, margin_y_ + font_label_height_ + 30);
+    display_.setFont(font_primary_);
+    display_.print(format_buffer);
 
     // display best/last rectangles
-    int rectX = 0;
-    int rectY = (mHeight * 2) / 3;
-    int rectW = mWidth / 2;
-    int rectH = (mHeight * 1) / 3;
-    uint16_t color = currentLapTime < mBestLapTime ? mColorSuccess : mColorDanger;
-    mDisplay.fillRect(rectX, rectY, rectW, rectH, color);
-    mDisplay.setCursor(rectX + (rectW - 4*mFontLabelWidth)/2, rectY + (rectH - mFontLabelHeight) / 2);
-    mDisplay.setFont(mFontLabel);
-    mDisplay.setTextColor(mColorBackground);
-    mDisplay.print("BEST");
+    int rect_x = 0;
+    int rect_y = (display_height_ * 2) / 3;
+    int rect_w = display_width_ / 2;
+    int rect_h = (display_height_ * 1) / 3;
+    uint16_t color = current_lap_time < best_lap_time_ ? color_success_ : color_danger_;
+    display_.fillRect(rect_x, rect_y, rect_w, rect_h, color);
+    display_.setCursor(rect_x + (rect_w - 4*font_label_width_)/2, rect_y + (rect_h - font_label_height_) / 2);
+    display_.setFont(font_label_);
+    display_.setTextColor(color_ackground_);
+    display_.print("BEST");
 
-    rectX = mWidth / 2;
-    rectY = (mHeight * 2) / 3;
-    rectW = mWidth / 2;
-    rectH = (mHeight * 1) / 3;
-    color = currentLapTime < mLastLapTime ? mColorSuccess : mColorDanger;
-    mDisplay.fillRect(rectX, rectY, rectW, rectH, color);
-    mDisplay.setCursor(rectX + (rectW - 4*mFontLabelWidth)/2, rectY + (rectH - mFontLabelHeight) / 2);
-    mDisplay.setFont(mFontLabel);
-    mDisplay.setTextColor(mColorBackground);
-    mDisplay.print("LAST");
+    rect_x = display_width_ / 2;
+    rect_y = (display_height_ * 2) / 3;
+    rect_w = display_width_ / 2;
+    rect_h = (display_height_ * 1) / 3;
+    color = current_lap_time < last_lap_time_ ? color_success_ : color_danger_;
+    display_.fillRect(rect_x, rect_y, rect_w, rect_h, color);
+    display_.setCursor(rect_x + (rect_w - 4*font_label_width_)/2, rect_y + (rect_h - font_label_height_) / 2);
+    display_.setFont(font_label_);
+    display_.setTextColor(color_ackground_);
+    display_.print("LAST");
 
     // draw a line dividing the two
-    mDisplay.drawFastVLine(rectX, rectY, rectH, mColorBackground);
+    display_.drawFastVLine(rect_x, rect_y, rect_h, color_ackground_);
 
     // update best time if necessary
-    if (currentLapTime < mBestLapTime){
-        mBestLapTime = currentLapTime;
+    if (current_lap_time < best_lap_time_){
+        best_lap_time_ = current_lap_time;
     }
     // update the last time
-    mLastLapTime = currentLapTime;
+    last_lap_time_ = current_lap_time;
 
     // push updates to the screen
     unsigned long elapsed = 0;
-    CScreen::Update(elapsed);
+    Screen::Update(elapsed);
 }
 
 
@@ -141,7 +141,7 @@ void CScreenLapTime::Initialize(){
  * 
  * \param elapsed The time elapsed in milliseconds since the update was last called
  */
-void CScreenLapTime::Update(unsigned long &elapsed){
+void ScreenLapTime::Update(unsigned long &elapsed){
     // do nothing here, since everything is controlled in the initialization function
 }
 

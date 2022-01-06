@@ -19,21 +19,21 @@
 /*
  * base class for all screen displays
  */
-class CScreenNumber : public CScreen {
+class ScreenNumber : public Screen {
 
 
     public:
 
         /** Constructor */
-        CScreenNumber(ILI9341_t3n &disp, StateSignal &signal, String label) : CScreen(disp), mSignal(signal), mLabel(label) {};
+        ScreenNumber(ILI9341_t3n &disp, StateSignal &signal, String label) : Screen(disp), signal_(signal), label_(label) {};
 
         /** Destructor */
-        virtual ~CScreenNumber() {};
+        virtual ~ScreenNumber() {};
 
         /** Copy constructor disabled */
-        CScreenNumber(const CScreenNumber &) = delete;
+        ScreenNumber(const ScreenNumber &) = delete;
         /** Assignment operator disabled */
-        void operator=(const CScreenNumber &) = delete;
+        void operator=(const ScreenNumber &) = delete;
 
         virtual void Initialize() override;
         virtual void Update(unsigned long &elapsed) override;
@@ -45,23 +45,23 @@ class CScreenNumber : public CScreen {
         /*
          * Constants that affect the spacing of objects on the displau
          */
-        const int mMarginX = 1;   ///< horizontal padding pixels
-        const int mMarginY = 12;  ///< veritcal padding pixels
-        const ILI9341_t3_font_t &mFontLabel = LiberationMono_32_Bold_Italic;   ///< The font for the screen label
-        const int mFontLabelHeight = 32;
-        const ILI9341_t3_font_t &mFont = Liberation_BIG;   ///< The font to use
-        const int mFontHeight = 144;  ///< Estimate of the height of the font in pixels
-        const int mFontWidth = 100; ///< estimation of the font width in pixels
-        //const int mFontWidth = 35;  ///< the font width in pixels (I think that you need to guess this)
-        //const int mMaxChars = 8;   ///< The maximum number of characters that the screen can display
-        int mPrevVal = 0; ///< write to the screen if previos val is different than current val
+        const int margin_x_ = 1;   ///< horizontal padding pixels
+        const int margin_y_ = 12;  ///< veritcal padding pixels
+        const ILI9341_t3_font_t &font_label_ = LiberationMono_32_Bold_Italic;   ///< The font for the screen label
+        const int font_label_height_ = 32;
+        const ILI9341_t3_font_t &font_ = Liberation_BIG;   ///< The font to use
+        const int font_height_ = 144;  ///< Estimate of the height of the font in pixels
+        const int font_width_ = 100; ///< estimation of the font width in pixels
+        //const int font_width_ = 35;  ///< the font width in pixels (I think that you need to guess this)
+        //const int max_chars_ = 8;   ///< The maximum number of characters that the screen can display
+        int previous_val_ = 0; ///< write to the screen if previos val is different than current val
         
-        StateSignal &mSignal;  ///< The number to display on the screen
-        String mLabel = ""; ///< The label to display on the top of the screen
+        StateSignal &signal_;  ///< The number to display on the screen
+        String label_ = ""; ///< The label to display on the top of the screen
 
-        String mFormat = "%d";  ///< THe format for the number printed
+        String format_ = "%d";  ///< THe format for the number printed
 
-        bool mOverride = false;  ///< Override writing to the display
+        bool override_ = false;  ///< Override writing to the display
 };
 
 
@@ -72,26 +72,26 @@ class CScreenNumber : public CScreen {
  * Initialize the screen.
  * This draws the labels and updates the screen for the first time.
  */
-void CScreenNumber::Initialize(){
-    CScreen::Initialize(); 
+void ScreenNumber::Initialize(){
+    Screen::Initialize(); 
     
     // top and bottom borders
-    mDisplay.drawFastHLine(0,           0, mWidth, mColorSecondary);
-    mDisplay.drawFastHLine(0, mHeight - 1, mWidth, mColorSecondary);
+    display_.drawFastHLine(0,           0, display_width_, color_secondary_);
+    display_.drawFastHLine(0, display_height_ - 1, display_width_, color_secondary_);
 
     // print the screen label
-    mDisplay.setCursor(2, 5);
-    mDisplay.setFont(mFontLabel);
-    mDisplay.setTextColor(mColorPrimary);
-    mDisplay.print(mLabel);
+    display_.setCursor(2, 5);
+    display_.setFont(font_label_);
+    display_.setTextColor(color_primary_);
+    display_.print(label_);
 
     // set the previous value to something outragous
-    mPrevVal = -1337;
+    previous_val_ = -1337;
 
     // push updates to the screen
     unsigned long elapsed = 0;
-    mOverride = true;
-    CScreenNumber::Update(elapsed);
+    override_ = true;
+    ScreenNumber::Update(elapsed);
 }
 
 
@@ -103,30 +103,30 @@ void CScreenNumber::Initialize(){
  * 
  * \param elapsed The time elapsed in milliseconds since the update was last called
  */
-void CScreenNumber::Update(unsigned long &elapsed){
+void ScreenNumber::Update(unsigned long &elapsed){
     // do nothing here, since everything is controlled in the initialization function
 
-    if (static_cast<int>(mSignal.value()) != mPrevVal || mOverride){
+    if (static_cast<int>(signal_.value()) != previous_val_ || override_){
         // reset the override
-        mOverride = false;
+        override_ = false;
         
         // update the value
-        mPrevVal = static_cast<int>(mSignal.value());
+        previous_val_ = static_cast<int>(signal_.value());
 
         // overwrite old stuff
-        mDisplay.fillRect(0, mMarginY + mFontLabelHeight, mWidth, mHeight - (mMarginY + mFontLabelHeight) - 1, mColorBackground);
+        display_.fillRect(0, margin_y_ + font_label_height_, display_width_, display_height_ - (margin_y_ + font_label_height_) - 1, color_ackground_);
 
         
-        mDisplay.setFont(mFont);
-        mDisplay.setTextColor(mColorPrimary, mColorBackground);
-        char formatBuf[10];
-        sprintf(formatBuf, "%.0f", mSignal.value());
-        int numLen = strlen(formatBuf);
-        mDisplay.setCursor((mWidth - numLen*mFontWidth)/2, mHeight/2 - mFontHeight/2);
-        mDisplay.print(formatBuf);
-        //mDisplay.print(round(mSignal.value()));
+        display_.setFont(font_);
+        display_.setTextColor(color_primary_, color_ackground_);
+        char format_buffer[10];
+        sprintf(format_buffer, "%.0f", signal_.value());
+        int numLen = strlen(format_buffer);
+        display_.setCursor((display_width_ - numLen*font_width_)/2, display_height_/2 - font_height_/2);
+        display_.print(format_buffer);
+        //display_.print(round(signal_.value()));
 
-        CScreen::Update(elapsed);
+        Screen::Update(elapsed);
     }
 
 }

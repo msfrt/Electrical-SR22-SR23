@@ -9,49 +9,49 @@
 /*
  * base class for all screen displays
  */
-class CLightBar {
+class LightBar {
          
 
     protected:
-        Adafruit_NeoPixel &mLights;  ///< The low-level object that actually interfaces with the hardware
+        Adafruit_NeoPixel &lights_;  ///< The low-level object that actually interfaces with the hardware
 
         /*
          * Gets the index of the first LED to update
          */
-        int GetFirstLEDIndex() const {return mFirstLED;}
+        int GetFirstLEDIndex() const {return first_led_;}
 
         /*
          * Gets the index of the last LED to update
          */
-        int GetLastLEDIndex() const {return mFirstLED + mNumLEDs - 1;}
+        int GetLastLEDIndex() const {return first_led_ + num_leds_ - 1;}
 
         /*
          * Get the number of LEDs in this light bar
          */
-        int GetNumLEDs() const {return mNumLEDs;}
+        int GetNumLEDs() const {return num_leds_;}
 
     private:
 
-        int mFirstLED;
-        int mNumLEDs;
+        int first_led_;
+        int num_leds_;
 
     public:
 
         /**
          * Constructor
          * \param lights The neopixel lights object
-         * \param firstIndex The index of the first LED to use (LED indecies start at 0 in neopixels)
-         * \param numLEDS The number of LEDs to update
+         * \param first_index The index of the first LED to use (LED indecies start at 0 in neopixels)
+         * \param num_leds The number of LEDs to update
          */
-        CLightBar(Adafruit_NeoPixel &lights, int firstIndex, int numLEDs) : mLights(lights), mFirstLED(firstIndex), mNumLEDs(numLEDs) {};
+        LightBar(Adafruit_NeoPixel &lights, int first_index, int num_leds) : lights_(lights), first_led_(first_index), num_leds_(num_leds) {};
 
         /** Destructor */
-        virtual ~CLightBar() {};
+        virtual ~LightBar() {};
 
         /** Copy constructor disabled */
-        CLightBar(const CLightBar &) = delete;
+        LightBar(const LightBar &) = delete;
         /** Assignment operator disabled */
-        void operator=(const CLightBar &) = delete;
+        void operator=(const LightBar &) = delete;
 
         virtual void Initialize();
         virtual void Update(unsigned long &elapased);
@@ -64,18 +64,18 @@ class CLightBar {
 /**
  * Initialize the lights by clearing them.
  */
-void CLightBar::Initialize(){
-    mLights.begin();
+void LightBar::Initialize(){
+    lights_.begin();
     Clear();
-    mLights.show();
+    lights_.show();
 }
 
 /**
  * Initialize the lights by clearing them.
  */
-void CLightBar::Clear(){
+void LightBar::Clear(){
     for (int i = GetFirstLEDIndex(); i <= GetLastLEDIndex(); i++){
-        mLights.setPixelColor(i, 0, 0, 0);
+        lights_.setPixelColor(i, 0, 0, 0);
     }
 }
 
@@ -86,8 +86,8 @@ void CLightBar::Clear(){
  *
  * \param elapsed The time in milliseconds elapsed since last called
  */
-void CLightBar::Update(unsigned long &elapsed){
-    mLights.show();
+void LightBar::Update(unsigned long &elapsed){
+    lights_.show();
 }
 
 

@@ -11,17 +11,17 @@
 
 /*
  * light bar for a blinking display */
-class CLightBarStartupSides1 : public CLightBar {
+class LightBarStartupSides1 : public LightBar {
 
     public:
 
 
     private:
 
-        bool mCompleted = false;
-        int mCurrentStep = 0;
+        bool completed_ = false;
+        int current_step_ = 0;
          
-        EasyTimer mBlinkTimer = EasyTimer(40);   ///< The rate at which the lights during upshift should blink
+        EasyTimer blink_timer_ = EasyTimer(40);   ///< The rate at which the lights during upshift should blink
 
     protected:
 
@@ -29,20 +29,20 @@ class CLightBarStartupSides1 : public CLightBar {
     public:
 
         /** Constructor */
-        CLightBarStartupSides1(Adafruit_NeoPixel &lights, int firstIndex, int numLEDs);
+        LightBarStartupSides1(Adafruit_NeoPixel &lights, int first_index, int num_leds);
 
         /** Destructor */
-        virtual ~CLightBarStartupSides1() {};
+        virtual ~LightBarStartupSides1() {};
 
         /** Copy constructor disabled */
-        CLightBarStartupSides1(const CLightBarStartupSides1 &) = delete;
+        LightBarStartupSides1(const LightBarStartupSides1 &) = delete;
         /** Assignment operator disabled */
-        void operator=(const CLightBarStartupSides1 &) = delete;
+        void operator=(const LightBarStartupSides1 &) = delete;
 
         virtual void Initialize() override;
         virtual void Update(unsigned long &elapased) override;
 
-        bool IsCompleted() const {return mCompleted;}
+        bool IsCompleted() const {return completed_;}
 
 };
 
@@ -50,18 +50,18 @@ class CLightBarStartupSides1 : public CLightBar {
  * Constructor
  * \param lights The neopixel light object
  * \param first index The first index of the neopixels to use
- * \param numLEDs The number of LEDs to use
+ * \param num_leds The number of LEDs to use
  */
-CLightBarStartupSides1::CLightBarStartupSides1(Adafruit_NeoPixel &lights, int firstIndex, int numLEDs) : 
-            CLightBar(lights, firstIndex, numLEDs) {};
+LightBarStartupSides1::LightBarStartupSides1(Adafruit_NeoPixel &lights, int first_index, int num_leds) : 
+            LightBar(lights, first_index, num_leds) {};
 
 
 
 /**
  * Initialize the lights by clearing them.
  */
-void CLightBarStartupSides1::Initialize(){
-    CLightBar::Initialize();
+void LightBarStartupSides1::Initialize(){
+    LightBar::Initialize();
 }
 
 
@@ -71,24 +71,24 @@ void CLightBarStartupSides1::Initialize(){
  *
  * \param elapsed The time in milliseconds elapsed since last called
  */
-void CLightBarStartupSides1::Update(unsigned long &elapsed){
+void LightBarStartupSides1::Update(unsigned long &elapsed){
 
-    int led = GetLastLEDIndex() - (mCurrentStep / 255);
-    int pwm = mCurrentStep % 255;
+    int led = GetLastLEDIndex() - (current_step_ / 255);
+    int pwm = current_step_ % 255;
 
     // determine if we're done with all of the LEDs
     if (led < GetFirstLEDIndex()){
-        mCompleted = true;
+        completed_ = true;
         return;
     }
 
     // write the led
-    mLights.setPixelColor(led, pwm, pwm, pwm);
+    lights_.setPixelColor(led, pwm, pwm, pwm);
 
-    mCurrentStep += 5;
+    current_step_ += 5;
     
     // sends the update
-    CLightBar::Update(elapsed);
+    LightBar::Update(elapsed);
 
 }
 

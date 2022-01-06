@@ -12,27 +12,27 @@
 
 /*
  * light bar for a blinking display */
-class CLightBarBlinkSinusoidal : public CLightBarBlink {
+class LightBarBlinkSinusoidal : public LightBarBlink {
 
     private:
 
     protected:
 
-        unsigned long mPeriod = 5000; ///< The period of a sinusoidal cycle in milliseconds
-        unsigned long mCurrentTime = 0;   ///< Used to keep track of the current time in milliseconds since starting
+        unsigned long period_ = 5000; ///< The period of a sinusoidal cycle in milliseconds
+        unsigned long current_time_ = 0;   ///< Used to keep track of the current time in milliseconds since starting
 
     public:
 
         /** Constructor */
-        CLightBarBlinkSinusoidal(Adafruit_NeoPixel &lights, int firstIndex, int numLEDs);
+        LightBarBlinkSinusoidal(Adafruit_NeoPixel &lights, int first_index, int num_leds);
 
         /** Destructor */
-        virtual ~CLightBarBlinkSinusoidal() {};
+        virtual ~LightBarBlinkSinusoidal() {};
 
         /** Copy constructor disabled */
-        CLightBarBlinkSinusoidal(const CLightBarBlinkSinusoidal &) = delete;
+        LightBarBlinkSinusoidal(const LightBarBlinkSinusoidal &) = delete;
         /** Assignment operator disabled */
-        void operator=(const CLightBarBlinkSinusoidal &) = delete;
+        void operator=(const LightBarBlinkSinusoidal &) = delete;
 
         virtual void Initialize() override;
         virtual void Update(unsigned long &elapased) override;
@@ -43,19 +43,19 @@ class CLightBarBlinkSinusoidal : public CLightBarBlink {
  * Constructor
  * \param lights The neopixel light object
  * \param first index The first index of the neopixels to use
- * \param numLEDs The number of LEDs to use
+ * \param num_leds The number of LEDs to use
  */
-CLightBarBlinkSinusoidal::CLightBarBlinkSinusoidal(Adafruit_NeoPixel &lights, int firstIndex, int numLEDs) : 
-            CLightBarBlink(lights, firstIndex, numLEDs) {};
+LightBarBlinkSinusoidal::LightBarBlinkSinusoidal(Adafruit_NeoPixel &lights, int first_index, int num_leds) : 
+            LightBarBlink(lights, first_index, num_leds) {};
 
 
 
 /**
  * Initialize the lights by clearing them.
  */
-void CLightBarBlinkSinusoidal::Initialize(){
-    CLightBarBlink::Initialize();
-    mCurrentTime = 0;
+void LightBarBlinkSinusoidal::Initialize(){
+    LightBarBlink::Initialize();
+    current_time_ = 0;
 }
 
 
@@ -65,39 +65,39 @@ void CLightBarBlinkSinusoidal::Initialize(){
  *
  * \param elapsed The time in milliseconds elapsed since last called
  */
-void CLightBarBlinkSinusoidal::Update(unsigned long &elapsed){
+void LightBarBlinkSinusoidal::Update(unsigned long &elapsed){
 
 
     // if there is no signal set OR the signal's threshold has been reached, blink
-    if (!mSignal || mSignal->value() >= mMin){
+    if (!signal_ || signal_->value() >= min_){
 
         // if we just entered into blinking mode, reset the time
-        if (mState != Blinking){
-            mCurrentTime = 0;
+        if (state_ != Blinking){
+            current_time_ = 0;
         }
 
-        mState = Blinking;
+        state_ = Blinking;
 
         
     } else {
-        mState = Off;
+        state_ = Off;
     }
    
 
-    switch (mState){
+    switch (state_){
         case Off:
             Clear();
             break;
             
         case Blinking:
             // update elapsed time
-            mCurrentTime += elapsed;
+            current_time_ += elapsed;
 
             float fullCycle = 2 * PI;
-            float percentOn = (1 - cos(((float)(mCurrentTime % mPeriod) / (float)mPeriod) * fullCycle)) / 2;  // range [0, 1]
+            float percentOn = (1 - cos(((float)(current_time_ % period_) / (float)period_) * fullCycle)) / 2;  // range [0, 1]
 
             for (int led = GetFirstLEDIndex(); led <= GetLastLEDIndex(); led++){
-                mLights.setPixelColor(led, percentOn*mR, percentOn*mG, percentOn*mB);
+                lights_.setPixelColor(led, percentOn*r_, percentOn*g_, percentOn*b_);
             }
 
             break;
@@ -105,7 +105,7 @@ void CLightBarBlinkSinusoidal::Update(unsigned long &elapsed){
 
 
     // sends the update
-    CLightBar::Update(elapsed);
+    LightBar::Update(elapsed);
 
 }
 

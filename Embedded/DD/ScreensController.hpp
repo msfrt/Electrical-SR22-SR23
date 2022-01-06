@@ -1,5 +1,5 @@
-#ifndef CSCREENCONTROLLER_HPP
-#define CSCREENCONTROLLER_HPP
+#ifndef ScreenCONTROLLER_HPP
+#define ScreenCONTROLLER_HPP
 
 #include "ScreenInfo.hpp"
 #include "ScreenStartupAnim.hpp"
@@ -7,19 +7,19 @@
 #include "ScreenNumber.hpp"
 #include "ScreenLapTime.hpp"
 
-class CScreensController {
+class ScreensController {
 
     public:
 
-        CScreensController(ILI9341_t3n &left, ILI9341_t3n &right);
+        ScreensController(ILI9341_t3n &left, ILI9341_t3n &right);
 
         /** Destructor */
-        ~CScreensController();
+        ~ScreensController();
 
         /** Copy constructor disabled */
-        CScreensController(const CScreensController &) = delete;
+        ScreensController(const ScreensController &) = delete;
         /** Assignment operator disabled */
-        void operator=(const CScreensController &) = delete;
+        void operator=(const ScreensController &) = delete;
 
         /// the different states that the screens can be in. Please note that states should include
         /// transitionary states, such as ScreenBegin before Screen or whatever
@@ -29,7 +29,7 @@ class CScreensController {
          * Gets the current state of the screen
          * @returns the screen state
          */
-        int GetState() {return mState;}
+        int GetState() {return state_;}
 
         void Update(unsigned long &elapsed);
         void Initialize();
@@ -40,39 +40,39 @@ class CScreensController {
         /**
          *  Returns true if the a notification/message state is active
          */
-        bool IsNotificationActive() const {return mState == Notification || mState == LapTime; }
+        bool IsNotificationActive() const {return state_ == Notification || state_ == LapTime; }
 
 
     private:
 
-        ILI9341_t3n &mDisplayLeft;
-        ILI9341_t3n &mDisplayRight;
+        ILI9341_t3n &display_left_;
+        ILI9341_t3n &display_right_;
 
         void SetState(ScreenStates state);
 
-        ScreenStates mState;  ///< screen states
-        ScreenStates mStatePrev = GearInfo;  ///< Used to return to previous screen states after temporary states
-        unsigned long mStateStartTime = 0;  ///< The time in milliseconds that the current state started
+        ScreenStates state_;  ///< screen states
+        ScreenStates state_prev_ = GearInfo;  ///< Used to return to previous screen states after temporary states
+        unsigned long state_start_time_ = 0;  ///< The time in milliseconds that the current state started
 
-        unsigned long mMessageDisplayDuration = 5000;  ///< The time in milliseconds to display a message when recieved
-        unsigned long mLapTimeDisplayDuration = 5000;  ///< The time in milliseconds to display a laptime when triggered
+        unsigned long msg_display_duration_ = 5000;  ///< The time in milliseconds to display a message when recieved
+        unsigned long lap_time_display_duration_ = 5000;  ///< The time in milliseconds to display a laptime when triggered
 
 
         /* Screen definitions */
-        CScreenStartupAnim *mStartupScreenLeft  = nullptr;
-        CScreenStartupAnim *mStartupScreenRight = nullptr;
+        ScreenStartupAnim *startup_screen_left_  = nullptr;
+        ScreenStartupAnim *startup_screen_right_ = nullptr;
 
-        CScreenInfo *mInfoScreen1Left  = nullptr;
-        CScreenInfo *mInfoScreen1Right = nullptr;
+        ScreenInfo *info_screen_1_left_  = nullptr;
+        ScreenInfo *info_screen_1_right_ = nullptr;
 
-        CScreenInfo *mInfoScreen2Left  = nullptr;
-        CScreenInfo *mInfoScreen2Right = nullptr;
+        ScreenInfo *info_screen_2_left_  = nullptr;
+        ScreenInfo *info_screen_2_right_ = nullptr;
 
-        CScreenMessage *mMessageScreen = nullptr;
+        ScreenMessage *message_screen_ = nullptr;
 
-        CScreenNumber *mGearScreen = nullptr;
+        ScreenNumber *gear_screen_ = nullptr;
 
-        CScreenLapTime *mLapTimeScreen = nullptr;
+        ScreenLapTime *lap_time_screen_ = nullptr;
 
 };
 
@@ -82,40 +82,40 @@ class CScreensController {
  *
  * Constructs screens for all of the states and then sets the initial state
  */
-CScreensController::CScreensController(ILI9341_t3n &left, ILI9341_t3n &right) : 
-                                       mDisplayLeft(left), mDisplayRight(right){
+ScreensController::ScreensController(ILI9341_t3n &left, ILI9341_t3n &right) : 
+                                       display_left_(left), display_right_(right){
 
     /* gear screen */
-    mGearScreen = new CScreenNumber(mDisplayLeft, M400_gear, "GEAR:");
+    gear_screen_ = new ScreenNumber(display_left_, M400_gear, "GEAR:");
     
     /* Info screen 1 */
-    mInfoScreen1Left  = new CScreenInfo(mDisplayLeft);
-        mInfoScreen1Left->SetSignal(1, &M400_groundSpeed,     "SPD:", "%4.1f");
-        mInfoScreen1Left->SetSignal(2, &PDM_pdmVoltAvg,       "BAT:", "%4.1f");
-        mInfoScreen1Left->SetSignal(3, &ATCCF_brakeBias,      "BIAS:", "%2.0f%%");
-        mInfoScreen1Left->SetSignal(4, &PDM_fanLeftDutyCycle, "FANS:", "%3.0f");
+    info_screen_1_left_  = new ScreenInfo(display_left_);
+        info_screen_1_left_->SetSignal(1, &M400_groundSpeed,     "SPD:", "%4.1f");
+        info_screen_1_left_->SetSignal(2, &PDM_pdmVoltAvg,       "BAT:", "%4.1f");
+        info_screen_1_left_->SetSignal(3, &ATCCF_brakeBias,      "BIAS:", "%2.0f%%");
+        info_screen_1_left_->SetSignal(4, &PDM_fanLeftDutyCycle, "FANS:", "%3.0f");
 
-    mInfoScreen1Right = new CScreenInfo(mDisplayRight);
-        mInfoScreen1Right->SetSignal(1, &M400_rpm,         "RPM:",   "%5.1f", 1000);
-        mInfoScreen1Right->SetSignal(2, &M400_oilPressure, "OILP:",  "%4.1f");
-        mInfoScreen1Right->SetSignal(3, &M400_oilTemp,     "OILT:",  "%4.0f");
-        mInfoScreen1Right->SetSignal(4, &C50_tcSet,        "TCSET:", "%3.0f");
+    info_screen_1_right_ = new ScreenInfo(display_right_);
+        info_screen_1_right_->SetSignal(1, &M400_rpm,         "RPM:",   "%5.1f", 1000);
+        info_screen_1_right_->SetSignal(2, &M400_oilPressure, "OILP:",  "%4.1f");
+        info_screen_1_right_->SetSignal(3, &M400_oilTemp,     "OILT:",  "%4.0f");
+        info_screen_1_right_->SetSignal(4, &C50_tcSet,        "TCSET:", "%3.0f");
 
     /* Info screen 2 */
-    mInfoScreen2Left  = new CScreenInfo(mDisplayLeft);
-        mInfoScreen2Left->SetSignal(1, &ATCCF_rotorTempFL, "FL:", "%5.1f");
-        mInfoScreen2Left->SetSignal(2, &ATCCF_rotorTempFR, "FR:", "%5.1f");
-        mInfoScreen2Left->SetSignal(3, &ATCCR_rotorTempRL, "RL:", "%5.1f");
-        mInfoScreen2Left->SetSignal(4, &ATCCR_rotorTempRR, "RR:", "%5.1f");
+    info_screen_2_left_  = new ScreenInfo(display_left_);
+        info_screen_2_left_->SetSignal(1, &ATCCF_rotorTempFL, "FL:", "%5.1f");
+        info_screen_2_left_->SetSignal(2, &ATCCF_rotorTempFR, "FR:", "%5.1f");
+        info_screen_2_left_->SetSignal(3, &ATCCR_rotorTempRL, "RL:", "%5.1f");
+        info_screen_2_left_->SetSignal(4, &ATCCR_rotorTempRR, "RR:", "%5.1f");
     // keep the same screen on the right side
-    mInfoScreen2Right = mInfoScreen1Right;
+    info_screen_2_right_ = info_screen_1_right_;
 
 
     /* message screen */
-    mMessageScreen = new CScreenMessage(mDisplayLeft);
+    message_screen_ = new ScreenMessage(display_left_);
 
     /* laptime */
-    mLapTimeScreen = new CScreenLapTime(mDisplayLeft);
+    lap_time_screen_ = new ScreenLapTime(display_left_);
 
 
 }
@@ -126,23 +126,23 @@ CScreensController::CScreensController(ILI9341_t3n &left, ILI9341_t3n &right) :
  *
  * Destructs all dynamically allocated things
  */
-CScreensController::~CScreensController(){
+ScreensController::~ScreensController(){
 
     /* gear */
-    delete mGearScreen;
+    delete gear_screen_;
 
     /* Screen 1 */
-    delete mInfoScreen1Left;
-    delete mInfoScreen1Right;
+    delete info_screen_1_left_;
+    delete info_screen_1_right_;
 
     /* Screen 2 */
-    delete mInfoScreen2Left;
+    delete info_screen_2_left_;
 
     /* message display */
-    delete mMessageScreen;
+    delete message_screen_;
     
     /* laptime */
-    delete mLapTimeScreen;
+    delete lap_time_screen_;
 
 }
 
@@ -152,7 +152,7 @@ CScreensController::~CScreensController(){
  *
  * Sets the first state for the controller
  */
-void CScreensController::Initialize(){
+void ScreensController::Initialize(){
 
     SetState(GearInfo);
 
@@ -166,49 +166,49 @@ void CScreensController::Initialize(){
  * the updates are processed and the screens are written. 
  * \param elapsed The time in milliseconds since the update method was last called
  */
-void CScreensController::Update(unsigned long &elapsed){
+void ScreensController::Update(unsigned long &elapsed){
 
-    switch (mState){
+    switch (state_){
         // case StartupLeft:
-        //     mStartupScreenLeft->Update(elapsed);
-        //     if (mStartupScreenLeft->IsCompleted()){
+        //     startup_screen_left_->Update(elapsed);
+        //     if (startup_screen_left_->IsCompleted()){
         //         SetState(StartupRight);
         //     }
         //     break;
 
 
         // case StartupRight:
-        //     mStartupScreenRight->Update(elapsed); 
-        //     if (mStartupScreenRight->IsCompleted()){
+        //     startup_screen_right_->Update(elapsed); 
+        //     if (startup_screen_right_->IsCompleted()){
         //         SetState(InfoScreen1);
         //     } 
         //     break;
         case GearInfo:
-            mGearScreen->Update(elapsed);
-            mInfoScreen1Right->Update(elapsed);
+            gear_screen_->Update(elapsed);
+            info_screen_1_right_->Update(elapsed);
             break;
 
         case InfoScreen1:
-            mInfoScreen1Left->Update(elapsed);
-            mInfoScreen1Right->Update(elapsed);
+            info_screen_1_left_->Update(elapsed);
+            info_screen_1_right_->Update(elapsed);
             break;
 
         case InfoScreen2:
-            mInfoScreen2Left->Update(elapsed);
-            mInfoScreen2Right->Update(elapsed);
+            info_screen_2_left_->Update(elapsed);
+            info_screen_2_right_->Update(elapsed);
             break;
 
         case Notification:
-            mMessageScreen->Update(elapsed);
+            message_screen_->Update(elapsed);
 
             // update the last state's right screen, too!
-            switch (mStatePrev){
+            switch (state_prev_){
                 case GearInfo: // fall through
                 case InfoScreen1:
-                    mInfoScreen1Right->Update(elapsed);
+                    info_screen_1_right_->Update(elapsed);
                     break;
                 case InfoScreen2:
-                    mInfoScreen2Right->Update(elapsed);
+                    info_screen_2_right_->Update(elapsed);
                     break;
                 case Notification:
                     break;
@@ -219,22 +219,22 @@ void CScreensController::Update(unsigned long &elapsed){
             }
 
             // if the state is complete, set a new state
-            if (millis() - mStateStartTime > mMessageDisplayDuration){
-                SetState(mStatePrev);
+            if (millis() - state_start_time_ > msg_display_duration_){
+                SetState(state_prev_);
             }
 
             break;
 
         case LapTime:
-            mLapTimeScreen->Update(elapsed);
+            lap_time_screen_->Update(elapsed);
             // update the last state's right screen, too!
-            switch (mStatePrev){
+            switch (state_prev_){
                 case GearInfo: // fall through
                 case InfoScreen1:
-                    mInfoScreen1Right->Update(elapsed);
+                    info_screen_1_right_->Update(elapsed);
                     break;
                 case InfoScreen2:
-                    mInfoScreen2Right->Update(elapsed);
+                    info_screen_2_right_->Update(elapsed);
                     break;
                 case Notification:
                     break;
@@ -245,8 +245,8 @@ void CScreensController::Update(unsigned long &elapsed){
             }
 
             // if the state is complete, set a new state
-            if (millis() - mStateStartTime > mLapTimeDisplayDuration){
-                SetState(mStatePrev);
+            if (millis() - state_start_time_ > lap_time_display_duration_){
+                SetState(state_prev_);
             }
             break;
 
@@ -261,12 +261,12 @@ void CScreensController::Update(unsigned long &elapsed){
  *
  * \param state The state to set 
  */
-void CScreensController::SetState(ScreenStates state){
+void ScreensController::SetState(ScreenStates state){
 
     /*
      * State exiting actions
      */
-    switch (mState){
+    switch (state_){
         // case StartupLeft:
         //     break;
         // case StartupRight:
@@ -284,7 +284,7 @@ void CScreensController::SetState(ScreenStates state){
             // the notifaction state never existed, since after the next 10ish lines
             // of code, the previous state will be two states ago, and the current state
             // will be the last previous state... confusing but yeah
-            mState = mStatePrev;
+            state_ = state_prev_;
             break;
         case Titan:
             break;
@@ -293,38 +293,38 @@ void CScreensController::SetState(ScreenStates state){
     /*
      * Set the state
      */
-    mStatePrev = mState;  // move current to previous state
-    mState = state;       // move new input state to current state
-    mStateStartTime = millis();  // update state start time
+    state_prev_ = state_;  // move current to previous state
+    state_ = state;       // move new input state to current state
+    state_start_time_ = millis();  // update state start time
 
 
     /*
      * State entering actions
      */
-    switch (mState){
+    switch (state_){
         // case StartupLeft:
-        //     mStartupScreenLeft->Initialize();
+        //     startup_screen_left_->Initialize();
         //     break;
         // case StartupRight:
-        //     mStartupScreenRight->Initialize();
+        //     startup_screen_right_->Initialize();
         //     break;
         case GearInfo:
-            mGearScreen->Initialize();
-            mInfoScreen1Right->Initialize();
+            gear_screen_->Initialize();
+            info_screen_1_right_->Initialize();
             break;
         case InfoScreen1:
-            mInfoScreen1Left->Initialize();
-            mInfoScreen1Right->Initialize();
+            info_screen_1_left_->Initialize();
+            info_screen_1_right_->Initialize();
             break;
         case InfoScreen2:
-            mInfoScreen2Left->Initialize();
-            mInfoScreen2Right->Initialize();
+            info_screen_2_left_->Initialize();
+            info_screen_2_right_->Initialize();
             break;
         case Notification:
-            mMessageScreen->Initialize();
+            message_screen_->Initialize();
             break;
         case LapTime:
-            mLapTimeScreen->Initialize();
+            lap_time_screen_->Initialize();
             break;
         case Titan:
             break;
@@ -337,9 +337,9 @@ void CScreensController::SetState(ScreenStates state){
  * Called when the control button is pressed. This can either change the screen state
  * or disable the current notification screen.
  */
-void CScreensController::OnButtonPress(){
+void ScreensController::OnButtonPress(){
 
-    switch (mState){
+    switch (state_){
         // case StartupLeft:
         //     SetState(InfoScreen1);
         //     break;
@@ -357,7 +357,7 @@ void CScreensController::OnButtonPress(){
             break;
         case Notification: // fal through
         case LapTime:
-            SetState(mStatePrev);
+            SetState(state_prev_);
             break;
         case Titan:
             break;
@@ -370,10 +370,10 @@ void CScreensController::OnButtonPress(){
  * What to do when a message is recieved
  * \param msg The message to display
  */
-void CScreensController::OnMessage(String msg){
+void ScreensController::OnMessage(String msg){
 
-    if (mMessageScreen){
-        mMessageScreen->SetMessage(msg);
+    if (message_screen_){
+        message_screen_->SetMessage(msg);
     }
     SetState(Notification);
 
@@ -383,9 +383,9 @@ void CScreensController::OnMessage(String msg){
 /**
  * Called when a new lap is triggered
  */
-void CScreensController::OnNewLap(){
+void ScreensController::OnNewLap(){
 
-    if(mLapTimeScreen){
+    if(lap_time_screen_){
         SetState(LapTime);
     }
 

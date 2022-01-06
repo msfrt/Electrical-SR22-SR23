@@ -72,7 +72,7 @@ Adafruit_NeoPixel pixelsRight = Adafruit_NeoPixel(pixelsRightCount, pixelsRightP
 
 
 
-// used for light-sensor dimming
+// used for light-sensor dimin_g
 const int displayBrightnessPercentNight = 75;
 const int displayBrightnessPercentDay = 100;
 
@@ -127,9 +127,9 @@ EasyTimer debug(50); // debugging timer
 #include "LightBarController.hpp"
 
 
-CScreensController screensController(displayLeft, displayRight);
-CLightBarController lightsController(pixelsLeft, pixelsTop, pixelsRight);
-//CScreenInfo testScreen(displayLeft, DISPLAY_WIDTH, DISPLAY_HEIGHT);
+ScreensController screensController(displayLeft, displayRight);
+LightBarController lightsController(pixelsLeft, pixelsTop, pixelsRight);
+//ScreenInfo testScreen(displayLeft, DISPLAY_WIDTH, DISPLAY_HEIGHT);
 
 
 void setup() {

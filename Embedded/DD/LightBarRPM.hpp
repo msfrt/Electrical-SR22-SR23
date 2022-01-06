@@ -11,7 +11,7 @@
 
 /*
  * light bar for an RPM display */
-class CLightBarRPM : public CLightBar {
+class LightBarRPM : public LightBar {
 
     public:
 
@@ -19,21 +19,21 @@ class CLightBarRPM : public CLightBar {
 
     private:
          
-        StateSignal &mRPM;   ///< The RPM signal
-        int mMin;   ///< The minimum bound for the RPM bar to start lighting up
-        int mMax;   ///< The maximum bound for the rpm bar light up before signalling an upshift
-        int mDownshift;   ///< Signal a downshift if below this RPM. Set to a negative number to disable.
+        StateSignal &rpm_signal_;   ///< The RPM signal
+        int min_;   ///< The minimum bound for the RPM bar to start lighting up
+        int max_;   ///< The maximum bound for the rpm bar light up before signalling an upshift
+        int downshift_limit_;   ///< Signal a downshift if below this RPM. Set to a negative number to disable.
 
-        BarStates mState = Normal;   ///< The current state of LED light output
+        BarStates state_ = Normal;   ///< The current state of LED light output
 
-        EasyTimer mUpshiftBlinkTimer = EasyTimer(20);   ///< The rate at which the lights during upshift should blink
-        bool mUpshiftOn = false;  ///< Whether the lights are currently on or off in the upshift flash
+        EasyTimer upshift_blink_timer_ = EasyTimer(20);   ///< The rate at which the lights during upshift should blink
+        bool upshift_on_ = false;  ///< Whether the lights are currently on or off in the upshift flash
 
-        int mBarPWMPositions;   ///< The number total pwms that the bar has (calculated upon construction. 255 posns per LED)
-        int mNumYellow;   ///< number of yellow pixels
-        int mNumRed;      ///< number of red pixels
+        int bar_pwm_positions_;   ///< The number total pwms that the bar has (calculated upon construction. 255 posns per LED)
+        int num_yellow_;   ///< number of yellow pixels
+        int num_red_;      ///< number of red pixels
 
-        int CalculatePWM(int &totalBarPWMs);
+        int CalculatePWM(int &total_bar_pwms);
 
     protected:
 
@@ -41,15 +41,15 @@ class CLightBarRPM : public CLightBar {
     public:
 
         /** Constructor */
-        CLightBarRPM(Adafruit_NeoPixel &lights, int firstIndex, int numLEDs, StateSignal &rpmSignal, int minRPM, int maxRPM, int downshiftRPM = -1);
+        LightBarRPM(Adafruit_NeoPixel &lights, int first_index, int num_leds, StateSignal &rpsignal_, int min_rpm, int max_rpm, int downshift_rpm = -1);
 
         /** Destructor */
-        virtual ~CLightBarRPM() {};
+        virtual ~LightBarRPM() {};
 
         /** Copy constructor disabled */
-        CLightBarRPM(const CLightBarRPM &) = delete;
+        LightBarRPM(const LightBarRPM &) = delete;
         /** Assignment operator disabled */
-        void operator=(const CLightBarRPM &) = delete;
+        void operator=(const LightBarRPM &) = delete;
 
         virtual void Initialize() override;
         virtual void Update(unsigned long &elapased) override;
@@ -60,18 +60,18 @@ class CLightBarRPM : public CLightBar {
  * Constructor
  * \param lights The neopixel light object
  * \param first index The first index of the neopixels to use
- * \param numLEDs The number of LEDs to use
+ * \param num_leds The number of LEDs to use
  * \param rpm The RPM signal
- * \param minRPM The minimum bound for the RPM bar to start lighting up
- * \param maxRPM The maximum bound for the rpm bar light up before signalling an upshift
- * \param downshiftRPM The RPM to signal a downshift below
+ * \param min_rpm The minimum bound for the RPM bar to start lighting up
+ * \param max_rpm The maximum bound for the rpm bar light up before signalling an upshift
+ * \param downshift_rpm The RPM to signal a downshift below
  */
-CLightBarRPM::CLightBarRPM(Adafruit_NeoPixel &lights, int firstIndex, int numLEDs, StateSignal &rpmSignal, int minRPM, int maxRPM, int downshiftRPM) : 
-            CLightBar(lights, firstIndex, numLEDs), mRPM(rpmSignal), mMin(minRPM), mMax(maxRPM), mDownshift(downshiftRPM) {
+LightBarRPM::LightBarRPM(Adafruit_NeoPixel &lights, int first_index, int num_leds, StateSignal &rpsignal_, int min_rpm, int max_rpm, int downshift_rpm) : 
+            LightBar(lights, first_index, num_leds), rpm_signal_(rpsignal_), min_(min_rpm), max_(max_rpm), downshift_limit_(downshift_rpm) {
 
-    mBarPWMPositions = numLEDs * 255;
-    mNumYellow = numLEDs * 0.25;
-    mNumRed = numLEDs * 0.25;
+    bar_pwm_positions_ = num_leds * 255;
+    num_yellow_ = num_leds * 0.25;
+    num_red_ = num_leds * 0.25;
 }
 
 
@@ -79,8 +79,8 @@ CLightBarRPM::CLightBarRPM(Adafruit_NeoPixel &lights, int firstIndex, int numLED
 /**
  * Initialize the lights by clearing them.
  */
-void CLightBarRPM::Initialize(){
-    CLightBar::Initialize();
+void LightBarRPM::Initialize(){
+    LightBar::Initialize();
 }
 
 
@@ -90,21 +90,21 @@ void CLightBarRPM::Initialize(){
  *  LED in the bar of LEDs.
  * \returns an integer 0-255 representing a PWM value;
  */
-int CLightBarRPM::CalculatePWM(int &totalBarPWMs){
+int LightBarRPM::CalculatePWM(int &total_bar_pwms){
 
     // led should be completely on
-    if (totalBarPWMs >= 255){
-        totalBarPWMs -= 255;
+    if (total_bar_pwms >= 255){
+        total_bar_pwms -= 255;
         return 255;
     
     // led should be completely off
-    } else if (totalBarPWMs <= 0){
+    } else if (total_bar_pwms <= 0){
         return 0;
 
     // led is somewhere in the middle
     } else {
-        int temp = totalBarPWMs;
-        totalBarPWMs = 0;
+        int temp = total_bar_pwms;
+        total_bar_pwms = 0;
         return temp;
     }
 }
@@ -117,34 +117,34 @@ int CLightBarRPM::CalculatePWM(int &totalBarPWMs){
  *
  * \param elapsed The time in milliseconds elapsed since last called
  */
-void CLightBarRPM::Update(unsigned long &elapsed){
+void LightBarRPM::Update(unsigned long &elapsed){
 
 
     // first, determine the state
-    if ((int)mRPM.value() > mMax){
-        mState = Upshift;
+    if ((int)rpm_signal_.value() > max_){
+        state_ = Upshift;
 
-    } else if ((int)mRPM.value() > mMin){
-        mState = Normal;
+    } else if ((int)rpm_signal_.value() > min_){
+        state_ = Normal;
 
-    } else if ((int)mRPM.value() > mDownshift ){
-        mState = Off;
+    } else if ((int)rpm_signal_.value() > downshift_limit_ ){
+        state_ = Off;
 
     } else {
-        mState = Downshift;
+        state_ = Downshift;
 
     }
 
     
-    //Serial.println(mState);
+    //Serial.println(state_);
 
 
-    switch (mState){
+    switch (state_){
         case Downshift:
             {
                 int red = 0;
                 for (int i = GetFirstLEDIndex(); i <= GetLastLEDIndex(); i++){
-                    mLights.setPixelColor(i, red, 0, 255); // burple
+                    lights_.setPixelColor(i, red, 0, 255); // burple
                     if (i < GetNumLEDs()/2 - 1){
                         red += 30;
                     } else if (i == GetNumLEDs()/2) { 
@@ -158,27 +158,27 @@ void CLightBarRPM::Update(unsigned long &elapsed){
 
         case Off:
             Clear();
-            CLightBar::Update(elapsed);
+            LightBar::Update(elapsed);
             break;
 
         case Normal:
             {  // brackets needed since we initilize a value here
-                int barPWMs = map(mRPM.value(), mMin, mMax, 0, mBarPWMPositions);
+                int bar_pwms = map(rpm_signal_.value(), min_, max_, 0, bar_pwm_positions_);
 
                 for (int led = GetFirstLEDIndex(); led <= GetLastLEDIndex(); led++){
 
                     // green
-                    if (led < GetNumLEDs() - mNumYellow - mNumRed){
-                        mLights.setPixelColor(led, 0, CalculatePWM(barPWMs), 0);
+                    if (led < GetNumLEDs() - num_yellow_ - num_red_){
+                        lights_.setPixelColor(led, 0, CalculatePWM(bar_pwms), 0);
                     
                     // yellow
-                    } else if (led < GetNumLEDs() - mNumRed){
-                        int pwms = CalculatePWM(barPWMs);
-                        mLights.setPixelColor(led, pwms, pwms, 0);
+                    } else if (led < GetNumLEDs() - num_red_){
+                        int pwms = CalculatePWM(bar_pwms);
+                        lights_.setPixelColor(led, pwms, pwms, 0);
 
                     // red
                     } else {
-                        mLights.setPixelColor(led, CalculatePWM(barPWMs), 0, 0);
+                        lights_.setPixelColor(led, CalculatePWM(bar_pwms), 0, 0);
                     }
 
                     
@@ -189,14 +189,14 @@ void CLightBarRPM::Update(unsigned long &elapsed){
 
         case Upshift:
             
-            if (mUpshiftBlinkTimer.isup()){
-                if (mUpshiftOn){
-                    mUpshiftOn = false;
+            if (upshift_blink_timer_.isup()){
+                if (upshift_on_){
+                    upshift_on_ = false;
                     Clear();
                 } else {
-                    mUpshiftOn = true;
+                    upshift_on_ = true;
                     for (int i = GetFirstLEDIndex(); i <= GetLastLEDIndex(); i++){
-                        mLights.setPixelColor(i, 255, 0, 0); // red
+                        lights_.setPixelColor(i, 255, 0, 0); // red
                     }
                 }
             }
@@ -205,7 +205,7 @@ void CLightBarRPM::Update(unsigned long &elapsed){
     }
 
     // sends the update
-    CLightBar::Update(elapsed);
+    LightBar::Update(elapsed);
 
 }
 
