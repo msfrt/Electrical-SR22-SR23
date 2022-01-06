@@ -35,16 +35,9 @@ script should have a `README.md` file for important information regarding the as
 The most common style guide for c++ code is the
 [Google Style Guide](https://google.github.io/styleguide/cppguide.html). We will not be using the Google Style Guide
 word-for-word, however, you should make your best attempt to follow it. CSE 232 uses the Google Style Guide, so if you
-haven't taken it yet, this is a great opportunity to get ahead of the pack. One deviation from the guide is the line
-length limit. Limits are important, but 80 is just too short. We will use a line length limit of 120, and anything
-after that length should wrap around to the next line (In Atom, you can change the preferred length in: File >
-Settings > Editor > Preferred line length). Uniformity to code is the one of the keys to understandability.
+haven't taken it yet, this is a great opportunity to get ahead of the pack. Uniformity to code is the one of the keys to understandability.
 If you look back at older code from the team, you'll probably struggle to understand it. This was because there was no
 style guide. The style guide is important. Always follow the style guide.
-
-Here are some things that you should change in Atom to be compliant with the style guide:
-* Preferred line length: 120 (as mentioned above)
-* Tab size: 2 (preferences > settings > editor > tab length)
 
 ## Software Flow
 
@@ -58,12 +51,7 @@ Because we are not savages, and we use Atom as our preferred text editor, we nee
 The [Teensyduino](https://www.pjrc.com/teensy/teensyduino.html) Arduino add-on adds the Teensy microcontroller boards
 to Arduino, as well as a program the enables communication and programming via a USB bootloader.
 
-##### Atom
-[Atom](https://atom.io/) is a popular text editor that you will probably spend most of your time in. It's 100%
+##### VSCode
+[VSCode](https://code.visualstudio.com/) is a popular text editor that you will probably spend most of your time in. It's
 customizable, so you can change themes, plugins, and configurations to suit your needs exactly. Dave uses the
-[Monokai](https://atom.io/themes/monokai) theme because he likes fruity colors, but you can use whatever you want. A
-few packages that we highly recommend:
-* [Linter](https://atom.io/packages/linter)
-* [Minimap](https://atom.io/packages/minimap)
-* [File Icons](https://atom.io/packages/file-icons)
-* [autosave](https://atom.io/packages/autosave)
+[OneDark](https://marketplace.visualstudio.com/items?itemName=zhuangtongfa.Material-theme) theme because he likes fruity colors, but you can use whatever you want.
