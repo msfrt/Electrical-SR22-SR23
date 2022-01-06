@@ -16,6 +16,14 @@
 FlexCAN_T4<CAN1, RX_SIZE_256, TX_SIZE_16> cbus1;
 FlexCAN_T4<CAN2, RX_SIZE_256, TX_SIZE_16> cbus2;
 static CAN_message_t rxmsg;
+// each bus has a total of 64 mailboxes
+#define NUM_RX_STD_MAILBOXES 60
+#define NUM_RX_EXT_MAILBOXES 2
+#define NUM_TX_MAILBOXES 2
+// limit the number of messages each bus can read for each loop cycle. Typically, only one
+// message is recieved in the time that the loop can run, but a buildup can occur, and this
+// limit can poll the bus to read messages while not getting stuck in an infinite loop
+#define MAX_CAN_FRAME_READ_PER_CYCLE 5
 
 // BoardTemp(int pin, int read_bits, int temp_cal, int mv_cal);
 BoardTempDiode board_temp(21, READ_RESOLUTION_BITS, 26.2, 598);
@@ -191,7 +199,7 @@ void setup() {
 
   debug.set_delay_millis(10000);
 
-  //cbus2.mailboxStatus();
+  cbus1.mailboxStatus();
 
 
 }
@@ -208,20 +216,22 @@ void loop() {
   
 
   // read any incoming CAN messages
+  // Serial.println("Reading CAN:");
   read_can();
+  // cbus1.events();
   
   // if there is a new message to display to the driver, assemble and display it
   if (CMD_driverMessageChar0.is_updated()){
-    String displayString = "";
-    displayString += (char) CMD_driverMessageChar0.value();
-    displayString += (char) CMD_driverMessageChar1.value();
-    displayString += (char) CMD_driverMessageChar2.value();
-    displayString += (char) CMD_driverMessageChar3.value();
-    displayString += (char) CMD_driverMessageChar4.value();
-    displayString += (char) CMD_driverMessageChar5.value();
-    displayString += (char) CMD_driverMessageChar6.value();
-    displayString += (char) CMD_driverMessageChar7.value();
-    displayString.trim();
+    char displayStringChars[] = "\0\0\0\0\0\0\0\0\0";
+    displayStringChars[0] = CMD_driverMessageChar0.value();
+    displayStringChars[1] = CMD_driverMessageChar1.value();
+    displayStringChars[2] = CMD_driverMessageChar2.value();
+    displayStringChars[3] = CMD_driverMessageChar3.value();
+    displayStringChars[4] = CMD_driverMessageChar4.value();
+    displayStringChars[5] = CMD_driverMessageChar5.value();
+    displayStringChars[6] = CMD_driverMessageChar6.value();
+    displayStringChars[7] = CMD_driverMessageChar7.value();
+    String displayString(displayStringChars);
     screensController.OnMessage(displayString);
   }
 
@@ -243,16 +253,25 @@ void loop() {
 
 
 
-  // if (debug.isup()){
-  //   screensController.OnButtonPress();
-  //   lightsController.OnButtonPress();
-  // }
+  if (debug.isup()){
+    //screensController.OnButtonPress();
+    //lightsController.OnButtonPress();
+    //cbus1.mailboxStatus();
+  }
   
 
 }
 
 
+void test_callback1(const CAN_message_t &imsg){
+  //Serial.println("Recieved 1");
+  decode_CAN1(imsg);
+}
 
+void test_callback2(const CAN_message_t &imsg){
+  //Serial.println("Recieved 2");
+  decode_CAN1(imsg);
+}
 
 
 void set_mailboxes(){
@@ -260,65 +279,64 @@ void set_mailboxes(){
   // to view mailbox status, you can use the member function mailboxStatus(). Don't put it in a fast loop, though,
   // because you may actually affect how the chips moves things around
 
-  cbus1.setMaxMB(64);
-  cbus1.setMB(MB4,RX,STD);  // first 30 mailboxes as rx, 2 rx extended. this is pretty overkill, but hey, here they are
-  cbus1.setMB(MB5,RX,STD);  // this leaves the last 32 mailboxes for tx
-  cbus1.setMB(MB6,RX,STD);
-  cbus1.setMB(MB7,RX,STD);
-  cbus1.setMB(MB8,RX,STD);
-  cbus1.setMB(MB9,RX,STD);
-  cbus1.setMB(MB10,RX,STD);
-  cbus1.setMB(MB11,RX,STD);
-  cbus1.setMB(MB12,RX,STD);
-  cbus1.setMB(MB13,RX,STD);
-  cbus1.setMB(MB14,RX,STD);
-  cbus1.setMB(MB15,RX,STD);
-  cbus1.setMB(MB16,RX,STD);
-  cbus1.setMB(MB17,RX,STD);
-  cbus1.setMB(MB18,RX,STD);
-  cbus1.setMB(MB19,RX,STD);
-  cbus1.setMB(MB20,RX,STD);
-  cbus1.setMB(MB21,RX,STD);
-  cbus1.setMB(MB22,RX,STD);
-  cbus1.setMB(MB23,RX,STD);
-  cbus1.setMB(MB24,RX,STD);
-  cbus1.setMB(MB25,RX,STD);
-  cbus1.setMB(MB26,RX,STD);
-  cbus1.setMB(MB27,RX,STD);
-  cbus1.setMB(MB28,RX,STD);
-  cbus1.setMB(MB29,RX,STD);
-  cbus1.setMB(MB30,RX,EXT);
-  cbus1.setMB(MB31,RX,EXT);
-
+  cbus1.setMaxMB(64);  // use all mailboxes of course
   cbus2.setMaxMB(64);
-  cbus2.setMB(MB4,RX,STD);
-  cbus2.setMB(MB5,RX,STD);
-  cbus2.setMB(MB6,RX,STD);
-  cbus2.setMB(MB7,RX,STD);
-  cbus2.setMB(MB8,RX,STD);
-  cbus2.setMB(MB9,RX,STD);
-  cbus2.setMB(MB10,RX,STD);
-  cbus2.setMB(MB11,RX,STD);
-  cbus2.setMB(MB12,RX,STD);
-  cbus2.setMB(MB13,RX,STD);
-  cbus2.setMB(MB14,RX,STD);
-  cbus2.setMB(MB15,RX,STD);
-  cbus2.setMB(MB16,RX,STD);
-  cbus2.setMB(MB17,RX,STD);
-  cbus2.setMB(MB18,RX,STD);
-  cbus2.setMB(MB19,RX,STD);
-  cbus2.setMB(MB20,RX,STD);
-  cbus2.setMB(MB21,RX,STD);
-  cbus2.setMB(MB22,RX,STD);
-  cbus2.setMB(MB23,RX,STD);
-  cbus2.setMB(MB24,RX,STD);
-  cbus2.setMB(MB25,RX,STD);
-  cbus2.setMB(MB26,RX,STD);
-  cbus2.setMB(MB27,RX,STD);
-  cbus2.setMB(MB28,RX,STD);
-  cbus2.setMB(MB29,RX,STD);
-  cbus2.setMB(MB30,RX,EXT);
-  cbus2.setMB(MB31,RX,EXT);
+
+  for (int i=0; i<NUM_RX_STD_MAILBOXES; i++){
+    cbus1.setMB((FLEXCAN_MAILBOX)i, RX, STD);
+    cbus2.setMB((FLEXCAN_MAILBOX)i, RX, STD);
+  }
+  for (int i=NUM_RX_STD_MAILBOXES; i<(NUM_RX_STD_MAILBOXES + NUM_RX_EXT_MAILBOXES); i++){
+    cbus1.setMB((FLEXCAN_MAILBOX)i, RX, EXT);
+    cbus2.setMB((FLEXCAN_MAILBOX)i, RX, EXT);
+  }
+  for (int i=(NUM_RX_STD_MAILBOXES + NUM_RX_EXT_MAILBOXES); i<(NUM_RX_STD_MAILBOXES + NUM_RX_EXT_MAILBOXES + NUM_TX_MAILBOXES); i++){
+    cbus1.setMB((FLEXCAN_MAILBOX)i, TX, STD);
+    cbus2.setMB((FLEXCAN_MAILBOX)i, TX, STD);
+  }
+
+  // be sure to assign at least one mailbox to each message that you want to read.
+  // filtering allows us to avoid using clock cycles to read messages that we have no interest in.
+  // it also reserves a slot for messages as they are recieved.
+  cbus1.setMBFilter(REJECT_ALL);
+  cbus1.setMBFilter(MB0, TCGPS_laptrigger.get_msg_id());
+  cbus1.setMBFilter(MB1, C50_tcSet.get_msg_id());
+  cbus1.setMBFilter(MB2, M400_groundSpeed.get_msg_id());
+  cbus1.setMBFilter(MB3, M400_rpm.get_msg_id());
+  cbus1.setMBFilter(MB4, M400_oilPressure.get_msg_id());
+  cbus1.setMBFilter(MB5, M400_oilTemp.get_msg_id());
+  cbus1.setMBFilter(MB6, CMD_driverMessageChar0.get_msg_id());
+  cbus1.setMBFilter(MB7, CMD_driverNotificationLightR.get_msg_id());
+  cbus1.setMBFilter(MB8, 0);
+  cbus1.setMBFilter(MB9, 0);
+  cbus1.setMBFilter(MB10, 0);
+  cbus1.setMBFilter(MB11, 0);
+  cbus1.setMBFilter(MB12, 0);
+  cbus1.setMBFilter(MB13, 0);
+  cbus1.setMBFilter(MB14, 0);
+
+
+  
+  cbus2.setMBFilter(REJECT_ALL);
+  cbus2.setMBFilter(MB0, PDM_pdmVoltAvg.get_msg_id());
+  cbus2.setMBFilter(MB1, ATCCF_brakeBias.get_msg_id());
+  cbus2.setMBFilter(MB2, ATCCF_rotorTempFL.get_msg_id()); // includes FR
+  cbus2.setMBFilter(MB3, ATCCR_rotorTempRL.get_msg_id());  // includes FR
+  cbus2.setMBFilter(MB4, PDM_coolingOverrideActive.get_msg_id());
+  cbus2.setMBFilter(MB5, 0);
+  cbus2.setMBFilter(MB6, 0);
+  cbus2.setMBFilter(MB7, 0);
+  cbus2.setMBFilter(MB8, 0);
+  cbus2.setMBFilter(MB9, 0);
+  cbus2.setMBFilter(MB10, 0);
+  cbus2.setMBFilter(MB11, 0);
+  cbus2.setMBFilter(MB12, 0);
+  cbus2.setMBFilter(MB13, 0);
+  cbus2.setMBFilter(MB14, 0);
+  
+
+  
+
 }
 
 
@@ -328,12 +346,16 @@ void set_mailboxes(){
  **/
 void read_can(){
 
-  if (cbus1.read(rxmsg)){
+  int count = 0;
+  while (cbus1.read(rxmsg) && count < MAX_CAN_FRAME_READ_PER_CYCLE){
     decode_CAN1(rxmsg);
+    count++;
   }
 
-  if (cbus2.read(rxmsg)){
+  count = 0;
+  while (cbus2.read(rxmsg) && count < MAX_CAN_FRAME_READ_PER_CYCLE){
     decode_CAN2(rxmsg);
+    count++;
   }
 
 }

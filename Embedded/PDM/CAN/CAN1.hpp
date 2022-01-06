@@ -8,8 +8,8 @@
     
 ******************************************************************************/
 
-#ifndef EMBEDDED_DD_CAN_CAN1_HPP
-#define EMBEDDED_DD_CAN_CAN1_HPP
+#ifndef EMBEDDED_PDM_CAN_CAN1_HPP
+#define EMBEDDED_PDM_CAN_CAN1_HPP
 
 #include <FlexCAN_T4.h>
 #include <StateCAN.h>

@@ -89,6 +89,8 @@ void CScreenMessage::Initialize(){
         }
     }
 
+    Serial.println(realLength);
+
     mDisplay.setCursor((mMaxChars - realLength) * ((mWidth / 2) / mMaxChars), mHeight/2 - mFontHeight/2);
     mDisplay.setFont(mFont);
     mDisplay.print(mMessage);

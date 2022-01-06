@@ -363,12 +363,12 @@ void CScreensController::OnButtonPress(){
 
 /**
  * What to do when a message is recieved
- * \param message The message to display
+ * \param msg The message to display
  */
-void CScreensController::OnMessage(String message){
+void CScreensController::OnMessage(String msg){
 
     if (mMessageScreen){
-        mMessageScreen->SetMessage(message);
+        mMessageScreen->SetMessage(msg);
     }
     SetState(Notification);
 
