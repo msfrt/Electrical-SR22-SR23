@@ -18,7 +18,7 @@
 StateSignal ATCCR_counterMsg467(4, false, 1, 0.0, 0, 15, 0.0, 0, 467);
 StateSignal ATCCR_egt4(16, true, 10, 0.0, 0, 1000, 0.0, 0, 467);
 StateSignal ATCCR_rectifierCurrent(16, true, 10, 0.0, -200, 200, 0.0, 0, 467);
-StateSignal ATCCR_shiftingPressure(16, true, 10, 0.0, -5, 200, 0.0, 0, 467);
+StateSignal ATCCR_coolantTempRadMiddle(16, true, 10, 0.0, 0, 120, 0.0, 0, 467);
 
 // Message: ATCCR_16 [0x1d2]
 StateSignal ATCCR_counterMsg466(4, false, 1, 0.0, 0, 15, 0.0, 0, 466);
@@ -29,10 +29,10 @@ StateSignal ATCCR_egt3(16, true, 10, 0.0, 0, 1000, 0.0, 0, 466);
 // Message: ATCCR_15 [0x1d1]
 StateSignal ATCCR_counterMsg465(4, false, 1, 0.0, 0, 15, 0.0, 0, 465);
 StateSignal ATCCR_uptime(32, false, 1, 0.0, 0, 4294967295, 0.0, 0, 465);
-StateSignal ATCCR_coolantTempRadMiddle(16, true, 10, 0.0, 0, 120, 0.0, 0, 465);
+StateSignal ATCCR_shiftingPressure(16, true, 10, 0.0, -5, 200, 0.0, 0, 465);
 
-// Message: ATCCF_16 [0x1a0]
-StateSignal ATCCF_uptime(32, false, 1, 0.0, 0, 4294967295, 0.0, 0, 416);
+// Message: ATCCF_15 [0x19f]
+StateSignal ATCCF_uptime(32, false, 1, 0.0, 0, 4294967295, 0.0, 0, 415);
 
 // Message: PDM_26 [0x114]
 StateSignal PDM_uptime(32, false, 1, 0.0, 0, 4294967295, 0.0, 0, 276);
@@ -66,11 +66,6 @@ StateSignal VCU_teensyTemp(16, true, 10, 0.0, 0, 150, 0.0, 0, 160);
 StateSignal DD_counterMsg210(4, false, 1, 0.0, 0, 15, 0.0, 0, 710);
 StateSignal DD_boardTemp(16, true, 10, 0.0, 0, 150, 0.0, 0, 710);
 StateSignal DD_teensyTemp(16, true, 10, 0.0, 0, 150, 0.0, 0, 710);
-
-// Message: ATCCF_15 [0x19f]
-StateSignal ATCCF_counterMsg415(4, false, 1, 0.0, 0, 15, 0.0, 0, 415);
-StateSignal ATCCF_boardTemp(16, true, 10, 0.0, -5, 100, 0.0, 0, 415);
-StateSignal ATCCF_teensyTemp(16, true, 10, 0.0, -5, 100, 0.0, 0, 415);
 
 // Message: PDM_23 [0x111]
 StateSignal PDM_counterMsg273(4, false, 1, 0.0, 0, 15, 0.0, 0, 273);
@@ -201,6 +196,7 @@ StateSignal ATCCF_tireTempFLO(16, true, 10, 0.0, 0, 100, 0.0, 0, 413);
 
 // Message: ATCCF_12 [0x19c]
 StateSignal ATCCF_counterMsg412(4, false, 1, 0.0, 0, 15, 0.0, 0, 412);
+StateSignal ATCCF_teensyTemp(16, true, 10, 0.0, -5, 100, 0.0, 0, 412);
 StateSignal ATCCF_rotorTempFL(16, true, 10, 0.0, 0, 1000, 0.0, 0, 412);
 StateSignal ATCCF_rotorTempFR(16, true, 10, 0.0, 0, 1000, 0.0, 0, 412);
 
@@ -208,7 +204,7 @@ StateSignal ATCCF_rotorTempFR(16, true, 10, 0.0, 0, 1000, 0.0, 0, 412);
 StateSignal ATCCF_counterMsg411(4, false, 1, 0.0, 0, 15, 0.0, 0, 411);
 StateSignal ATCCF_brakePressureF(16, true, 10, 0.0, 0, 2000, 0.0, 0, 411);
 StateSignal ATCCF_brakePressureR(16, true, 10, 0.0, 0, 2000, 0.0, 0, 411);
-StateSignal ATCCF_steeringWheelAngle(16, true, 10, 0.0, -180, 180, 0.0, 0, 411);
+StateSignal ATCCF_boardTemp(16, true, 10, 0.0, -5, 100, 0.0, 0, 411);
 
 // Message: ATCCF_10 [0x19a]
 StateSignal ATCCF_counterMsg410(4, false, 1, 0.0, 0, 15, 0.0, 0, 410);
@@ -235,7 +231,7 @@ void read_ATCCR_17(const CAN_message_t &imsg) {
 	ATCCR_counterMsg467.set_can_value(((imsg.buf[0] & 0b00001111)));
 	ATCCR_egt4.set_can_value((imsg.buf[2]) | (imsg.buf[3] << 8));
 	ATCCR_rectifierCurrent.set_can_value((imsg.buf[4]) | (imsg.buf[5] << 8));
-	ATCCR_shiftingPressure.set_can_value((imsg.buf[6]) | (imsg.buf[7] << 8));
+	ATCCR_coolantTempRadMiddle.set_can_value((imsg.buf[6]) | (imsg.buf[7] << 8));
 
 }
 
@@ -260,15 +256,15 @@ void read_ATCCR_15(const CAN_message_t &imsg) {
 
 	ATCCR_counterMsg465.set_can_value(((imsg.buf[0] & 0b00001111)));
 	ATCCR_uptime.set_can_value((imsg.buf[2]) | (imsg.buf[3] << 8) | (imsg.buf[4] << 16) | (imsg.buf[5] << 24));
-	ATCCR_coolantTempRadMiddle.set_can_value((imsg.buf[6]) | (imsg.buf[7] << 8));
+	ATCCR_shiftingPressure.set_can_value((imsg.buf[6]) | (imsg.buf[7] << 8));
 
 }
 
 /*
- * Decode a CAN frame for the message ATCCF_16
+ * Decode a CAN frame for the message ATCCF_15
  * \param imsg A reference to the incoming CAN message frame
  */
-void read_ATCCF_16(const CAN_message_t &imsg) {
+void read_ATCCF_15(const CAN_message_t &imsg) {
 
 	ATCCF_uptime.set_can_value((imsg.buf[0]) | (imsg.buf[1] << 8) | (imsg.buf[2] << 16) | (imsg.buf[3] << 24));
 
@@ -346,18 +342,6 @@ void read_DD_10(const CAN_message_t &imsg) {
 	DD_counterMsg210.set_can_value(((imsg.buf[0] & 0b00001111)));
 	DD_boardTemp.set_can_value((imsg.buf[2]) | (imsg.buf[3] << 8));
 	DD_teensyTemp.set_can_value((imsg.buf[4]) | (imsg.buf[5] << 8));
-
-}
-
-/*
- * Decode a CAN frame for the message ATCCF_15
- * \param imsg A reference to the incoming CAN message frame
- */
-void read_ATCCF_15(const CAN_message_t &imsg) {
-
-	ATCCF_counterMsg415.set_can_value(((imsg.buf[0] & 0b00001111)));
-	ATCCF_boardTemp.set_can_value((imsg.buf[2]) | (imsg.buf[3] << 8));
-	ATCCF_teensyTemp.set_can_value((imsg.buf[4]) | (imsg.buf[5] << 8));
 
 }
 
@@ -642,6 +626,7 @@ void read_ATCCF_13(const CAN_message_t &imsg) {
 void read_ATCCF_12(const CAN_message_t &imsg) {
 
 	ATCCF_counterMsg412.set_can_value(((imsg.buf[0] & 0b00001111)));
+	ATCCF_teensyTemp.set_can_value((imsg.buf[2]) | (imsg.buf[3] << 8));
 	ATCCF_rotorTempFL.set_can_value((imsg.buf[4]) | (imsg.buf[5] << 8));
 	ATCCF_rotorTempFR.set_can_value((imsg.buf[6]) | (imsg.buf[7] << 8));
 
@@ -656,7 +641,7 @@ void read_ATCCF_11(const CAN_message_t &imsg) {
 	ATCCF_counterMsg411.set_can_value(((imsg.buf[0] & 0b00001111)));
 	ATCCF_brakePressureF.set_can_value((imsg.buf[2]) | (imsg.buf[3] << 8));
 	ATCCF_brakePressureR.set_can_value((imsg.buf[4]) | (imsg.buf[5] << 8));
-	ATCCF_steeringWheelAngle.set_can_value((imsg.buf[6]) | (imsg.buf[7] << 8));
+	ATCCF_boardTemp.set_can_value((imsg.buf[6]) | (imsg.buf[7] << 8));
 
 }
 
@@ -705,8 +690,8 @@ void decode_CAN2(const CAN_message_t &imsg) {
 			read_ATCCR_15(imsg);
 			break;
 
-		case 416:
-			read_ATCCF_16(imsg);
+		case 415:
+			read_ATCCF_15(imsg);
 			break;
 
 		case 276:
@@ -731,10 +716,6 @@ void decode_CAN2(const CAN_message_t &imsg) {
 
 		case 710:
 			read_DD_10(imsg);
-			break;
-
-		case 415:
-			read_ATCCF_15(imsg);
 			break;
 
 		case 273:

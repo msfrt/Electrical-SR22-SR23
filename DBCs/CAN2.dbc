@@ -37,7 +37,7 @@ BU_: PDM ATCCR ATCCF
 
 
 BO_ 467 ATCCR_17: 8 Vector__XXX
- SG_ ATCCR_shiftingPressure : 48|16@1- (0.1,0) [-5|200] "PSI" Vector__XXX
+ SG_ ATCCR_coolantTempRadMiddle : 48|16@1- (0.1,0) [0|120] "C" Vector__XXX
  SG_ ATCCR_rectifierCurrent : 32|16@1- (0.1,0) [-200|200] "A" Vector__XXX
  SG_ ATCCR_egt4 : 16|16@1- (0.1,0) [0|1000] "C" Vector__XXX
  SG_ ATCCR_counterMsg467 : 0|4@1+ (1,0) [0|15] "" Vector__XXX
@@ -49,11 +49,11 @@ BO_ 466 ATCCR_16: 8 Vector__XXX
  SG_ ATCCR_counterMsg466 : 0|4@1+ (1,0) [0|15] "" Vector__XXX
 
 BO_ 465 ATCCR_15: 8 Vector__XXX
+ SG_ ATCCR_shiftingPressure : 48|16@1- (0.1,0) [-5|200] "PSI" Vector__XXX
  SG_ ATCCR_counterMsg465 : 0|4@1+ (1,0) [0|15] "" Vector__XXX
- SG_ ATCCR_coolantTempRadMiddle : 48|16@1- (0.1,0) [0|120] "C" Vector__XXX
  SG_ ATCCR_uptime : 16|32@1+ (1,0) [0|4294967295] "ms" Vector__XXX
 
-BO_ 416 ATCCF_16: 8 Vector__XXX
+BO_ 415 ATCCF_15: 8 Vector__XXX
  SG_ ATCCF_uptime : 0|32@1+ (1,0) [0|4294967295] "ms" Vector__XXX
 
 BO_ 276 PDM_26: 8 Vector__XXX
@@ -88,11 +88,6 @@ BO_ 710 DD_10: 8 Vector__XXX
  SG_ DD_counterMsg210 : 0|4@1+ (1,0) [0|15] "" Vector__XXX
  SG_ DD_teensyTemp : 32|16@1- (0.1,0) [0|150] "C" Vector__XXX
  SG_ DD_boardTemp : 16|16@1- (0.1,0) [0|150] "C" Vector__XXX
-
-BO_ 415 ATCCF_15: 8 ATCCF
- SG_ ATCCF_boardTemp : 16|16@1- (0.1,0) [-5|100] "C" Vector__XXX
- SG_ ATCCF_teensyTemp : 32|16@1- (0.1,0) [-5|100] "C" Vector__XXX
- SG_ ATCCF_counterMsg415 : 0|4@1+ (1,0) [0|15] "" Vector__XXX
 
 BO_ 273 PDM_23: 8 PDM
  SG_ PDM_starterRelayVoltAvg : 48|16@1- (0.001,0) [-5|20] "V" Vector__XXX
@@ -222,12 +217,13 @@ BO_ 413 ATCCF_13: 8 ATCCF
  SG_ ATCCF_counterMsg413 : 0|4@1+ (1,0) [0|15] "" Vector__XXX
 
 BO_ 412 ATCCF_12: 8 ATCCF
+ SG_ ATCCF_teensyTemp : 16|16@1- (0.1,0) [-5|100] "C" Vector__XXX
  SG_ ATCCF_rotorTempFR : 48|16@1- (0.1,0) [0|1000] "C" Vector__XXX
  SG_ ATCCF_rotorTempFL : 32|16@1- (0.1,0) [0|1000] "C" Vector__XXX
  SG_ ATCCF_counterMsg412 : 0|4@1+ (1,0) [0|15] "" Vector__XXX
 
 BO_ 411 ATCCF_11: 8 ATCCF
- SG_ ATCCF_steeringWheelAngle : 48|16@1- (0.1,0) [-180|180] "deg" Vector__XXX
+ SG_ ATCCF_boardTemp : 48|16@1- (0.1,0) [-5|100] "C" Vector__XXX
  SG_ ATCCF_brakePressureR : 32|16@1- (0.1,0) [0|2000] "PSI" Vector__XXX
  SG_ ATCCF_brakePressureF : 16|16@1- (0.1,0) [0|2000] "PSI" Vector__XXX
  SG_ ATCCF_counterMsg411 : 0|4@1+ (1,0) [0|15] "" Vector__XXX
@@ -240,13 +236,13 @@ BO_ 410 ATCCF_10: 8 ATCCF
 
 
 
-CM_ SG_ 467 ATCCR_shiftingPressure "Shifting manifold pressure";
+CM_ SG_ 467 ATCCR_coolantTempRadMiddle "Coolant Temp Radiator Middle";
 CM_ SG_ 467 ATCCR_counterMsg467 "Counter for Message 465";
 CM_ SG_ 466 ATCCR_counterMsg466 "Counter for Message 465";
+CM_ SG_ 465 ATCCR_shiftingPressure "Shifting manifold pressure";
 CM_ SG_ 465 ATCCR_counterMsg465 "Counter for Message 465";
-CM_ SG_ 465 ATCCR_coolantTempRadMiddle "Coolant Temp Radiator Middle";
 CM_ SG_ 465 ATCCR_uptime "Uptime for the ATCC";
-CM_ SG_ 416 ATCCF_uptime "Uptime for the ATCC";
+CM_ SG_ 415 ATCCF_uptime "Uptime for the ATCC";
 CM_ SG_ 276 PDM_uptime "Uptime for the PDM";
 CM_ BO_ 259 "OBD flags";
 CM_ SG_ 259 PDM_coolingOverrideActive "OBD";
@@ -274,9 +270,6 @@ CM_ SG_ 710 DD_counterMsg210 "Counter for Message 410
 ";
 CM_ SG_ 710 DD_teensyTemp "Driver Display Teensy chip temp";
 CM_ SG_ 710 DD_boardTemp "Driver display board temp";
-CM_ SG_ 415 ATCCF_boardTemp "Board Temp";
-CM_ SG_ 415 ATCCF_teensyTemp "PDM Teensy ECU Temp";
-CM_ SG_ 415 ATCCF_counterMsg415 "Counter for Message 415";
 CM_ SG_ 273 PDM_starterRelayVoltAvg "Starter Relay Voltage Average";
 CM_ SG_ 273 PDM_counterMsg273 "Counter for Message 273";
 CM_ SG_ 273 PDM_brakelightVoltAvg "Brakelight Voltage Average";
@@ -378,10 +371,11 @@ CM_ SG_ 413 ATCCF_tireTempFLO "Tire Temp FLO";
 CM_ SG_ 413 ATCCF_tireTempFLM "Tire Temp FLM";
 CM_ SG_ 413 ATCCF_tireTempFLI "Tire Temp FLI";
 CM_ SG_ 413 ATCCF_counterMsg413 "Counter for Message 413";
+CM_ SG_ 412 ATCCF_teensyTemp "PDM Teensy ECU Temp";
 CM_ SG_ 412 ATCCF_rotorTempFR "Brake Temp FR";
 CM_ SG_ 412 ATCCF_rotorTempFL "Brake Temp FL";
 CM_ SG_ 412 ATCCF_counterMsg412 "Counter for Message 412";
-CM_ SG_ 411 ATCCF_steeringWheelAngle "Steering Wheel Angle";
+CM_ SG_ 411 ATCCF_boardTemp "Board Temp";
 CM_ SG_ 411 ATCCF_brakePressureR "Brake Pressure R";
 CM_ SG_ 411 ATCCF_brakePressureF "Brake Pressure F";
 CM_ SG_ 411 ATCCF_counterMsg411 "Counter for Message 411";
