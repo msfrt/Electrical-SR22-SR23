@@ -54,7 +54,7 @@ StateSignal PDM_engineMinutes(16, true, 1, 0.0, -32768, 32767, 0.0, 0, 275);
 StateSignal PDM_counterMsg274(4, false, 1, 0.0, 0, 15, 0.0, 0, 274);
 StateSignal PDM_fanLeftDutyCycle(8, false, 1, 0.0, 0, 100, 0.0, 0, 274);
 StateSignal PDM_fanRightDutyCycle(8, false, 1, 0.0, 0, 100, 0.0, 0, 274);
-StateSignal PDM_wpPWM(8, false, 1, 0.0, 0, 255, 0.0, 0, 274);
+StateSignal PDM_wpDutyCycle(8, false, 1, 0.0, 0, 255, 0.0, 0, 274);
 StateSignal PDM_teensyTemp(16, true, 10, 0.0, -5, 20, 0.0, 0, 274);
 
 // Message: VCU_10 [0xa0]
@@ -316,7 +316,7 @@ void read_PDM_24(const CAN_message_t &imsg) {
 	PDM_counterMsg274.set_can_value(((imsg.buf[0] & 0b00001111)));
 	PDM_fanLeftDutyCycle.set_can_value((imsg.buf[2]));
 	PDM_fanRightDutyCycle.set_can_value((imsg.buf[3]));
-	PDM_wpPWM.set_can_value((imsg.buf[4]));
+	PDM_wpDutyCycle.set_can_value((imsg.buf[4]));
 	PDM_teensyTemp.set_can_value((imsg.buf[6]) | (imsg.buf[7] << 8));
 
 }

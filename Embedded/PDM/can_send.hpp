@@ -4,15 +4,13 @@
 #include <FlexCAN_T4.h>
 #include <EasyTimer.h>
 #include <BoardTemp.h>
-#include "sigs_inside.hpp"
+#include "CAN/CAN1.hpp"
+#include "CAN/CAN2.hpp"
 
 // external definitions
 extern int OBDFLAG_oil_pressure;
 extern int OBDFLAG_oil_temp;
 extern int OBDFLAG_fuel_pressure;
-
-FlexCAN_T4<CAN1, RX_SIZE_256, TX_SIZE_16> cbus1;
-FlexCAN_T4<CAN2, RX_SIZE_256, TX_SIZE_16> cbus2;
 
 static CAN_message_t msg;
 
@@ -28,13 +26,13 @@ void send_PDM_09(){
   msg.buf[0] = OBDFLAG_oil_pressure;
   msg.buf[1] = OBDFLAG_oil_temp;
   msg.buf[2] = OBDFLAG_fuel_pressure;
-  msg.buf[3] = 0;
+  msg.buf[3] = PDM_coolingOverrideActive.can_value();
   msg.buf[4] = 0;
   msg.buf[5] = 0;
   msg.buf[6] = 0;
   msg.buf[7] = GLO_engine_state & 0b11111111;
 
-  cbus2.write(msg);
+  can2.write(msg);
 }
 
 
@@ -65,7 +63,7 @@ void send_PDM_10(){
   msg.buf[7] = PDM_pdmCurrentMin.can_value() >> 8;
 
   // send the message
-  cbus2.write(msg);
+  can2.write(msg);
 }
 
 
@@ -88,7 +86,7 @@ void send_PDM_11(){
   msg.buf[6] = PDM_pdmVoltMin.can_value();
   msg.buf[7] = PDM_pdmVoltMin.can_value() >> 8;
 
-  cbus2.write(msg);
+  can2.write(msg);
 }
 
 
@@ -110,7 +108,7 @@ void send_PDM_12(){
   msg.buf[6] = PDM_fanRightCurrentMin.can_value();
   msg.buf[7] = PDM_fanRightCurrentMin.can_value() >> 8;
 
-  cbus2.write(msg);
+  can2.write(msg);
 }
 
 
@@ -132,7 +130,7 @@ void send_PDM_13(){
   msg.buf[6] = PDM_fanRightVoltMin.can_value();
   msg.buf[7] = PDM_fanRightVoltMin.can_value() >> 8;
 
-  cbus2.write(msg);
+  can2.write(msg);
 }
 
 
@@ -154,7 +152,7 @@ void send_PDM_14(){
   msg.buf[6] = PDM_fanLeftCurrentMin.can_value();
   msg.buf[7] = PDM_fanLeftCurrentMin.can_value() >> 8;
 
-  cbus2.write(msg);
+  can2.write(msg);
 }
 
 
@@ -176,7 +174,7 @@ void send_PDM_15(){
   msg.buf[6] = PDM_fanLeftVoltMin.can_value();
   msg.buf[7] = PDM_fanLeftVoltMin.can_value() >> 8;
 
-  cbus2.write(msg);
+  can2.write(msg);
 }
 
 
@@ -198,7 +196,7 @@ void send_PDM_16(){
   msg.buf[6] = PDM_wpCurrentMin.can_value();
   msg.buf[7] = PDM_wpCurrentMin.can_value() >> 8;
 
-  cbus2.write(msg);
+  can2.write(msg);
 }
 
 
@@ -220,7 +218,7 @@ void send_PDM_17(){
   msg.buf[6] = PDM_wpVoltMin.can_value();
   msg.buf[7] = PDM_wpVoltMin.can_value() >> 8;
 
-  cbus2.write(msg);
+  can2.write(msg);
 }
 
 
@@ -242,7 +240,7 @@ void send_PDM_18(){
   msg.buf[6] = PDM_fuelCurrentMin.can_value();
   msg.buf[7] = PDM_fuelCurrentMin.can_value() >> 8;
 
-  cbus2.write(msg);
+  can2.write(msg);
 }
 
 
@@ -264,7 +262,7 @@ void send_PDM_19(){
   msg.buf[6] = PDM_fuelVoltMin.can_value();
   msg.buf[7] = PDM_fuelVoltMin.can_value() >> 8;
 
-  cbus2.write(msg);
+  can2.write(msg);
 }
 
 
@@ -286,7 +284,7 @@ void send_PDM_20(){
   msg.buf[6] = PDM_mainVoltMin.can_value();
   msg.buf[7] = PDM_mainVoltMin.can_value() >> 8;
 
-  cbus2.write(msg);
+  can2.write(msg);
 }
 
 
@@ -308,7 +306,7 @@ void send_PDM_21(){
   msg.buf[6] = PDM_dataVoltMin.can_value();
   msg.buf[7] = PDM_dataVoltMin.can_value() >> 8;
 
-  cbus2.write(msg);
+  can2.write(msg);
 }
 
 
@@ -331,7 +329,7 @@ void send_PDM_22(){
   msg.buf[6] = PDM_keepAliveVoltMin.can_value();
   msg.buf[7] = PDM_keepAliveVoltMin.can_value() >> 8;
 
-  cbus2.write(msg);
+  can2.write(msg);
 }
 
 
@@ -353,7 +351,7 @@ void send_PDM_23(){
   msg.buf[6] = PDM_starterRelayVoltAvg.can_value();
   msg.buf[7] = PDM_starterRelayVoltAvg.can_value() >> 8;
 
-  cbus2.write(msg);
+  can2.write(msg);
 }
 
 
@@ -362,21 +360,21 @@ void send_PDM_24(){
   msg.id = 274;
   msg.len = 8;
 
-  PDM_fanLeftPWM = fan_left.actual();
-  PDM_fanRightPWM = fan_right.actual();
-  PDM_wpPWM = water_pump.actual();
+  PDM_fanLeftDutyCycle = fan_left.actual();
+  PDM_fanRightDutyCycle = fan_right.actual();
+  PDM_wpDutyCycle = water_pump.actual();
   PDM_teensyTemp = tempmonGetTemp(); // built-in teensy function
 
   msg.buf[0] = ctr.value();
   msg.buf[1] = 0;
-  msg.buf[2] = PDM_fanLeftPWM.can_value();
-  msg.buf[3] = PDM_fanRightPWM.can_value();
-  msg.buf[4] = PDM_wpPWM.can_value();
+  msg.buf[2] = PDM_fanLeftDutyCycle.can_value();
+  msg.buf[3] = PDM_fanRightDutyCycle.can_value();
+  msg.buf[4] = PDM_wpDutyCycle.can_value();
   msg.buf[5] = 0;
   msg.buf[6] = PDM_teensyTemp.can_value();
   msg.buf[7] = PDM_teensyTemp.can_value() >> 8;
 
-  cbus2.write(msg);
+  can2.write(msg);
 }
 
 
@@ -399,7 +397,7 @@ void send_PDM_25(){
   msg.buf[6] = eeprom_engine_minutes.value();
   msg.buf[7] = eeprom_engine_minutes.value() >> 8;
 
-  cbus2.write(msg);
+  can2.write(msg);
 }
 
 
@@ -417,7 +415,7 @@ void send_PDM_26(){
   msg.buf[6] = 0;
   msg.buf[7] = 0;
 
-  cbus2.write(msg);
+  can2.write(msg);
 }
 
 

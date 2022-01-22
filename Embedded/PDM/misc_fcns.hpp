@@ -138,9 +138,9 @@ bool determine_logging_state(int &engine_state, const unsigned long &timeout_dur
 bool brakelight_run(){
 
   // user override present
-  if (USER_brakeLightOverride.value() >= 0 && USER_brakeLightOverride.value() <= 100){
+  if (CMD_brakeLightOverride.value() >= 0 && CMD_brakeLightOverride.value() <= 100){
 
-    analogWrite(GLO_brakelight_teensy_pin, map(USER_brakeLightOverride.value(), 0, 100, 0, GLO_max_analog_write_pwm));
+    analogWrite(GLO_brakelight_teensy_pin, map(CMD_brakeLightOverride.value(), 0, 100, 0, GLO_max_analog_write_pwm));
     return true;
 
   // brake-pressure exceeds minimum activation pressure

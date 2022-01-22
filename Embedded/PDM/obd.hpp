@@ -3,7 +3,8 @@
 
 #include <EasyTimer.h>
 #include <Adafruit_NeoPixel.h>
-#include "sigs_inside.hpp"
+#include "CAN/CAN1.hpp"
+#include "CAN/CAN2.hpp"
 #include "rainbow_pixels.hpp"
 
 // add low fuel pressure warning
@@ -54,10 +55,10 @@ void obd_main(){
 
   // user override time-outs
   if (OBDTIMER_user_override_timout_check_timer.isup()){
-    USER_wpOverride.timeout_check();
-    USER_fanLeftOverride.timeout_check();
-    USER_fanRightOverride.timeout_check();
-    USER_brakeLightOverride.timeout_check();
+    CMD_waterPumpOverride.timeout_check();
+    CMD_fanLeftOverride.timeout_check();
+    CMD_fanRightOverride.timeout_check();
+    CMD_brakeLightOverride.timeout_check();
   }
 
   // M400 timeouts
@@ -139,33 +140,32 @@ bool obd_oil_pressure_acceptence(StateSignal &oil_pressure, StateSignal &rpm){
 
       // send messages to the driver (send 10 times because this is important and can NOT be missed buy DD)
       if (OBDPARAM_notify_driver_warning){
-        for (int i = 0; i < 10; i++){
-          // PDM 31 - driver display LED
-          msg.buf[0] = 3; // LED color code RED
-          msg.buf[1] = 0;
-          msg.buf[2] = 0;
-          msg.buf[3] = 0;
-          msg.buf[4] = 0;
-          msg.buf[5] = 0;
-          msg.buf[6] = 0;
-          msg.buf[7] = 0;
-          msg.id = 281;
-          msg.len = 8;
-          cbus2.write(msg);
 
-          // PDM 30 - driver message
-          msg.buf[0] = 'O';
-          msg.buf[1] = 'I';
-          msg.buf[2] = 'L';
-          msg.buf[3] = 'P';
-          msg.buf[4] = ' ';
-          msg.buf[5] = 'L';
-          msg.buf[6] = 'O';
-          msg.buf[7] = 'W';
-          msg.id = 280;
-          msg.len = 8;
-          cbus2.write(msg);
-        }
+        // CMD_11 - driver display LED
+        msg.buf[0] = 255; // R
+        msg.buf[1] = 0; // G
+        msg.buf[2] = 0; // B
+        msg.buf[3] = 0;
+        msg.buf[4] = 0;
+        msg.buf[5] = 0;
+        msg.buf[6] = 0;
+        msg.buf[7] = 0;
+        msg.id = 211;
+        msg.len = 8;
+        can1.write(msg);
+
+        // CMD_12 - driver message
+        msg.buf[0] = 'O';
+        msg.buf[1] = 'I';
+        msg.buf[2] = 'L';
+        msg.buf[3] = 'P';
+        msg.buf[4] = ' ';
+        msg.buf[5] = 'L';
+        msg.buf[6] = 'O';
+        msg.buf[7] = 'W';
+        msg.id = 212;
+        msg.len = 8;
+        can1.write(msg);
       }
     }
   }
@@ -206,33 +206,31 @@ bool obd_oil_temp_checker(StateSignal &oiltemp){
 
       // send messages to the driver (send 10 times because this is important and can NOT be missed buy DD)
       if (OBDPARAM_notify_driver_warning){
-        for (int i = 0; i < 10; i++){
-          // PDM 31 - driver display LED
-          msg.buf[0] = 3; // LED color code RED
-          msg.buf[1] = 0;
-          msg.buf[2] = 0;
-          msg.buf[3] = 0;
-          msg.buf[4] = 0;
-          msg.buf[5] = 0;
-          msg.buf[6] = 0;
-          msg.buf[7] = 0;
-          msg.id = 281;
-          msg.len = 8;
-          cbus2.write(msg);
+        // CMD_11 - driver display LED
+        msg.buf[0] = 255; // R
+        msg.buf[1] = 0; // G
+        msg.buf[2] = 0; // B
+        msg.buf[3] = 0;
+        msg.buf[4] = 0;
+        msg.buf[5] = 0;
+        msg.buf[6] = 0;
+        msg.buf[7] = 0;
+        msg.id = 211;
+        msg.len = 8;
+        can1.write(msg);
 
-          // PDM 30 - driver message
-          msg.buf[0] = 'O';
-          msg.buf[1] = 'I';
-          msg.buf[2] = 'L';
-          msg.buf[3] = ' ';
-          msg.buf[4] = 'H';
-          msg.buf[5] = 'O';
-          msg.buf[6] = 'T';
-          msg.buf[7] = '\0';
-          msg.id = 280;
-          msg.len = 8;
-          cbus2.write(msg);
-        }
+        // CMD_12 - driver message
+        msg.buf[0] = 'O';
+        msg.buf[1] = 'I';
+        msg.buf[2] = 'L';
+        msg.buf[3] = 'P';
+        msg.buf[4] = ' ';
+        msg.buf[5] = 'H';
+        msg.buf[6] = 'O';
+        msg.buf[7] = 'T';
+        msg.id = 212;
+        msg.len = 8;
+        can1.write(msg);
       }
     }
   }
@@ -280,33 +278,31 @@ bool obd_fuel_pressure_checker(StateSignal &fuelp){
 
       // send messages to the driver (send 10 times because this is important and can NOT be missed buy DD)
       if (OBDPARAM_notify_driver_warning){
-        for (int i = 0; i < 10; i++){
-          // PDM 31 - driver display LED
-          msg.buf[0] = 2; // LED color code YELLOW
-          msg.buf[1] = 0;
-          msg.buf[2] = 0;
-          msg.buf[3] = 0;
-          msg.buf[4] = 0;
-          msg.buf[5] = 0;
-          msg.buf[6] = 0;
-          msg.buf[7] = 0;
-          msg.id = 281;
-          msg.len = 8;
-          cbus2.write(msg);
+        // CMD_11 - driver display LED
+        msg.buf[0] = 255; // R
+        msg.buf[1] = 200; // G
+        msg.buf[2] = 0; // B
+        msg.buf[3] = 0;
+        msg.buf[4] = 0;
+        msg.buf[5] = 0;
+        msg.buf[6] = 0;
+        msg.buf[7] = 0;
+        msg.id = 211;
+        msg.len = 8;
+        can1.write(msg);
 
-          // PDM 30 - driver message
-          msg.buf[0] = 'L';
-          msg.buf[1] = 'O';
-          msg.buf[2] = 'W';
-          msg.buf[3] = ' ';
-          msg.buf[4] = 'F';
-          msg.buf[5] = 'U';
-          msg.buf[6] = 'E';
-          msg.buf[7] = 'L';
-          msg.id = 280;
-          msg.len = 8;
-          cbus2.write(msg);
-        }
+        // CMD_12 - driver message
+        msg.buf[0] = 'L';
+        msg.buf[1] = 'O';
+        msg.buf[2] = 'W';
+        msg.buf[3] = ' ';
+        msg.buf[4] = 'F';
+        msg.buf[5] = 'U';
+        msg.buf[6] = 'E';
+        msg.buf[7] = 'L';
+        msg.id = 212;
+        msg.len = 8;
+        can1.write(msg);
       }
     }
   }
@@ -368,8 +364,8 @@ void obd_leds(){
 
 
   // if the user is overriding a pwm control, blink purple
-  } else if (USER_wpOverride.value() >= 1 || USER_fanLeftOverride.value() >= 1 ||
-             USER_fanRightOverride.value() >= 1 || USER_brakeLightOverride.value() >= 1){
+  } else if (CMD_waterPumpOverride.value() >= 1 || CMD_fanLeftOverride.value() >= 1 ||
+             CMD_fanRightOverride.value() >= 1 || CMD_brakeLightOverride.value() >= 1){
     static EasyTimer user_override_blink(4);
     if (user_override_blink.isup()){
       if (leds_on){

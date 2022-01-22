@@ -74,7 +74,7 @@ BO_ 275 PDM_25: 8 Vector__XXX
 
 BO_ 274 PDM_24: 8 Vector__XXX
  SG_ PDM_teensyTemp : 48|16@1- (0.1,0) [-5|20] "C" Vector__XXX
- SG_ PDM_wpPWM : 32|8@1+ (1,0) [0|255] "Duty %" Vector__XXX
+ SG_ PDM_wpDutyCycle : 32|8@1+ (1,0) [0|255] "Duty %" Vector__XXX
  SG_ PDM_fanRightDutyCycle : 24|8@1+ (1,0) [0|100] "Duty %" Vector__XXX
  SG_ PDM_fanLeftDutyCycle : 16|8@1+ (1,0) [0|100] "Duty %" Vector__XXX
  SG_ PDM_counterMsg274 : 0|4@1+ (1,0) [0|15] "" Vector__XXX
@@ -258,7 +258,7 @@ CM_ SG_ 275 PDM_engineHours "Fuel Current Maximum";
 CM_ SG_ 275 PDM_carMiles "Fuel Current Maximum";
 CM_ SG_ 275 PDM_counterMsg275 "Counter for Message 274";
 CM_ SG_ 274 PDM_teensyTemp "PDM Teensy ECU Temp";
-CM_ SG_ 274 PDM_wpPWM "Water Pump Duty Cycle";
+CM_ SG_ 274 PDM_wpDutyCycle "Water Pump Duty Cycle";
 CM_ SG_ 274 PDM_fanRightDutyCycle "Right Fan Duty Cycle";
 CM_ SG_ 274 PDM_fanLeftDutyCycle "Left Fan Duty Cycle";
 CM_ SG_ 274 PDM_counterMsg274 "Counter for Message 274";

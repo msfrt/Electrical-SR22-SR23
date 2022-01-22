@@ -14,6 +14,20 @@
  *  -
 */
 
+// can bus decleration
+FlexCAN_T4<CAN1, RX_SIZE_256, TX_SIZE_16> can1;
+FlexCAN_T4<CAN2, RX_SIZE_256, TX_SIZE_16> can2;
+static CAN_message_t rxmsg;
+// each bus has a total of 64 mailboxes
+#define NUM_RX_STD_MAILBOXES 32
+#define NUM_RX_EXT_MAILBOXES 2
+#define NUM_TX_MAILBOXES 30
+// limit the number of messages each bus can read for each loop cycle.
+// Typically, only one message is recieved in the time that the loop can run,
+// but a buildup can occur, and this limit can poll the bus to read messages
+// while not getting stuck in an infinite loop
+#define MAX_CAN_FRAME_READ_PER_CYCLE 5
+
 
 // global variable definition
 int GLO_engine_state = 0; // engine state (no need to change this variable)
@@ -69,14 +83,10 @@ EasyTimer odometer_update_timer(2);
 // this file contains all of the control tables & declarations for fans and water pump
 #include "fans.hpp"
 
-// signal definitions are inside
-#include "sigs_inside.hpp"
-
 // CAN message definitions are inside
+#include "CAN/CAN1.hpp"
+#include "CAN/CAN2.hpp"
 #include "can_send.hpp"
-
-// CAN read functions are inside
-#include "can_read.hpp"
 
 // odds and ends functions
 #include "misc_fcns.hpp"
@@ -105,10 +115,10 @@ void setup() { //high 18 low 26
   Serial.begin(112500);
 
   //initialize the CAN Bus and set its baud rate to 1Mb
-  cbus1.begin();
-  cbus1.setBaudRate(1000000);
-  cbus2.begin();
-  cbus2.setBaudRate(1000000);
+  can1.begin();
+  can1.setBaudRate(1000000);
+  can2.begin();
+  can2.setBaudRate(1000000);
   set_mailboxes();
 
   // populate left fan table
@@ -163,8 +173,7 @@ void loop() {
   }
 
   // read both can buses
-  read_can1();
-  read_can2();
+  read_CAN();
 
   // run the brakelight
   brakelight_run();
@@ -204,94 +213,88 @@ void loop() {
 
 
 
-void set_mailboxes(){
+void set_mailboxes() {
+  // to view mailbox status, you can use the member function mailboxStatus().
+  // Don't put it in a fast loop, though, because you may actually affect how
+  // the chips moves things around
 
-  // to view mailbox status, you can use the member function mailboxStatus(). Don't put it in a fast loop, though,
-  // because you may actually affect how the chips moves things around
+  can1.setMaxMB(64);  // use all mailboxes of course
+  can2.setMaxMB(64);
 
-  // CAN 2 - sends a bunch of stuff
-  cbus2.setMaxMB(64); // change from default 16 mailboxes to 64 (maximum)
-  cbus2.enableFIFO(); // first in-first out prevents overwriting unsent messages depending on the queue
-  cbus2.setMB(MB4,RX,STD);  // change the first 12 mailboxes to recieve standard frames. 4 for extended. the first four
-  cbus2.setMB(MB5,RX,STD);  // already do by default. the rest of the mailboxes (48) are TX mailboxes by default, which
-  cbus2.setMB(MB6,RX,STD);  // is necessary because we send more data than the bus can handle in short periods of time
-  cbus2.setMB(MB7,RX,STD);
-  cbus2.setMB(MB8,RX,STD);
-  cbus2.setMB(MB9,RX,STD);
-  cbus2.setMB(MB10,RX,STD);
-  cbus2.setMB(MB11,RX,STD);
-  cbus2.setMB(MB12,RX,EXT);  // perhaps there is an issue and something is sending extended frames for whatever reason
-  cbus2.setMB(MB13,RX,EXT);  // we have a lot of mailboxes anyways, so these four can be set to extended
-  cbus2.setMB(MB14,RX,EXT);
-  cbus2.setMB(MB15,RX,EXT);
-  // cbus2.setMB(MB16,TX);
-  // cbus2.setMB(MB17, TX);
-  // cbus2.setMB(MB18, TX);
-  // cbus2.setMB(MB19, TX);
-  // cbus2.setMB(MB20, TX);
-  // cbus2.setMB(MB21, TX);
-  // cbus2.setMB(MB22, TX);
-  // cbus2.setMB(MB23, TX);
-  // cbus2.setMB(MB24, TX);
-  // cbus2.setMB(MB25, TX);
-  // cbus2.setMB(MB26, TX);
-  // cbus2.setMB(MB27, TX);
-  // cbus2.setMB(MB28, TX);
-  // cbus2.setMB(MB29, TX);
-  // cbus2.setMB(MB30, TX);
-  // cbus2.setMB(MB31, TX);
-  // cbus2.setMB(MB32, TX);
-  // cbus2.setMB(MB33, TX);
-  // cbus2.setMB(MB34, TX);
-  // cbus2.setMB(MB35, TX);
-  // cbus2.setMB(MB36, TX);
-  // cbus2.setMB(MB37, TX);
-  // cbus2.setMB(MB38, TX);
-  // cbus2.setMB(MB39, TX);
-  // cbus2.setMB(MB40, TX);
-  // cbus2.setMB(MB41, TX);
-  // cbus2.setMB(MB42, TX);
-  // cbus2.setMB(MB43, TX);
-  // cbus2.setMB(MB44, TX);
-  // cbus2.setMB(MB45, TX);
-  // cbus2.setMB(MB46, TX);
-  // cbus2.setMB(MB47, TX);
-  // cbus2.setMB(MB48, TX);
-  // cbus2.setMB(MB49, TX);
-  // cbus2.setMB(MB50, TX);
-  // cbus2.setMB(MB51, TX);
-  // cbus2.setMB(MB52, TX);
-  // cbus2.setMB(MB53, TX);
-  // cbus2.setMB(MB54, TX);
-  // cbus2.setMB(MB55, TX);
-  // cbus2.setMB(MB56, TX);
-  // cbus2.setMB(MB57, TX);
-  // cbus2.setMB(MB58, TX);
-  // cbus2.setMB(MB59, TX);
-  // cbus2.setMB(MB60, TX);
-  // cbus2.setMB(MB61, TX);
-  // cbus2.setMB(MB62, TX);
-  // cbus2.setMB(MB63, TX);
+  for (int i = 0; i < NUM_RX_STD_MAILBOXES; i++) {
+    can1.setMB((FLEXCAN_MAILBOX)i, RX, STD);
+    can2.setMB((FLEXCAN_MAILBOX)i, RX, STD);
+  }
+  for (int i = NUM_RX_STD_MAILBOXES;
+       i < (NUM_RX_STD_MAILBOXES + NUM_RX_EXT_MAILBOXES); i++) {
+    can1.setMB((FLEXCAN_MAILBOX)i, RX, EXT);
+    can2.setMB((FLEXCAN_MAILBOX)i, RX, EXT);
+  }
+  for (int i = (NUM_RX_STD_MAILBOXES + NUM_RX_EXT_MAILBOXES);
+       i < (NUM_RX_STD_MAILBOXES + NUM_RX_EXT_MAILBOXES + NUM_TX_MAILBOXES);
+       i++) {
+    can1.setMB((FLEXCAN_MAILBOX)i, TX, STD);
+    can2.setMB((FLEXCAN_MAILBOX)i, TX, STD);
+  }
 
+  // be sure to assign at least one mailbox to each message that you want to
+  // read. filtering allows us to avoid using clock cycles to read messages that
+  // we have no interest in. it also reserves a slot for messages as they are
+  // recieved.
+  // can1.setMBFilter(REJECT_ALL);
+  // can1.setMBFilter(MB0, REJECT_ALL);
+  // can1.setMBFilter(MB0, M400_engineTemp.get_msg_id());
+  // can1.setMBFilter(MB1, 0);
+  // can1.setMBFilter(MB2, 0);
+  // can1.setMBFilter(MB3, 0);
+  // can1.setMBFilter(MB4, 0);
+  // can1.setMBFilter(MB5, 0);
+  // can1.setMBFilter(MB6, 0);
+  // can1.setMBFilter(MB7, 0);
+  // can1.setMBFilter(MB8, 0);
+  // can1.setMBFilter(MB9, 0);
+  // can1.setMBFilter(MB10, 0);
+  // can1.setMBFilter(MB11, 0);
+  // can1.setMBFilter(MB12, 0);
+  // can1.setMBFilter(MB13, 0);
+  // can1.setMBFilter(MB14, 0);
 
-  cbus1.setMaxMB(64);
-  cbus1.enableFIFO();
-  cbus1.setMB(MB4,RX,STD);  // first 16 mailboxes as rx, 4 rx extended. this is pretty overkill, but hey, here they are
-  cbus1.setMB(MB5,RX,STD);
-  cbus1.setMB(MB6,RX,STD);
-  cbus1.setMB(MB7,RX,STD);
-  cbus1.setMB(MB8,RX,STD);
-  cbus1.setMB(MB9,RX,STD);
-  cbus1.setMB(MB10,RX,STD);
-  cbus1.setMB(MB11,RX,STD);
-  cbus1.setMB(MB12,RX,STD);
-  cbus1.setMB(MB13,RX,STD);
-  cbus1.setMB(MB14,RX,STD);
-  cbus1.setMB(MB15,RX,STD);
-  cbus1.setMB(MB16,RX,EXT);
-  cbus1.setMB(MB17,RX,EXT);
-  cbus1.setMB(MB18,RX,EXT);
-  cbus1.setMB(MB19,RX,EXT);
+  // can2.setMBFilter(REJECT_ALL);
+  // can2.setMBFilter(MB0, REJECT_ALL);
+  // can2.setMBFilter(MB0, ATCCF_brakePressureF.get_msg_id());
+  // can2.setMBFilter(MB1, REJECT_ALL);
+  // can2.setMBFilter(MB1, ATCCF_brakePressureR.get_msg_id());
+  // can2.setMBFilter(MB2, ATCCF_rotorTempFL.get_msg_id());  // includes FR
+  // can2.setMBFilter(MB3, ATCCR_rotorTempRL.get_msg_id());  // includes FR
+  // can2.setMBFilter(MB4, PDM_coolingOverrideActive.get_msg_id());
+  // can2.setMBFilter(MB5, PDM_fanLeftDutyCycle.get_msg_id());
+  // can2.setMBFilter(MB6, 0);
+  // can2.setMBFilter(MB7, 0);
+  // can2.setMBFilter(MB8, 0);
+  // can2.setMBFilter(MB9, 0);
+  // can2.setMBFilter(MB10, 0);
+  // can2.setMBFilter(MB11, 0);
+  // can2.setMBFilter(MB12, 0);
+  // can2.setMBFilter(MB13, 0);
+  // can2.setMBFilter(MB14, 0);
+}
+
+/**
+ *  Reads a CAN message if available and then sends it to thr
+ *  proper decoding funciton
+ **/
+void read_CAN() {
+  int count = 0;
+  while (can1.read(rxmsg) && count < MAX_CAN_FRAME_READ_PER_CYCLE) {
+    decode_CAN1(rxmsg);
+    count++;
+  }
+
+  count = 0;
+  while (can2.read(rxmsg) && count < MAX_CAN_FRAME_READ_PER_CYCLE) {
+    decode_CAN2(rxmsg);
+    count++;
+  }
 }
 
 
