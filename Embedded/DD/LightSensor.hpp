@@ -1,7 +1,7 @@
 #ifndef LIGHT_SENSOR_DIMMER
 #define LIGHT_SENSOR_DIMMER
 
-//#define PRINT_LIGHT_VOLTAGE
+#define PRINT_LIGHT_VOLTAGE
 
 // returns a brightness percent 0-100 that can be used for external scaling.
 // returns -1 if there is no update.
@@ -17,8 +17,8 @@ int LightSensor(const int &pin, const int analog_read_bits) {
   static int last_calcd_value = 100;
 
   // light parameters
-  static float daytime_mVoltage = 2500.0;
-  static float nighttime_mVoltage = 1000.0;
+  static float daytime_mVoltage = 3200.0;
+  static float nighttime_mVoltage = 2575.0;
 
   running_total += analogRead(pin);
   running_sample_count++;
