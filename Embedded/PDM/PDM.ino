@@ -1,4 +1,4 @@
-// Dave Yonkers, 2020
+// Dave Yonkers, 2022
 
 #include <EasyTimer.h>
 #include <PWMControl.h>
@@ -10,9 +10,20 @@
 #include <BoardTemp.h>
 #include <EepromHelper.h>
 
-/* TODOS:
- *  -
-*/
+
+// can bus decleration
+FlexCAN_T4<CAN1, RX_SIZE_256, TX_SIZE_16> can1;
+FlexCAN_T4<CAN2, RX_SIZE_256, TX_SIZE_16> can2;
+static CAN_message_t rxmsg;
+// each bus has a total of 64 mailboxes
+#define NUM_RX_STD_MAILBOXES 32
+#define NUM_RX_EXT_MAILBOXES 2
+#define NUM_TX_MAILBOXES 30
+// limit the number of messages each bus can read for each loop cycle.
+// Typically, only one message is recieved in the time that the loop can run,
+// but a buildup can occur, and this limit can poll the bus to read messages
+// while not getting stuck in an infinite loop
+#define MAX_CAN_FRAME_READ_PER_CYCLE 5
 
 
 // global variable definition
@@ -70,13 +81,11 @@ EasyTimer odometer_update_timer(2);
 #include "fans.hpp"
 
 // signal definitions are inside
-#include "sigs_inside.hpp"
+#include "CAN/CAN1.hpp"
+#include "CAN/CAN2.hpp"
 
 // CAN message definitions are inside
 #include "can_send.hpp"
-
-// CAN read functions are inside
-#include "can_read.hpp"
 
 // odds and ends functions
 #include "misc_fcns.hpp"
@@ -88,7 +97,6 @@ EasyTimer odometer_update_timer(2);
 // timer that you can use to print things out for debugging
 EasyTimer debug(2);
 const bool GLO_debug = false;
-
 
 
 
@@ -106,10 +114,10 @@ void setup() { //high 18 low 26
   Serial.begin(112500);
 
   //initialize the CAN Bus and set its baud rate to 1Mb
-  cbus1.begin();
-  cbus1.setBaudRate(1000000);
-  cbus2.begin();
-  cbus2.setBaudRate(1000000);
+  can1.begin();
+  can1.setBaudRate(1000000);
+  can2.begin();
+  can2.setBaudRate(1000000);
   set_mailboxes();
 
   // populate left fan table
@@ -164,8 +172,7 @@ void loop() {
   }
 
   // read both can buses
-  read_can1();
-  read_can2();
+  read_CAN();
 
   // run the brakelight
   brakelight_run();
@@ -200,7 +207,7 @@ void loop() {
     Serial.println();
     // Serial.println(eeprom_engine_hours.value());
     // Serial.println(eeprom_engine_minutes.value());
-    Serial.print("FanR PWM %: "); Serial.println(PDM_fanRightPWM.value());
+    Serial.print("FanR duty cycle %: "); Serial.println(PDM_fanRightDutyCycle.value());
 
     M400_batteryVoltage = 14;
     M400_rpm = 5000;
@@ -221,88 +228,107 @@ void set_mailboxes(){
   // because you may actually affect how the chips moves things around
 
   // CAN 2 - sends a bunch of stuff
-  cbus2.setMaxMB(64); // change from default 16 mailboxes to 64 (maximum)
-  cbus2.enableFIFO(); // first in-first out prevents overwriting unsent messages depending on the queue
-  cbus2.setMB(MB4,RX,STD);  // change the first 12 mailboxes to recieve standard frames. 4 for extended. the first four
-  cbus2.setMB(MB5,RX,STD);  // already do by default. the rest of the mailboxes (48) are TX mailboxes by default, which
-  cbus2.setMB(MB6,RX,STD);  // is necessary because we send more data than the bus can handle in short periods of time
-  cbus2.setMB(MB7,RX,STD);
-  cbus2.setMB(MB8,RX,STD);
-  cbus2.setMB(MB9,RX,STD);
-  cbus2.setMB(MB10,RX,STD);
-  cbus2.setMB(MB11,RX,STD);
-  cbus2.setMB(MB12,RX,EXT);  // perhaps there is an issue and something is sending extended frames for whatever reason
-  cbus2.setMB(MB13,RX,EXT);  // we have a lot of mailboxes anyways, so these four can be set to extended
-  cbus2.setMB(MB14,RX,EXT);
-  cbus2.setMB(MB15,RX,EXT);
-  // cbus2.setMB(MB16,TX);
-  // cbus2.setMB(MB17, TX);
-  // cbus2.setMB(MB18, TX);
-  // cbus2.setMB(MB19, TX);
-  // cbus2.setMB(MB20, TX);
-  // cbus2.setMB(MB21, TX);
-  // cbus2.setMB(MB22, TX);
-  // cbus2.setMB(MB23, TX);
-  // cbus2.setMB(MB24, TX);
-  // cbus2.setMB(MB25, TX);
-  // cbus2.setMB(MB26, TX);
-  // cbus2.setMB(MB27, TX);
-  // cbus2.setMB(MB28, TX);
-  // cbus2.setMB(MB29, TX);
-  // cbus2.setMB(MB30, TX);
-  // cbus2.setMB(MB31, TX);
-  // cbus2.setMB(MB32, TX);
-  // cbus2.setMB(MB33, TX);
-  // cbus2.setMB(MB34, TX);
-  // cbus2.setMB(MB35, TX);
-  // cbus2.setMB(MB36, TX);
-  // cbus2.setMB(MB37, TX);
-  // cbus2.setMB(MB38, TX);
-  // cbus2.setMB(MB39, TX);
-  // cbus2.setMB(MB40, TX);
-  // cbus2.setMB(MB41, TX);
-  // cbus2.setMB(MB42, TX);
-  // cbus2.setMB(MB43, TX);
-  // cbus2.setMB(MB44, TX);
-  // cbus2.setMB(MB45, TX);
-  // cbus2.setMB(MB46, TX);
-  // cbus2.setMB(MB47, TX);
-  // cbus2.setMB(MB48, TX);
-  // cbus2.setMB(MB49, TX);
-  // cbus2.setMB(MB50, TX);
-  // cbus2.setMB(MB51, TX);
-  // cbus2.setMB(MB52, TX);
-  // cbus2.setMB(MB53, TX);
-  // cbus2.setMB(MB54, TX);
-  // cbus2.setMB(MB55, TX);
-  // cbus2.setMB(MB56, TX);
-  // cbus2.setMB(MB57, TX);
-  // cbus2.setMB(MB58, TX);
-  // cbus2.setMB(MB59, TX);
-  // cbus2.setMB(MB60, TX);
-  // cbus2.setMB(MB61, TX);
-  // cbus2.setMB(MB62, TX);
-  // cbus2.setMB(MB63, TX);
+  can2.setMaxMB(64); // change from default 16 mailboxes to 64 (maximum)
+  can2.enableFIFO(); // first in-first out prevents overwriting unsent messages depending on the queue
+  can2.setMB(MB4,RX,STD);  // change the first 12 mailboxes to recieve standard frames. 4 for extended. the first four
+  can2.setMB(MB5,RX,STD);  // already do by default. the rest of the mailboxes (48) are TX mailboxes by default, which
+  can2.setMB(MB6,RX,STD);  // is necessary because we send more data than the bus can handle in short periods of time
+  can2.setMB(MB7,RX,STD);
+  can2.setMB(MB8,RX,STD);
+  can2.setMB(MB9,RX,STD);
+  can2.setMB(MB10,RX,STD);
+  can2.setMB(MB11,RX,STD);
+  can2.setMB(MB12,RX,EXT);  // perhaps there is an issue and something is sending extended frames for whatever reason
+  can2.setMB(MB13,RX,EXT);  // we have a lot of mailboxes anyways, so these four can be set to extended
+  can2.setMB(MB14,RX,EXT);
+  can2.setMB(MB15,RX,EXT);
+  // can2.setMB(MB16,TX);
+  // can2.setMB(MB17, TX);
+  // can2.setMB(MB18, TX);
+  // can2.setMB(MB19, TX);
+  // can2.setMB(MB20, TX);
+  // can2.setMB(MB21, TX);
+  // can2.setMB(MB22, TX);
+  // can2.setMB(MB23, TX);
+  // can2.setMB(MB24, TX);
+  // can2.setMB(MB25, TX);
+  // can2.setMB(MB26, TX);
+  // can2.setMB(MB27, TX);
+  // can2.setMB(MB28, TX);
+  // can2.setMB(MB29, TX);
+  // can2.setMB(MB30, TX);
+  // can2.setMB(MB31, TX);
+  // can2.setMB(MB32, TX);
+  // can2.setMB(MB33, TX);
+  // can2.setMB(MB34, TX);
+  // can2.setMB(MB35, TX);
+  // can2.setMB(MB36, TX);
+  // can2.setMB(MB37, TX);
+  // can2.setMB(MB38, TX);
+  // can2.setMB(MB39, TX);
+  // can2.setMB(MB40, TX);
+  // can2.setMB(MB41, TX);
+  // can2.setMB(MB42, TX);
+  // can2.setMB(MB43, TX);
+  // can2.setMB(MB44, TX);
+  // can2.setMB(MB45, TX);
+  // can2.setMB(MB46, TX);
+  // can2.setMB(MB47, TX);
+  // can2.setMB(MB48, TX);
+  // can2.setMB(MB49, TX);
+  // can2.setMB(MB50, TX);
+  // can2.setMB(MB51, TX);
+  // can2.setMB(MB52, TX);
+  // can2.setMB(MB53, TX);
+  // can2.setMB(MB54, TX);
+  // can2.setMB(MB55, TX);
+  // can2.setMB(MB56, TX);
+  // can2.setMB(MB57, TX);
+  // can2.setMB(MB58, TX);
+  // can2.setMB(MB59, TX);
+  // can2.setMB(MB60, TX);
+  // can2.setMB(MB61, TX);
+  // can2.setMB(MB62, TX);
+  // can2.setMB(MB63, TX);
 
 
-  cbus1.setMaxMB(64);
-  cbus1.enableFIFO();
-  cbus1.setMB(MB4,RX,STD);  // first 16 mailboxes as rx, 4 rx extended. this is pretty overkill, but hey, here they are
-  cbus1.setMB(MB5,RX,STD);
-  cbus1.setMB(MB6,RX,STD);
-  cbus1.setMB(MB7,RX,STD);
-  cbus1.setMB(MB8,RX,STD);
-  cbus1.setMB(MB9,RX,STD);
-  cbus1.setMB(MB10,RX,STD);
-  cbus1.setMB(MB11,RX,STD);
-  cbus1.setMB(MB12,RX,STD);
-  cbus1.setMB(MB13,RX,STD);
-  cbus1.setMB(MB14,RX,STD);
-  cbus1.setMB(MB15,RX,STD);
-  cbus1.setMB(MB16,RX,EXT);
-  cbus1.setMB(MB17,RX,EXT);
-  cbus1.setMB(MB18,RX,EXT);
-  cbus1.setMB(MB19,RX,EXT);
+  can1.setMaxMB(64);
+  can1.enableFIFO();
+  can1.setMB(MB4,RX,STD);  // first 16 mailboxes as rx, 4 rx extended. this is pretty overkill, but hey, here they are
+  can1.setMB(MB5,RX,STD);
+  can1.setMB(MB6,RX,STD);
+  can1.setMB(MB7,RX,STD);
+  can1.setMB(MB8,RX,STD);
+  can1.setMB(MB9,RX,STD);
+  can1.setMB(MB10,RX,STD);
+  can1.setMB(MB11,RX,STD);
+  can1.setMB(MB12,RX,STD);
+  can1.setMB(MB13,RX,STD);
+  can1.setMB(MB14,RX,STD);
+  can1.setMB(MB15,RX,STD);
+  can1.setMB(MB16,RX,EXT);
+  can1.setMB(MB17,RX,EXT);
+  can1.setMB(MB18,RX,EXT);
+  can1.setMB(MB19,RX,EXT);
+}
+
+
+/**
+ *  Reads a CAN message if available and then sends it to thr
+ *  proper decoding funciton
+ **/
+void read_CAN() {
+  int count = 0;
+  while (can1.read(rxmsg) && count < MAX_CAN_FRAME_READ_PER_CYCLE) {
+    decode_CAN1(rxmsg);
+    count++;
+  }
+
+  count = 0;
+  while (can2.read(rxmsg) && count < MAX_CAN_FRAME_READ_PER_CYCLE) {
+    decode_CAN2(rxmsg);
+    count++;
+  }
 }
 
 

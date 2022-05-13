@@ -3,8 +3,10 @@
 
 #include <EasyTimer.h>
 #include <Adafruit_NeoPixel.h>
-#include "sigs_inside.hpp"
 #include "rainbow_pixels.hpp"
+#include "CAN/CAN1.hpp"
+#include "CAN/CAN2.hpp"
+
 
 // add low fuel pressure warning
 
@@ -54,10 +56,10 @@ void obd_main(){
 
   // user override time-outs
   if (OBDTIMER_user_override_timout_check_timer.isup()){
-    USER_wpOverride.timeout_check();
-    USER_fanLeftOverride.timeout_check();
-    USER_fanRightOverride.timeout_check();
-    USER_brakeLightOverride.timeout_check();
+    CMD_waterPumpOverride.timeout_check();
+    CMD_fanLeftOverride.timeout_check();
+    CMD_fanRightOverride.timeout_check();
+    CMD_brakeLightOverride.timeout_check();
   }
 
   // M400 timeouts
@@ -151,7 +153,7 @@ bool obd_oil_pressure_acceptence(StateSignal &oil_pressure, StateSignal &rpm){
           msg.buf[7] = 0;
           msg.id = 281;
           msg.len = 8;
-          cbus2.write(msg);
+          can2.write(msg);
 
           // PDM 30 - driver message
           msg.buf[0] = 'O';
@@ -164,7 +166,7 @@ bool obd_oil_pressure_acceptence(StateSignal &oil_pressure, StateSignal &rpm){
           msg.buf[7] = 'W';
           msg.id = 280;
           msg.len = 8;
-          cbus2.write(msg);
+          can2.write(msg);
         }
       }
     }
@@ -218,7 +220,7 @@ bool obd_oil_temp_checker(StateSignal &oiltemp){
           msg.buf[7] = 0;
           msg.id = 281;
           msg.len = 8;
-          cbus2.write(msg);
+          can2.write(msg);
 
           // PDM 30 - driver message
           msg.buf[0] = 'O';
@@ -231,7 +233,7 @@ bool obd_oil_temp_checker(StateSignal &oiltemp){
           msg.buf[7] = '\0';
           msg.id = 280;
           msg.len = 8;
-          cbus2.write(msg);
+          can2.write(msg);
         }
       }
     }
@@ -292,7 +294,7 @@ bool obd_fuel_pressure_checker(StateSignal &fuelp){
           msg.buf[7] = 0;
           msg.id = 281;
           msg.len = 8;
-          cbus2.write(msg);
+          can2.write(msg);
 
           // PDM 30 - driver message
           msg.buf[0] = 'L';
@@ -305,7 +307,7 @@ bool obd_fuel_pressure_checker(StateSignal &fuelp){
           msg.buf[7] = 'L';
           msg.id = 280;
           msg.len = 8;
-          cbus2.write(msg);
+          can2.write(msg);
         }
       }
     }
@@ -313,8 +315,6 @@ bool obd_fuel_pressure_checker(StateSignal &fuelp){
 
   return fuelp_good;
 }
-
-
 
 
 
@@ -368,8 +368,8 @@ void obd_leds(){
 
 
   // if the user is overriding a pwm control, blink purple
-  } else if (USER_wpOverride.value() >= 1 || USER_fanLeftOverride.value() >= 1 ||
-             USER_fanRightOverride.value() >= 1 || USER_brakeLightOverride.value() >= 1){
+  } else if (CMD_waterPumpOverride.value() >= 1 || CMD_fanLeftOverride.value() >= 1 ||
+             CMD_fanRightOverride.value() >= 1 || CMD_brakeLightOverride.value() >= 1){
     static EasyTimer user_override_blink(4);
     if (user_override_blink.isup()){
       if (leds_on){
