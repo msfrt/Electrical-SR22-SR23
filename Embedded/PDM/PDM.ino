@@ -71,6 +71,9 @@ EasyTimer engine_time_update_timer(1);
 // will be so small that mileage may actually never be incremented because of poor floating-point math
 EasyTimer odometer_update_timer(2);
 
+//sets override percentage for fans
+const int override_percent = 80;
+
 // eeprom-saved signals
 #include "EEPROM_sigs.hpp"
 
@@ -100,9 +103,11 @@ const bool GLO_debug = false;
 
 
 
+
 void setup() { //high 18 low 26
 
   analogReadResolution(GLO_read_resolution_bits);
+  
 
   // begin OBD Neopixel
   GLO_obd_neopixel.begin();
@@ -160,6 +165,21 @@ void setup() { //high 18 low 26
   // neat brakelight animation
   brakelight_startup();
 
+  //initializes the fans off
+  CMD_fanLeftOverride = 0;
+  CMD_fanRightOverride = 0;
+
+  //sets cool mode pin
+  cool_down_pin = 19;
+  pinMode(cool_down_pin, INPUT);
+
+  //Previous reading of cool down switch
+  int lastReading = 0;
+  //current reading of the cool down switch state
+  int coolDownState = 0;
+  
+  unsigned long lastDebounceTime = 0;  // the last time the output pin was toggled
+  unsigned long debounceDelay = 50;    // the debounce time; increase if the output flickers
 }
 
 
@@ -218,6 +238,36 @@ void loop() {
 
     }
   }
+  
+  //Reads cool down switch and set override accordingly
+  int reading = digitalRead(cool_down_pin);
+
+    //Checks is the cool down button is pressed for the first time to turn on fans
+    
+    if((reading != lastReading){
+      lastDebounceTime = millis();    
+    }
+
+
+      if ((millis() - lastDebounceTime) > debounceDelay){
+        if(reading == 1){
+          coolDownState = !coolDownState;
+       }
+
+       if (cooDownState == 1){
+        CMD_fanLeftOverride = override_percent;
+        CMD_fanRightOverride = ovveride_percent;
+       }
+       else{
+        CMD_fanLeftOverride = 0;
+        CMD_fanRightOverride = 0;
+       }
+       
+      }
+
+      lastReading = reading;
+    
+   
 }
 
 
@@ -330,8 +380,3 @@ void read_CAN() {
     count++;
   }
 }
-
-
-
-
-
