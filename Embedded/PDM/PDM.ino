@@ -266,11 +266,11 @@ void loop() {
         CMD_fanLeftOverride = 0;
         CMD_fanRightOverride = 0;
        }
-      Serial.print("Reading: "); Serial.println(reading);
-      Serial.print("State: "); Serial.println(coolDownState);
-      Serial.print("Left Override: "); Serial.println(CMD_fanLeftOverride.value());
-      Serial.print("Right Override: "); Serial.println(CMD_fanRightOverride.value());
-      Serial.println("");
+//      Serial.print("Reading: "); Serial.println(reading);
+//      Serial.print("State: "); Serial.println(coolDownState);
+//      Serial.print("Left Override: "); Serial.println(CMD_fanLeftOverride.value());
+//      Serial.print("Right Override: "); Serial.println(CMD_fanRightOverride.value());
+//      Serial.println("");
       } 
       if((reading==1) && (buttonStateSwitch == false)){
         buttonStateSwitch = true;
