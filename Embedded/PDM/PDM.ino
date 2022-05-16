@@ -101,6 +101,17 @@ const int override_percent = 80;
 EasyTimer debug(2);
 const bool GLO_debug = false;
 
+#define cool_down_pin 19
+//Previous reading of cool down switch
+int lastReading = 0;
+//current reading of the cool down switch state
+int coolDownState = 0;
+  
+unsigned long lastDebounceTime = 0;  // the last time the output pin was toggled
+unsigned long debounceDelay = 500;    // the debounce time; increase if the output flickers
+
+bool buttonStateSwitch = true;
+
 
 
 
@@ -170,16 +181,8 @@ void setup() { //high 18 low 26
   CMD_fanRightOverride = 0;
 
   //sets cool mode pin
-  cool_down_pin = 19;
   pinMode(cool_down_pin, INPUT);
 
-  //Previous reading of cool down switch
-  int lastReading = 0;
-  //current reading of the cool down switch state
-  int coolDownState = 0;
-  
-  unsigned long lastDebounceTime = 0;  // the last time the output pin was toggled
-  unsigned long debounceDelay = 50;    // the debounce time; increase if the output flickers
 }
 
 
@@ -244,24 +247,34 @@ void loop() {
 
     //Checks is the cool down button is pressed for the first time to turn on fans
     
-    if((reading != lastReading){
+    if(reading != lastReading){
       lastDebounceTime = millis();    
     }
 
 
       if ((millis() - lastDebounceTime) > debounceDelay){
-        if(reading == 1){
+        if((reading == 0)&& (buttonStateSwitch==true)){
+          buttonStateSwitch = false;
           coolDownState = !coolDownState;
-       }
+       
 
-       if (cooDownState == 1){
+       if (coolDownState == 1){
         CMD_fanLeftOverride = override_percent;
-        CMD_fanRightOverride = ovveride_percent;
+        CMD_fanRightOverride = override_percent;
        }
        else{
         CMD_fanLeftOverride = 0;
         CMD_fanRightOverride = 0;
        }
+      Serial.print("Reading: "); Serial.println(reading);
+      Serial.print("State: "); Serial.println(coolDownState);
+      Serial.print("Left Override: "); Serial.println(CMD_fanLeftOverride.value());
+      Serial.print("Right Override: "); Serial.println(CMD_fanRightOverride.value());
+      Serial.println("");
+      } 
+      if((reading==1) && (buttonStateSwitch == false)){
+        buttonStateSwitch = true;
+      }
        
       }
 
