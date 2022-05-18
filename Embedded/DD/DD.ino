@@ -233,6 +233,12 @@ void loop() {
     }
   }
 
+  // Secret Menue
+  if (checkButton(button1Pin, button1State, button1StatePrev, button1Time,
+                  5000)) {
+    screensController.Milf();
+                  }
+
   // read any incoming CAN messages
   // Serial.println("Reading CAN:");
   readCan();

@@ -42,6 +42,8 @@ class ScreensController {
   void OnMessage(String message);
   void OnNewLap();
 
+  void Milf();
+
   /**
    *  Returns true if the a notification/message state is active
    */
@@ -277,6 +279,7 @@ void ScreensController::SetState(ScreenStates state) {
       state_ = state_prev_;
       break;
     case Titan:
+      state_ = state_prev_;
       break;
   }
 
@@ -345,14 +348,14 @@ void ScreensController::OnButtonPress() {
       SetState(InfoScreen2);
       break;
     case InfoScreen2:
-      SetState(Titan);
+      SetState(GearInfo);
       break;
-    case Notification:  // fal through
+    case Notification:  // fall through
     case LapTime:
       SetState(state_prev_);
       break;
     case Titan:
-    SetState(GearInfo);
+    SetState(state_prev_);
       break;
   }
 }
@@ -376,5 +379,9 @@ void ScreensController::OnNewLap() {
     SetState(LapTime);
   }
 }
+
+void ScreensController::Milf(){
+  SetState(Titan);
+  }
 
 #endif
