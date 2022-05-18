@@ -15,202 +15,202 @@
 #include <StateCAN.h>
 
 // Message: ATCCR_17 [0x1d3]
-StateSignal ATCCR_counterMsg467(4, false, 1, 0.0, 0, 15, 0.0, 0, 467);
-StateSignal ATCCR_egt4(16, true, 10, 0.0, 0, 1000, 0.0, 0, 467);
-StateSignal ATCCR_rectifierCurrent(16, true, 10, 0.0, -200, 200, 0.0, 0, 467);
-StateSignal ATCCR_coolantTempRadMiddle(16, true, 10, 0.0, 0, 120, 0.0, 0, 467);
+StateSignal ATCCR_counterMsg467(4, false, 1, 0.0, 0, 15, 0.0, -1, 467);
+StateSignal ATCCR_egt4(16, true, 10, 0.0, 0, 1000, 0.0, -1, 467);
+StateSignal ATCCR_rectifierCurrent(16, true, 10, 0.0, -200, 200, 0.0, -1, 467);
+StateSignal ATCCR_coolantTempRadMiddle(16, true, 10, 0.0, 0, 120, 0.0, -1, 467);
 
 // Message: ATCCR_16 [0x1d2]
-StateSignal ATCCR_counterMsg466(4, false, 1, 0.0, 0, 15, 0.0, 0, 466);
-StateSignal ATCCR_egt1(16, true, 10, 0.0, 0, 1000, 0.0, 0, 466);
-StateSignal ATCCR_egt2(16, true, 10, 0.0, 0, 1000, 0.0, 0, 466);
-StateSignal ATCCR_egt3(16, true, 10, 0.0, 0, 1000, 0.0, 0, 466);
+StateSignal ATCCR_counterMsg466(4, false, 1, 0.0, 0, 15, 0.0, -1, 466);
+StateSignal ATCCR_egt1(16, true, 10, 0.0, 0, 1000, 0.0, -1, 466);
+StateSignal ATCCR_egt2(16, true, 10, 0.0, 0, 1000, 0.0, -1, 466);
+StateSignal ATCCR_egt3(16, true, 10, 0.0, 0, 1000, 0.0, -1, 466);
 
 // Message: ATCCR_15 [0x1d1]
-StateSignal ATCCR_counterMsg465(4, false, 1, 0.0, 0, 15, 0.0, 0, 465);
-StateSignal ATCCR_uptime(32, false, 1, 0.0, 0, 4294967295, 0.0, 0, 465);
-StateSignal ATCCR_shiftingPressure(16, true, 10, 0.0, -5, 200, 0.0, 0, 465);
+StateSignal ATCCR_counterMsg465(4, false, 1, 0.0, 0, 15, 0.0, -1, 465);
+StateSignal ATCCR_uptime(32, false, 1, 0.0, 0, 4294967295, 0.0, -1, 465);
+StateSignal ATCCR_shiftingPressure(16, true, 10, 0.0, -5, 200, 0.0, -1, 465);
 
 // Message: ATCCF_15 [0x19f]
-StateSignal ATCCF_uptime(32, false, 1, 0.0, 0, 4294967295, 0.0, 0, 415);
+StateSignal ATCCF_uptime(32, false, 1, 0.0, 0, 4294967295, 0.0, -1, 415);
 
 // Message: PDM_26 [0x114]
-StateSignal PDM_uptime(32, false, 1, 0.0, 0, 4294967295, 0.0, 0, 276);
+StateSignal PDM_uptime(32, false, 1, 0.0, 0, 4294967295, 0.0, -1, 276);
 
 // Message: PDM_09 [0x103]
-StateSignal PDM_OBD_oilPressure(1, false, 1, 0.0, 0, 0, 0.0, 0, 259);
-StateSignal PDM_OBD_oilTemp(1, false, 1, 0.0, 0, 0, 0.0, 0, 259);
-StateSignal PDM_OBD_fuelPressure(1, false, 1, 0.0, 0, 0, 0.0, 0, 259);
-StateSignal PDM_coolingOverrideActive(1, false, 1, 0.0, 0, 0, 0.0, 0, 259);
-StateSignal PDM_engineState(8, true, 1, 0.0, 0, 3, 0.0, 0, 259);
+StateSignal PDM_OBD_oilPressure(1, false, 1, 0.0, 0, 0, 0.0, -1, 259);
+StateSignal PDM_OBD_oilTemp(1, false, 1, 0.0, 0, 0, 0.0, -1, 259);
+StateSignal PDM_OBD_fuelPressure(1, false, 1, 0.0, 0, 0, 0.0, -1, 259);
+StateSignal PDM_coolingOverrideActive(1, false, 1, 0.0, 0, 0, 0.0, -1, 259);
+StateSignal PDM_engineState(8, true, 1, 0.0, 0, 3, 0.0, -1, 259);
 
 // Message: PDM_25 [0x113]
-StateSignal PDM_counterMsg275(4, false, 1, 0.0, 0, 15, 0.0, 0, 275);
-StateSignal PDM_carMiles(16, true, 10, 0.0, 0, 0, 0.0, 0, 275);
-StateSignal PDM_engineHours(16, true, 1, 0.0, -32768, 32767, 0.0, 0, 275);
-StateSignal PDM_engineMinutes(16, true, 1, 0.0, -32768, 32767, 0.0, 0, 275);
+StateSignal PDM_counterMsg275(4, false, 1, 0.0, 0, 15, 0.0, -1, 275);
+StateSignal PDM_carMiles(16, true, 10, 0.0, 0, 0, 0.0, -1, 275);
+StateSignal PDM_engineHours(16, true, 1, 0.0, -32768, 32767, 0.0, -1, 275);
+StateSignal PDM_engineMinutes(16, true, 1, 0.0, -32768, 32767, 0.0, -1, 275);
 
 // Message: PDM_24 [0x112]
-StateSignal PDM_counterMsg274(4, false, 1, 0.0, 0, 15, 0.0, 0, 274);
-StateSignal PDM_fanLeftDutyCycle(8, false, 1, 0.0, 0, 100, 0.0, 0, 274);
-StateSignal PDM_fanRightDutyCycle(8, false, 1, 0.0, 0, 100, 0.0, 0, 274);
-StateSignal PDM_wpDutyCycle(8, false, 1, 0.0, 0, 255, 0.0, 0, 274);
-StateSignal PDM_teensyTemp(16, true, 10, 0.0, -5, 20, 0.0, 0, 274);
+StateSignal PDM_counterMsg274(4, false, 1, 0.0, 0, 15, 0.0, -1, 274);
+StateSignal PDM_fanLeftDutyCycle(8, false, 1, 0.0, 0, 100, 0.0, -1, 274);
+StateSignal PDM_fanRightDutyCycle(8, false, 1, 0.0, 0, 100, 0.0, -1, 274);
+StateSignal PDM_wpDutyCycle(8, false, 1, 0.0, 0, 255, 0.0, -1, 274);
+StateSignal PDM_teensyTemp(16, true, 10, 0.0, -5, 20, 0.0, -1, 274);
 
 // Message: VCU_10 [0xa0]
-StateSignal VCU_counterMsg160(4, false, 1, 0.0, 0, 15, 0.0, 0, 160);
-StateSignal VCU_boardTemp(16, true, 10, 0.0, 0, 150, 0.0, 0, 160);
-StateSignal VCU_teensyTemp(16, true, 10, 0.0, 0, 150, 0.0, 0, 160);
+StateSignal VCU_counterMsg160(4, false, 1, 0.0, 0, 15, 0.0, -1, 160);
+StateSignal VCU_boardTemp(16, true, 10, 0.0, 0, 150, 0.0, -1, 160);
+StateSignal VCU_teensyTemp(16, true, 10, 0.0, 0, 150, 0.0, -1, 160);
 
 // Message: DD_10 [0x2c6]
-StateSignal DD_counterMsg210(4, false, 1, 0.0, 0, 15, 0.0, 0, 710);
-StateSignal DD_boardTemp(16, true, 10, 0.0, 0, 150, 0.0, 0, 710);
-StateSignal DD_teensyTemp(16, true, 10, 0.0, 0, 150, 0.0, 0, 710);
+StateSignal DD_counterMsg210(4, false, 1, 0.0, 0, 15, 0.0, -1, 710);
+StateSignal DD_boardTemp(16, true, 10, 0.0, 0, 150, 0.0, -1, 710);
+StateSignal DD_teensyTemp(16, true, 10, 0.0, 0, 150, 0.0, -1, 710);
 
 // Message: PDM_23 [0x111]
-StateSignal PDM_counterMsg273(4, false, 1, 0.0, 0, 15, 0.0, 0, 273);
-StateSignal PDM_boardTemp(16, true, 10, 0.0, -5, 100, 0.0, 0, 273);
-StateSignal PDM_brakelightVoltAvg(16, true, 1000, 0.0, -5, 100, 0.0, 0, 273);
-StateSignal PDM_starterRelayVoltAvg(16, true, 1000, 0.0, -5, 20, 0.0, 0, 273);
+StateSignal PDM_counterMsg273(4, false, 1, 0.0, 0, 15, 0.0, -1, 273);
+StateSignal PDM_boardTemp(16, true, 10, 0.0, -5, 100, 0.0, -1, 273);
+StateSignal PDM_brakelightVoltAvg(16, true, 1000, 0.0, -5, 100, 0.0, -1, 273);
+StateSignal PDM_starterRelayVoltAvg(16, true, 1000, 0.0, -5, 20, 0.0, -1, 273);
 
 // Message: PDM_22 [0x110]
-StateSignal PDM_counterMsg272(4, false, 1, 0.0, 0, 15, 0.0, 0, 272);
-StateSignal PDM_keepAliveVoltAvg(16, true, 1000, 0.0, -5, 20, 0.0, 0, 272);
-StateSignal PDM_keepAliveVoltMax(16, true, 1000, 0.0, -5, 20, 0.0, 0, 272);
-StateSignal PDM_keepAliveVoltMin(16, true, 1000, 0.0, -5, 20, 0.0, 0, 272);
+StateSignal PDM_counterMsg272(4, false, 1, 0.0, 0, 15, 0.0, -1, 272);
+StateSignal PDM_keepAliveVoltAvg(16, true, 1000, 0.0, -5, 20, 0.0, -1, 272);
+StateSignal PDM_keepAliveVoltMax(16, true, 1000, 0.0, -5, 20, 0.0, -1, 272);
+StateSignal PDM_keepAliveVoltMin(16, true, 1000, 0.0, -5, 20, 0.0, -1, 272);
 
 // Message: PDM_21 [0x10f]
-StateSignal PDM_counterMsg271(4, false, 1, 0.0, 0, 15, 0.0, 0, 271);
-StateSignal PDM_dataVoltAvg(16, true, 1000, 0.0, -5, 20, 0.0, 0, 271);
-StateSignal PDM_dataVoltMax(16, true, 1000, 0.0, -5, 20, 0.0, 0, 271);
-StateSignal PDM_dataVoltMin(16, true, 1000, 0.0, -5, 20, 0.0, 0, 271);
+StateSignal PDM_counterMsg271(4, false, 1, 0.0, 0, 15, 0.0, -1, 271);
+StateSignal PDM_dataVoltAvg(16, true, 1000, 0.0, -5, 20, 0.0, -1, 271);
+StateSignal PDM_dataVoltMax(16, true, 1000, 0.0, -5, 20, 0.0, -1, 271);
+StateSignal PDM_dataVoltMin(16, true, 1000, 0.0, -5, 20, 0.0, -1, 271);
 
 // Message: PDM_20 [0x10e]
-StateSignal PDM_counterMsg270(4, false, 1, 0.0, 0, 15, 0.0, 0, 270);
-StateSignal PDM_mainVoltAvg(16, true, 1000, 0.0, -5, 20, 0.0, 0, 270);
-StateSignal PDM_mainVoltMax(16, true, 1000, 0.0, -5, 20, 0.0, 0, 270);
-StateSignal PDM_mainVoltMin(16, true, 1000, 0.0, -5, 20, 0.0, 0, 270);
+StateSignal PDM_counterMsg270(4, false, 1, 0.0, 0, 15, 0.0, -1, 270);
+StateSignal PDM_mainVoltAvg(16, true, 1000, 0.0, -5, 20, 0.0, -1, 270);
+StateSignal PDM_mainVoltMax(16, true, 1000, 0.0, -5, 20, 0.0, -1, 270);
+StateSignal PDM_mainVoltMin(16, true, 1000, 0.0, -5, 20, 0.0, -1, 270);
 
 // Message: PDM_19 [0x10d]
-StateSignal PDM_counterMsg269(4, false, 1, 0.0, 0, 15, 0.0, 0, 269);
-StateSignal PDM_fuelVoltAvg(16, true, 1000, 0.0, -5, 20, 0.0, 0, 269);
-StateSignal PDM_fuelVoltMax(16, true, 1000, 0.0, -5, 20, 0.0, 0, 269);
-StateSignal PDM_fuelVoltMin(16, true, 1000, 0.0, -5, 20, 0.0, 0, 269);
+StateSignal PDM_counterMsg269(4, false, 1, 0.0, 0, 15, 0.0, -1, 269);
+StateSignal PDM_fuelVoltAvg(16, true, 1000, 0.0, -5, 20, 0.0, -1, 269);
+StateSignal PDM_fuelVoltMax(16, true, 1000, 0.0, -5, 20, 0.0, -1, 269);
+StateSignal PDM_fuelVoltMin(16, true, 1000, 0.0, -5, 20, 0.0, -1, 269);
 
 // Message: PDM_18 [0x10c]
-StateSignal PDM_counterMsg268(4, false, 1, 0.0, 0, 15, 0.0, 0, 268);
-StateSignal PDM_fuelCurrentAvg(16, true, 100, 0.0, -5, 20, 0.0, 0, 268);
-StateSignal PDM_fuelCurrentMax(16, true, 100, 0.0, -5, 20, 0.0, 0, 268);
-StateSignal PDM_fuelCurrentMin(16, true, 100, 0.0, -5, 20, 0.0, 0, 268);
+StateSignal PDM_counterMsg268(4, false, 1, 0.0, 0, 15, 0.0, -1, 268);
+StateSignal PDM_fuelCurrentAvg(16, true, 100, 0.0, -5, 20, 0.0, -1, 268);
+StateSignal PDM_fuelCurrentMax(16, true, 100, 0.0, -5, 20, 0.0, -1, 268);
+StateSignal PDM_fuelCurrentMin(16, true, 100, 0.0, -5, 20, 0.0, -1, 268);
 
 // Message: PDM_17 [0x10b]
-StateSignal PDM_counterMsg267(4, false, 1, 0.0, 0, 15, 0.0, 0, 267);
-StateSignal PDM_wpVoltAvg(16, true, 1000, 0.0, -5, 20, 0.0, 0, 267);
-StateSignal PDM_wpVoltMax(16, true, 1000, 0.0, -5, 20, 0.0, 0, 267);
-StateSignal PDM_wpVoltMin(16, true, 1000, 0.0, -5, 20, 0.0, 0, 267);
+StateSignal PDM_counterMsg267(4, false, 1, 0.0, 0, 15, 0.0, -1, 267);
+StateSignal PDM_wpVoltAvg(16, true, 1000, 0.0, -5, 20, 0.0, -1, 267);
+StateSignal PDM_wpVoltMax(16, true, 1000, 0.0, -5, 20, 0.0, -1, 267);
+StateSignal PDM_wpVoltMin(16, true, 1000, 0.0, -5, 20, 0.0, -1, 267);
 
 // Message: PDM_16 [0x10a]
-StateSignal PDM_counterMsg266(4, false, 1, 0.0, 0, 15, 0.0, 0, 266);
-StateSignal PDM_wpCurrentAvg(16, true, 100, 0.0, -5, 20, 0.0, 0, 266);
-StateSignal PDM_wpCurrentMax(16, true, 100, 0.0, -5, 20, 0.0, 0, 266);
-StateSignal PDM_wpCurrentMin(16, true, 100, 0.0, -5, 20, 0.0, 0, 266);
+StateSignal PDM_counterMsg266(4, false, 1, 0.0, 0, 15, 0.0, -1, 266);
+StateSignal PDM_wpCurrentAvg(16, true, 100, 0.0, -5, 20, 0.0, -1, 266);
+StateSignal PDM_wpCurrentMax(16, true, 100, 0.0, -5, 20, 0.0, -1, 266);
+StateSignal PDM_wpCurrentMin(16, true, 100, 0.0, -5, 20, 0.0, -1, 266);
 
 // Message: PDM_15 [0x109]
-StateSignal PDM_counterMsg265(4, false, 1, 0.0, 0, 15, 0.0, 0, 265);
-StateSignal PDM_fanLeftVoltAvg(16, true, 1000, 0.0, -5, 20, 0.0, 0, 265);
-StateSignal PDM_fanLeftVoltMax(16, true, 1000, 0.0, -5, 20, 0.0, 0, 265);
-StateSignal PDM_fanLeftVoltMin(16, true, 1000, 0.0, -5, 20, 0.0, 0, 265);
+StateSignal PDM_counterMsg265(4, false, 1, 0.0, 0, 15, 0.0, -1, 265);
+StateSignal PDM_fanLeftVoltAvg(16, true, 1000, 0.0, -5, 20, 0.0, -1, 265);
+StateSignal PDM_fanLeftVoltMax(16, true, 1000, 0.0, -5, 20, 0.0, -1, 265);
+StateSignal PDM_fanLeftVoltMin(16, true, 1000, 0.0, -5, 20, 0.0, -1, 265);
 
 // Message: PDM_14 [0x108]
-StateSignal PDM_counterMsg264(4, false, 1, 0.0, 0, 15, 0.0, 0, 264);
-StateSignal PDM_fanLeftCurrentAvg(16, true, 100, 0.0, -5, 20, 0.0, 0, 264);
-StateSignal PDM_fanLeftCurrentMax(16, true, 100, 0.0, -5, 20, 0.0, 0, 264);
-StateSignal PDM_fanLeftCurrentMin(16, true, 100, 0.0, -5, 20, 0.0, 0, 264);
+StateSignal PDM_counterMsg264(4, false, 1, 0.0, 0, 15, 0.0, -1, 264);
+StateSignal PDM_fanLeftCurrentAvg(16, true, 100, 0.0, -5, 20, 0.0, -1, 264);
+StateSignal PDM_fanLeftCurrentMax(16, true, 100, 0.0, -5, 20, 0.0, -1, 264);
+StateSignal PDM_fanLeftCurrentMin(16, true, 100, 0.0, -5, 20, 0.0, -1, 264);
 
 // Message: PDM_11 [0x105]
-StateSignal PDM_counterMsg261(4, false, 1, 0.0, 0, 15, 0.0, 0, 261);
-StateSignal PDM_pdmVoltAvg(16, true, 1000, 0.0, -5, 20, 0.0, 0, 261);
-StateSignal PDM_pdmVoltMax(16, true, 1000, 0.0, -5, 20, 0.0, 0, 261);
-StateSignal PDM_pdmVoltMin(16, true, 1000, 0.0, -5, 20, 0.0, 0, 261);
+StateSignal PDM_counterMsg261(4, false, 1, 0.0, 0, 15, 0.0, -1, 261);
+StateSignal PDM_pdmVoltAvg(16, true, 1000, 0.0, -5, 20, 0.0, -1, 261);
+StateSignal PDM_pdmVoltMax(16, true, 1000, 0.0, -5, 20, 0.0, -1, 261);
+StateSignal PDM_pdmVoltMin(16, true, 1000, 0.0, -5, 20, 0.0, -1, 261);
 
 // Message: PDM_13 [0x107]
-StateSignal PDM_counterMsg263(4, false, 1, 0.0, 0, 15, 0.0, 0, 263);
-StateSignal PDM_fanRightVoltAvg(16, true, 1000, 0.0, -5, 20, 0.0, 0, 263);
-StateSignal PDM_fanRightVoltMax(16, true, 1000, 0.0, -5, 20, 0.0, 0, 263);
-StateSignal PDM_fanRightVoltMin(16, true, 1000, 0.0, -5, 20, 0.0, 0, 263);
+StateSignal PDM_counterMsg263(4, false, 1, 0.0, 0, 15, 0.0, -1, 263);
+StateSignal PDM_fanRightVoltAvg(16, true, 1000, 0.0, -5, 20, 0.0, -1, 263);
+StateSignal PDM_fanRightVoltMax(16, true, 1000, 0.0, -5, 20, 0.0, -1, 263);
+StateSignal PDM_fanRightVoltMin(16, true, 1000, 0.0, -5, 20, 0.0, -1, 263);
 
 // Message: PDM_12 [0x106]
-StateSignal PDM_counterMsg262(4, false, 1, 0.0, 0, 15, 0.0, 0, 262);
-StateSignal PDM_fanRightCurrentAvg(16, true, 100, 0.0, -5, 20, 0.0, 0, 262);
-StateSignal PDM_fanRightCurrentMax(16, true, 100, 0.0, -5, 20, 0.0, 0, 262);
-StateSignal PDM_fanRightCurrentMin(16, true, 100, 0.0, -5, 20, 0.0, 0, 262);
+StateSignal PDM_counterMsg262(4, false, 1, 0.0, 0, 15, 0.0, -1, 262);
+StateSignal PDM_fanRightCurrentAvg(16, true, 100, 0.0, -5, 20, 0.0, -1, 262);
+StateSignal PDM_fanRightCurrentMax(16, true, 100, 0.0, -5, 20, 0.0, -1, 262);
+StateSignal PDM_fanRightCurrentMin(16, true, 100, 0.0, -5, 20, 0.0, -1, 262);
 
 // Message: PDM_10 [0x104]
-StateSignal PDM_counterMsg260(4, false, 1, 0.0, 0, 15, 0.0, 0, 260);
-StateSignal PDM_dataLog(1, false, 1, 0.0, 0, 1, 0.0, 0, 260);
-StateSignal PDM_pdmCurrentAvg(16, true, 100, 0.0, -5, 20, 0.0, 0, 260);
-StateSignal PDM_pdmCurrentMax(16, true, 100, 0.0, -5, 20, 0.0, 0, 260);
-StateSignal PDM_pdmCurrentMin(16, true, 100, 0.0, -5, 20, 0.0, 0, 260);
+StateSignal PDM_counterMsg260(4, false, 1, 0.0, 0, 15, 0.0, -1, 260);
+StateSignal PDM_dataLog(1, false, 1, 0.0, 0, 1, 0.0, -1, 260);
+StateSignal PDM_pdmCurrentAvg(16, true, 100, 0.0, -5, 20, 0.0, -1, 260);
+StateSignal PDM_pdmCurrentMax(16, true, 100, 0.0, -5, 20, 0.0, -1, 260);
+StateSignal PDM_pdmCurrentMin(16, true, 100, 0.0, -5, 20, 0.0, -1, 260);
 
 // Message: ATCCR_14 [0x1d0]
-StateSignal ATCCR_counterMsg464(4, false, 1, 0.0, 0, 15, 0.0, 0, 464);
-StateSignal ATCCR_tireTempRRI(16, true, 10, 0.0, 0, 100, 0.0, 0, 464);
-StateSignal ATCCR_tireTempRRM(16, true, 10, 0.0, 0, 100, 0.0, 0, 464);
-StateSignal ATCCR_tireTempRRO(16, true, 10, 0.0, 0, 100, 0.0, 0, 464);
+StateSignal ATCCR_counterMsg464(4, false, 1, 0.0, 0, 15, 0.0, -1, 464);
+StateSignal ATCCR_tireTempRRI(16, true, 10, 0.0, 0, 100, 0.0, -1, 464);
+StateSignal ATCCR_tireTempRRM(16, true, 10, 0.0, 0, 100, 0.0, -1, 464);
+StateSignal ATCCR_tireTempRRO(16, true, 10, 0.0, 0, 100, 0.0, -1, 464);
 
 // Message: ATCCR_13 [0x1cf]
-StateSignal ATCCR_counterMsg463(4, false, 1, 0.0, 0, 15, 0.0, 0, 463);
-StateSignal ATCCR_tireTempRLI(16, true, 10, 0.0, 0, 100, 0.0, 0, 463);
-StateSignal ATCCR_tireTempRLM(16, true, 10, 0.0, 0, 100, 0.0, 0, 463);
-StateSignal ATCCR_tireTempRLO(16, true, 10, 0.0, 0, 100, 0.0, 0, 463);
+StateSignal ATCCR_counterMsg463(4, false, 1, 0.0, 0, 15, 0.0, -1, 463);
+StateSignal ATCCR_tireTempRLI(16, true, 10, 0.0, 0, 100, 0.0, -1, 463);
+StateSignal ATCCR_tireTempRLM(16, true, 10, 0.0, 0, 100, 0.0, -1, 463);
+StateSignal ATCCR_tireTempRLO(16, true, 10, 0.0, 0, 100, 0.0, -1, 463);
 
 // Message: ATCCR_12 [0x1ce]
-StateSignal ATCCR_counterMsg462(4, false, 1, 0.0, 0, 15, 0.0, 0, 462);
-StateSignal ATCCR_teensyTemp(16, true, 10, 0.0, -5, 100, 0.0, 0, 462);
-StateSignal ATCCR_coolantTempRadInlet(16, true, 10, 0.0, 0, 120, 0.0, 0, 462);
-StateSignal ATCCR_coolantTempRadOutlet(16, true, 10, 0.0, 0, 120, 0.0, 0, 462);
+StateSignal ATCCR_counterMsg462(4, false, 1, 0.0, 0, 15, 0.0, -1, 462);
+StateSignal ATCCR_teensyTemp(16, true, 10, 0.0, -5, 100, 0.0, -1, 462);
+StateSignal ATCCR_coolantTempRadInlet(16, true, 10, 0.0, 0, 120, 0.0, -1, 462);
+StateSignal ATCCR_coolantTempRadOutlet(16, true, 10, 0.0, 0, 120, 0.0, -1, 462);
 
 // Message: ATCCR_11 [0x1cd]
-StateSignal ATCCR_counterMsg461(4, false, 1, 0.0, 0, 15, 0.0, 0, 461);
-StateSignal ATCCR_boardTemp(16, true, 10, 0.0, -5, 100, 0.0, 0, 461);
-StateSignal ATCCR_rotorTempRL(16, true, 10, 0.0, 0, 1000, 0.0, 0, 461);
-StateSignal ATCCR_rotorTempRR(16, true, 10, 0.0, 0, 1000, 0.0, 0, 461);
+StateSignal ATCCR_counterMsg461(4, false, 1, 0.0, 0, 15, 0.0, -1, 461);
+StateSignal ATCCR_boardTemp(16, true, 10, 0.0, -5, 100, 0.0, -1, 461);
+StateSignal ATCCR_rotorTempRL(16, true, 10, 0.0, 0, 1000, 0.0, -1, 461);
+StateSignal ATCCR_rotorTempRR(16, true, 10, 0.0, 0, 1000, 0.0, -1, 461);
 
 // Message: ATCCR_10 [0x1cc]
-StateSignal ATCCR_counterMsg460(4, false, 1, 0.0, 0, 15, 0.0, 0, 460);
-StateSignal ATCCR_batteryCurrent(16, true, 10, 0.0, -200, 200, 0.0, 0, 460);
-StateSignal ATCCR_suspensionTravelRL(16, true, 1000, 0.0, -4, 4, 0.0, 0, 460);
-StateSignal ATCCR_suspensionTravelRR(16, true, 1000, 0.0, -4, 4, 0.0, 0, 460);
+StateSignal ATCCR_counterMsg460(4, false, 1, 0.0, 0, 15, 0.0, -1, 460);
+StateSignal ATCCR_batteryCurrent(16, true, 10, 0.0, -200, 200, 0.0, -1, 460);
+StateSignal ATCCR_suspensionTravelRL(16, true, 1000, 0.0, -4, 4, 0.0, -1, 460);
+StateSignal ATCCR_suspensionTravelRR(16, true, 1000, 0.0, -4, 4, 0.0, -1, 460);
 
 // Message: ATCCF_14 [0x19e]
-StateSignal ATCCF_counterMsg414(4, false, 1, 0.0, 0, 15, 0.0, 0, 414);
-StateSignal ATCCF_tireTempFRI(16, true, 10, 0.0, 0, 100, 0.0, 0, 414);
-StateSignal ATCCF_tireTempFRM(16, true, 10, 0.0, 0, 100, 0.0, 0, 414);
-StateSignal ATCCF_tireTempFRO(16, true, 10, 0.0, 0, 100, 0.0, 0, 414);
+StateSignal ATCCF_counterMsg414(4, false, 1, 0.0, 0, 15, 0.0, -1, 414);
+StateSignal ATCCF_tireTempFRI(16, true, 10, 0.0, 0, 100, 0.0, -1, 414);
+StateSignal ATCCF_tireTempFRM(16, true, 10, 0.0, 0, 100, 0.0, -1, 414);
+StateSignal ATCCF_tireTempFRO(16, true, 10, 0.0, 0, 100, 0.0, -1, 414);
 
 // Message: ATCCF_13 [0x19d]
-StateSignal ATCCF_counterMsg413(4, false, 1, 0.0, 0, 15, 0.0, 0, 413);
-StateSignal ATCCF_tireTempFLI(16, true, 10, 0.0, 0, 100, 0.0, 0, 413);
-StateSignal ATCCF_tireTempFLM(16, true, 10, 0.0, 0, 100, 0.0, 0, 413);
-StateSignal ATCCF_tireTempFLO(16, true, 10, 0.0, 0, 100, 0.0, 0, 413);
+StateSignal ATCCF_counterMsg413(4, false, 1, 0.0, 0, 15, 0.0, -1, 413);
+StateSignal ATCCF_tireTempFLI(16, true, 10, 0.0, 0, 100, 0.0, -1, 413);
+StateSignal ATCCF_tireTempFLM(16, true, 10, 0.0, 0, 100, 0.0, -1, 413);
+StateSignal ATCCF_tireTempFLO(16, true, 10, 0.0, 0, 100, 0.0, -1, 413);
 
 // Message: ATCCF_12 [0x19c]
-StateSignal ATCCF_counterMsg412(4, false, 1, 0.0, 0, 15, 0.0, 0, 412);
-StateSignal ATCCF_teensyTemp(16, true, 10, 0.0, -5, 100, 0.0, 0, 412);
-StateSignal ATCCF_rotorTempFL(16, true, 10, 0.0, 0, 1000, 0.0, 0, 412);
-StateSignal ATCCF_rotorTempFR(16, true, 10, 0.0, 0, 1000, 0.0, 0, 412);
+StateSignal ATCCF_counterMsg412(4, false, 1, 0.0, 0, 15, 0.0, -1, 412);
+StateSignal ATCCF_teensyTemp(16, true, 10, 0.0, -5, 100, 0.0, -1, 412);
+StateSignal ATCCF_rotorTempFL(16, true, 10, 0.0, 0, 1000, 0.0, -1, 412);
+StateSignal ATCCF_rotorTempFR(16, true, 10, 0.0, 0, 1000, 0.0, -1, 412);
 
 // Message: ATCCF_11 [0x19b]
-StateSignal ATCCF_counterMsg411(4, false, 1, 0.0, 0, 15, 0.0, 0, 411);
-StateSignal ATCCF_brakePressureF(16, true, 10, 0.0, 0, 2000, 0.0, 0, 411);
-StateSignal ATCCF_brakePressureR(16, true, 10, 0.0, 0, 2000, 0.0, 0, 411);
-StateSignal ATCCF_boardTemp(16, true, 10, 0.0, -5, 100, 0.0, 0, 411);
+StateSignal ATCCF_counterMsg411(4, false, 1, 0.0, 0, 15, 0.0, -1, 411);
+StateSignal ATCCF_brakePressureF(16, true, 10, 0.0, 0, 2000, 0.0, 1000, 411);
+StateSignal ATCCF_brakePressureR(16, true, 10, 0.0, 0, 2000, 0.0, 1000, 411);
+StateSignal ATCCF_boardTemp(16, true, 10, 0.0, -5, 100, 0.0, -1, 411);
 
 // Message: ATCCF_10 [0x19a]
-StateSignal ATCCF_counterMsg410(4, false, 1, 0.0, 0, 15, 0.0, 0, 410);
-StateSignal ATCCF_brakeBias(16, true, 10, 0.0, 0, 100, 0.0, 0, 410);
-StateSignal ATCCF_suspensionTravelFL(16, true, 1000, 0.0, -32, 32, 0.0, 0, 410);
-StateSignal ATCCF_suspensionTravelFR(16, true, 1000, 0.0, -32, 32, 0.0, 0, 410);
+StateSignal ATCCF_counterMsg410(4, false, 1, 0.0, 0, 15, 0.0, -1, 410);
+StateSignal ATCCF_brakeBias(16, true, 10, 0.0, 0, 100, 0.0, -1, 410);
+StateSignal ATCCF_suspensionTravelFL(16, true, 1000, 0.0, -32, 32, 0.0, -1, 410);
+StateSignal ATCCF_suspensionTravelFR(16, true, 1000, 0.0, -32, 32, 0.0, -1, 410);
 
 
 
