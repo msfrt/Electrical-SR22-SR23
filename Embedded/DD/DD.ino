@@ -205,11 +205,11 @@ void loop() {
   unsigned long elapsed = millis() - previousUpdateTime;
   previousUpdateTime = millis();
 
-  if(PageSwitch.isup()){
-    Serial.println("Done");
-    screensController.OnButtonPress();
-      lightsController.OnButtonPress();
-  }
+//  if(PageSwitch.isup()){
+//    Serial.println("Done");
+//    screensController.OnButtonPress();
+//      lightsController.OnButtonPress();
+//  }
 
   // check the buttons. If neither are in a notification state, advance both.
   // However, if one IS in a notification state, only advance that one to get
