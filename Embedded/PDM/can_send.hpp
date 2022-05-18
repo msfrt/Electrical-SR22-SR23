@@ -7,10 +7,12 @@
 #include "CAN/CAN1.hpp"
 #include "CAN/CAN2.hpp"
 
+
 // external definitions
 extern int OBDFLAG_oil_pressure;
 extern int OBDFLAG_oil_temp;
 extern int OBDFLAG_fuel_pressure;
+
 
 static CAN_message_t msg;
 
@@ -26,7 +28,7 @@ void send_PDM_09(){
   msg.buf[0] = OBDFLAG_oil_pressure;
   msg.buf[1] = OBDFLAG_oil_temp;
   msg.buf[2] = OBDFLAG_fuel_pressure;
-  msg.buf[3] = PDM_coolingOverrideActive.can_value();
+  msg.buf[3] = 0;
   msg.buf[4] = 0;
   msg.buf[5] = 0;
   msg.buf[6] = 0;

@@ -26,7 +26,7 @@ ADCSensor      fuel_volt_sens(7, 0, 313);
 ADCSensor    fuel_current_sens(1, 2500, 40);
 ADCSensor      wp_current_sens(2, 2500, 40);
 ADCSensor    fanr_current_sens(3, 2500, 40);
-ADCSensor    fanl_current_sens(4, 2500, 40);
+ADCSensor    fanl_current_sens(4, 2500, 20);
 ADCSensor     pdm_current_sens(5, 2500, 20);
 ADCSensor brakelight_volt_sens(6,    0, 313);
 ADCSensor    starter_volt_sens(7,    0, 313);

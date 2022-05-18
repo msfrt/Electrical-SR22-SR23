@@ -1,4 +1,4 @@
-// Dave Yonkers, 2020
+// Dave Yonkers, 2022
 
 #include <EasyTimer.h>
 #include <PWMControl.h>
@@ -10,9 +10,6 @@
 #include <BoardTemp.h>
 #include <EepromHelper.h>
 
-/* TODOS:
- *  -
-*/
 
 // can bus decleration
 FlexCAN_T4<CAN1, RX_SIZE_256, TX_SIZE_16> can1;
@@ -83,9 +80,11 @@ EasyTimer odometer_update_timer(2);
 // this file contains all of the control tables & declarations for fans and water pump
 #include "fans.hpp"
 
-// CAN message definitions are inside
+// signal definitions are inside
 #include "CAN/CAN1.hpp"
 #include "CAN/CAN2.hpp"
+
+// CAN message definitions are inside
 #include "can_send.hpp"
 
 // odds and ends functions
@@ -94,10 +93,10 @@ EasyTimer odometer_update_timer(2);
 // on-board diagnostics
 #include "obd.hpp"
 
-// timer that you can use to print things out for debugging
-EasyTimer debug(1);
-const bool GLO_debug = false;
 
+// timer that you can use to print things out for debugging
+EasyTimer debug(2);
+const bool GLO_debug = false;
 
 
 
@@ -147,10 +146,10 @@ void setup() { //high 18 low 26
   pinMode(GLO_brakelight_teensy_pin, OUTPUT);
 
   // EEPROM
-  eeprom.begin();
+  // eeprom.begin();
 
   // write the eeprom variables that are not commented out in the write eeprom function in the EEPROM_sigs file
-  initialize_eeprom_variables();
+  // initialize_eeprom_variables();
 
   GLO_obd_neopixel.setPixelColor(0, 0, 255, 0); // green
   GLO_obd_neopixel.show();
@@ -192,13 +191,13 @@ void loop() {
   obd_main();
 
   // engine timer update
-  if (engine_time_update_timer.isup()){
-    engine_timer(eeprom_engine_hours, eeprom_engine_minutes);
-  }
+  // if (engine_time_update_timer.isup()){
+  //   engine_timer(eeprom_engine_hours, eeprom_engine_minutes);
+  // }
 
   // odometer update
-  if (odometer_update_timer.isup())
-    odometer(M400_groundSpeed, eeprom_mileage);
+  // if (odometer_update_timer.isup())
+  //   odometer(M400_groundSpeed, eeprom_mileage);
 
   // send all of the things
   send_can1();
@@ -206,78 +205,113 @@ void loop() {
 
   if (GLO_debug && debug.isup()){
     Serial.println();
-    Serial.println(eeprom_engine_hours.value());
-    Serial.println(eeprom_engine_minutes.value());
+    // Serial.println(eeprom_engine_hours.value());
+    // Serial.println(eeprom_engine_minutes.value());
+    Serial.print("FanR duty cycle %: "); Serial.println(PDM_fanRightDutyCycle.value());
+
+    M400_batteryVoltage = 14;
+    M400_rpm = 5000;
+
+    if (millis() > 5000){
+
+      M400_engineTemp = 100;
+
+    }
   }
 }
 
 
 
-void set_mailboxes() {
-  // to view mailbox status, you can use the member function mailboxStatus().
-  // Don't put it in a fast loop, though, because you may actually affect how
-  // the chips moves things around
+void set_mailboxes(){
 
-  can1.setMaxMB(64);  // use all mailboxes of course
-  can2.setMaxMB(64);
+  // to view mailbox status, you can use the member function mailboxStatus(). Don't put it in a fast loop, though,
+  // because you may actually affect how the chips moves things around
 
-  for (int i = 0; i < NUM_RX_STD_MAILBOXES; i++) {
-    can1.setMB((FLEXCAN_MAILBOX)i, RX, STD);
-    can2.setMB((FLEXCAN_MAILBOX)i, RX, STD);
-  }
-  for (int i = NUM_RX_STD_MAILBOXES;
-       i < (NUM_RX_STD_MAILBOXES + NUM_RX_EXT_MAILBOXES); i++) {
-    can1.setMB((FLEXCAN_MAILBOX)i, RX, EXT);
-    can2.setMB((FLEXCAN_MAILBOX)i, RX, EXT);
-  }
-  for (int i = (NUM_RX_STD_MAILBOXES + NUM_RX_EXT_MAILBOXES);
-       i < (NUM_RX_STD_MAILBOXES + NUM_RX_EXT_MAILBOXES + NUM_TX_MAILBOXES);
-       i++) {
-    can1.setMB((FLEXCAN_MAILBOX)i, TX, STD);
-    can2.setMB((FLEXCAN_MAILBOX)i, TX, STD);
-  }
+  // CAN 2 - sends a bunch of stuff
+  can2.setMaxMB(64); // change from default 16 mailboxes to 64 (maximum)
+  can2.enableFIFO(); // first in-first out prevents overwriting unsent messages depending on the queue
+  can2.setMB(MB4,RX,STD);  // change the first 12 mailboxes to recieve standard frames. 4 for extended. the first four
+  can2.setMB(MB5,RX,STD);  // already do by default. the rest of the mailboxes (48) are TX mailboxes by default, which
+  can2.setMB(MB6,RX,STD);  // is necessary because we send more data than the bus can handle in short periods of time
+  can2.setMB(MB7,RX,STD);
+  can2.setMB(MB8,RX,STD);
+  can2.setMB(MB9,RX,STD);
+  can2.setMB(MB10,RX,STD);
+  can2.setMB(MB11,RX,STD);
+  can2.setMB(MB12,RX,EXT);  // perhaps there is an issue and something is sending extended frames for whatever reason
+  can2.setMB(MB13,RX,EXT);  // we have a lot of mailboxes anyways, so these four can be set to extended
+  can2.setMB(MB14,RX,EXT);
+  can2.setMB(MB15,RX,EXT);
+  // can2.setMB(MB16,TX);
+  // can2.setMB(MB17, TX);
+  // can2.setMB(MB18, TX);
+  // can2.setMB(MB19, TX);
+  // can2.setMB(MB20, TX);
+  // can2.setMB(MB21, TX);
+  // can2.setMB(MB22, TX);
+  // can2.setMB(MB23, TX);
+  // can2.setMB(MB24, TX);
+  // can2.setMB(MB25, TX);
+  // can2.setMB(MB26, TX);
+  // can2.setMB(MB27, TX);
+  // can2.setMB(MB28, TX);
+  // can2.setMB(MB29, TX);
+  // can2.setMB(MB30, TX);
+  // can2.setMB(MB31, TX);
+  // can2.setMB(MB32, TX);
+  // can2.setMB(MB33, TX);
+  // can2.setMB(MB34, TX);
+  // can2.setMB(MB35, TX);
+  // can2.setMB(MB36, TX);
+  // can2.setMB(MB37, TX);
+  // can2.setMB(MB38, TX);
+  // can2.setMB(MB39, TX);
+  // can2.setMB(MB40, TX);
+  // can2.setMB(MB41, TX);
+  // can2.setMB(MB42, TX);
+  // can2.setMB(MB43, TX);
+  // can2.setMB(MB44, TX);
+  // can2.setMB(MB45, TX);
+  // can2.setMB(MB46, TX);
+  // can2.setMB(MB47, TX);
+  // can2.setMB(MB48, TX);
+  // can2.setMB(MB49, TX);
+  // can2.setMB(MB50, TX);
+  // can2.setMB(MB51, TX);
+  // can2.setMB(MB52, TX);
+  // can2.setMB(MB53, TX);
+  // can2.setMB(MB54, TX);
+  // can2.setMB(MB55, TX);
+  // can2.setMB(MB56, TX);
+  // can2.setMB(MB57, TX);
+  // can2.setMB(MB58, TX);
+  // can2.setMB(MB59, TX);
+  // can2.setMB(MB60, TX);
+  // can2.setMB(MB61, TX);
+  // can2.setMB(MB62, TX);
+  // can2.setMB(MB63, TX);
 
-  // be sure to assign at least one mailbox to each message that you want to
-  // read. filtering allows us to avoid using clock cycles to read messages that
-  // we have no interest in. it also reserves a slot for messages as they are
-  // recieved.
-  // can1.setMBFilter(REJECT_ALL);
-  // can1.setMBFilter(MB0, REJECT_ALL);
-  // can1.setMBFilter(MB0, M400_engineTemp.get_msg_id());
-  // can1.setMBFilter(MB1, 0);
-  // can1.setMBFilter(MB2, 0);
-  // can1.setMBFilter(MB3, 0);
-  // can1.setMBFilter(MB4, 0);
-  // can1.setMBFilter(MB5, 0);
-  // can1.setMBFilter(MB6, 0);
-  // can1.setMBFilter(MB7, 0);
-  // can1.setMBFilter(MB8, 0);
-  // can1.setMBFilter(MB9, 0);
-  // can1.setMBFilter(MB10, 0);
-  // can1.setMBFilter(MB11, 0);
-  // can1.setMBFilter(MB12, 0);
-  // can1.setMBFilter(MB13, 0);
-  // can1.setMBFilter(MB14, 0);
 
-  // can2.setMBFilter(REJECT_ALL);
-  // can2.setMBFilter(MB0, REJECT_ALL);
-  // can2.setMBFilter(MB0, ATCCF_brakePressureF.get_msg_id());
-  // can2.setMBFilter(MB1, REJECT_ALL);
-  // can2.setMBFilter(MB1, ATCCF_brakePressureR.get_msg_id());
-  // can2.setMBFilter(MB2, ATCCF_rotorTempFL.get_msg_id());  // includes FR
-  // can2.setMBFilter(MB3, ATCCR_rotorTempRL.get_msg_id());  // includes FR
-  // can2.setMBFilter(MB4, PDM_coolingOverrideActive.get_msg_id());
-  // can2.setMBFilter(MB5, PDM_fanLeftDutyCycle.get_msg_id());
-  // can2.setMBFilter(MB6, 0);
-  // can2.setMBFilter(MB7, 0);
-  // can2.setMBFilter(MB8, 0);
-  // can2.setMBFilter(MB9, 0);
-  // can2.setMBFilter(MB10, 0);
-  // can2.setMBFilter(MB11, 0);
-  // can2.setMBFilter(MB12, 0);
-  // can2.setMBFilter(MB13, 0);
-  // can2.setMBFilter(MB14, 0);
+  can1.setMaxMB(64);
+  can1.enableFIFO();
+  can1.setMB(MB4,RX,STD);  // first 16 mailboxes as rx, 4 rx extended. this is pretty overkill, but hey, here they are
+  can1.setMB(MB5,RX,STD);
+  can1.setMB(MB6,RX,STD);
+  can1.setMB(MB7,RX,STD);
+  can1.setMB(MB8,RX,STD);
+  can1.setMB(MB9,RX,STD);
+  can1.setMB(MB10,RX,STD);
+  can1.setMB(MB11,RX,STD);
+  can1.setMB(MB12,RX,STD);
+  can1.setMB(MB13,RX,STD);
+  can1.setMB(MB14,RX,STD);
+  can1.setMB(MB15,RX,STD);
+  can1.setMB(MB16,RX,EXT);
+  can1.setMB(MB17,RX,EXT);
+  can1.setMB(MB18,RX,EXT);
+  can1.setMB(MB19,RX,EXT);
 }
+
 
 /**
  *  Reads a CAN message if available and then sends it to thr
