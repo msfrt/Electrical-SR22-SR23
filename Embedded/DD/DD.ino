@@ -104,6 +104,8 @@ const int lightSensorPin = 20;
 
 EasyTimer debug(50);  // debugging timer
 
+EasyTimer PageSwitch(10);
+
 // used for dynamically changing clock speed :-)))
 // #if defined(__IMXRT1062__)
 // extern "C" uint32_t set_arm_clock(uint32_t frequency);
@@ -126,6 +128,8 @@ LightBarController lightsController(pixelsLeft, pixelsTop, pixelsRight);
 // ScreenInfo testScreen(displayLeft, DISPLAY_WIDTH, DISPLAY_HEIGHT);
 
 void setup() {
+    PageSwitch.set_delay_millis(5000);
+  
   // dynamically change clock speed
   // #if defined(__IMXRT1062__)
   //   set_arm_clock(45000000);
@@ -200,6 +204,12 @@ void setup() {
 void loop() {
   unsigned long elapsed = millis() - previousUpdateTime;
   previousUpdateTime = millis();
+
+  if(PageSwitch.isup()){
+    Serial.println("Done");
+    screensController.OnButtonPress();
+      lightsController.OnButtonPress();
+  }
 
   // check the buttons. If neither are in a notification state, advance both.
   // However, if one IS in a notification state, only advance that one to get

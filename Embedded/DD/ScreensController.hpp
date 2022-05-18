@@ -6,6 +6,7 @@
 #include "ScreenMessage.hpp"
 #include "ScreenNumber.hpp"
 #include "ScreenStartupAnim.hpp"
+#include "images/Mom.cpp"
 
 class ScreensController {
  public:
@@ -315,6 +316,12 @@ void ScreensController::SetState(ScreenStates state) {
       lap_time_screen_->Initialize();
       break;
     case Titan:
+      display_left_.fillScreen(ILI9341_BLACK);
+      display_right_.fillScreen(ILI9341_BLACK);
+      display_left_.writeRect(0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT, (uint16_t*)MOM_LEFT_bits);
+      display_right_.writeRect(0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT, (uint16_t*)MOM_RIGHT_bits);
+      display_left_.updateScreen();
+      display_right_.updateScreen();
       break;
   }
 }
@@ -338,13 +345,14 @@ void ScreensController::OnButtonPress() {
       SetState(InfoScreen2);
       break;
     case InfoScreen2:
-      SetState(GearInfo);
+      SetState(Titan);
       break;
     case Notification:  // fal through
     case LapTime:
       SetState(state_prev_);
       break;
     case Titan:
+    SetState(GearInfo);
       break;
   }
 }
