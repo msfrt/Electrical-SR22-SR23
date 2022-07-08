@@ -286,9 +286,9 @@ void send_ATCCR_16(){
   msg.id = 466;
   msg.len = 8;
 
-  ATCCR_egt1 = egt1_sens.avg();
-  ATCCR_egt2 = egt2_sens.avg();
-  ATCCR_egt3 = egt3_sens.avg();
+  ATCCR_egt1 = voltage_to_EGT_temp(egt1_sens.avg());
+  ATCCR_egt2 = voltage_to_EGT_temp(egt2_sens.avg());
+  ATCCR_egt3 = voltage_to_EGT_temp(egt3_sens.avg());
 
   msg.buf[0] = ctr.value();
   msg.buf[1] = 0;
@@ -308,7 +308,7 @@ void send_ATCCR_17(){
   msg.id = 467;
   msg.len = 8;
 
-  ATCCR_egt4 = egt1_sens.avg();
+  ATCCR_egt4 = voltage_to_EGT_temp(egt1_sens.avg());
   ATCCR_rectifierCurrent = rectifier_current_sens.avg();
   ATCCR_coolantTempRadMiddle = voltage_to_NTC_M12_H_temp(coolant_temp_middle_sens.avg());
 
