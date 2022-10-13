@@ -1,11 +1,11 @@
 /******************************************************************************
-    
-    This file was generated automatically from a DBC file by the dbctocpp 
-    utility, which is part of the StateCAN library, 
+
+    This file was generated automatically from a DBC file by the dbctocpp
+    utility, which is part of the StateCAN library,
     a component of SR-Libraries.
 
     https://github.com/msfrt/SR-Libraries
-    
+
 ******************************************************************************/
 
 #ifndef USERS_DAVEYONKERS_REPOSITORIES_ELECTRICAL_SR22_EMBEDDED_PDM_CAN_CAN1_HPP
@@ -142,7 +142,7 @@ StateSignal M400_driveSpeedRight(16, true, 10, 0.0, -3276, 3276, 0.0, 1000, 100)
 
 
 /************************************************************************************
-    
+
     Incoming CAN frame decoding functions
 
 ************************************************************************************/
