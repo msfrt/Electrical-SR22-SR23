@@ -103,17 +103,13 @@ const bool GLO_debug = false;
 
 #define cool_down_pin 19
 //Previous reading of cool down switch
-int lastReading = 0;
-//current reading of the cool down switch state
-int coolDownState = 0;
+int lastButtonState = HIGH;
+int buttonState;
+int coolDownState = LOW; 
+
   
 unsigned long lastDebounceTime = 0;  // the last time the output pin was toggled
-unsigned long debounceDelay = 500;    // the debounce time; increase if the output flickers
-
-bool buttonStateSwitch = true;
-
-
-
+unsigned long debounceDelay = 50;    // the debounce time; increase if the output flickers
 
 void setup() { //high 18 low 26
 
@@ -245,42 +241,41 @@ void loop() {
   //Reads cool down switch and set override accordingly
   int reading = digitalRead(cool_down_pin);
 
-    //Checks is the cool down button is pressed for the first time to turn on fans
-    
-    if(reading != lastReading){
-      lastDebounceTime = millis();    
+  if(reading != lastButtonState){
+    lastDebounceTime = millis();
+  }
+
+  if((millis() - lastDebounceTime) > debounceDelay){
+    if(reading != buttonState){
+      buttonState = reading;
+
+      if(buttonState == LOW){
+        coolDownState = !coolDownState;
+      }
     }
+  }
 
-
-      if ((millis() - lastDebounceTime) > debounceDelay){
-        if((reading == 0)&& (buttonStateSwitch==true)){
-          buttonStateSwitch = false;
-          coolDownState = !coolDownState;
-       
-
-       if (coolDownState == 1){
-        CMD_fanLeftOverride = override_percent;
-        CMD_fanRightOverride = override_percent;
-       }
-       else{
-        CMD_fanLeftOverride = 0;
-        CMD_fanRightOverride = 0;
-       }
-//      Serial.print("Reading: "); Serial.println(reading);
-//      Serial.print("State: "); Serial.println(coolDownState);
-//      Serial.print("Left Override: "); Serial.println(CMD_fanLeftOverride.value());
-//      Serial.print("Right Override: "); Serial.println(CMD_fanRightOverride.value());
-//      Serial.println("");
-      } 
-      if((reading==1) && (buttonStateSwitch == false)){
-        buttonStateSwitch = true;
-      }
-       
-      }
-
-      lastReading = reading;
+  if(coolDownState == HIGH){
+    CMD_fanLeftOverride = override_percent;
+    CMD_fanRightOverride = override_percent;
+  }
+  else if(coolDownState == LOW){
+    CMD_fanLeftOverride = 0;
+    CMD_fanRightOverride = 0;
+  }
+  lastButtonState = reading; 
+  
+  /*
+    if(reading == LOW){
+      CMD_fanLeftOverride = override_percent;
+      CMD_fanRightOverride = override_percent;
+    }
+    else if(reading == HIGH){
+      CMD_fanLeftOverride = 0;
+      CMD_fanRightOverride = 0;
+    }
+*/
     
-   
 }
 
 
