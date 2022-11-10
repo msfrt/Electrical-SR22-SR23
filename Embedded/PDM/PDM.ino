@@ -173,8 +173,8 @@ void setup() { //high 18 low 26
   brakelight_startup();
 
   //initializes the fans off
-  CMD_fanLeftOverride = 0;
-  CMD_fanRightOverride = 0;
+  //CMD_fanLeftOverride = 0;
+  //CMD_fanRightOverride = 0;
 
   //sets cool mode pin
   pinMode(cool_down_pin, INPUT);
@@ -258,10 +258,15 @@ void loop() {
   if(coolDownState == HIGH){
     CMD_fanLeftOverride = override_percent;
     CMD_fanRightOverride = override_percent;
-  }
+  } 
   else if(coolDownState == LOW){
-    CMD_fanLeftOverride = 0;
-    CMD_fanRightOverride = 0;
+    // populate left fan table
+    int* fanl_table_ptr = fan_left_table[0]; // create a temp ptr to populate PWM device
+    fan_left.fill_table(fanl_table_ptr); // populate the PWMDevice table
+
+    // populate right fan table
+    int* fanr_table_ptr = fan_right_table[0];
+    fan_right.fill_table(fanr_table_ptr);
   }
   lastButtonState = reading; 
   
