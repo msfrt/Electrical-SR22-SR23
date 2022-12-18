@@ -37,7 +37,8 @@ class ScreensController {
 
   void Update(unsigned long &elapsed);
   void Initialize();
-  void OnButtonPress();
+  void OnButtonPressUp(); // page up
+  void OnButtonPressDown(); // page down
   void OnMessage(String message);
   void OnNewLap();
 
@@ -323,7 +324,7 @@ void ScreensController::SetState(ScreenStates state) {
  * Called when the control button is pressed. This can either change the screen
  * state or disable the current notification screen.
  */
-void ScreensController::OnButtonPress() {
+void ScreensController::OnButtonPressUp() {
   switch (state_) {
     // case StartupLeft:
     //     SetState(InfoScreen1);
@@ -339,6 +340,32 @@ void ScreensController::OnButtonPress() {
       break;
     case InfoScreen2:
       SetState(GearInfo);
+      break;
+    case Notification:  // fal through
+    case LapTime:
+      SetState(state_prev_);
+      break;
+    case Titan:
+      break;
+  }
+}
+
+void ScreensController::OnButtonPressDown() {
+  switch (state_) {
+    // case StartupLeft:
+    //     SetState(InfoScreen1);
+    //     break;
+    // case StartupRight:
+    //     SetState(InfoScreen1);
+    //     break;
+    case GearInfo:
+      SetState(InfoScreen2);
+      break;
+    case InfoScreen1:
+      SetState(GearInfo);
+      break;
+    case InfoScreen2:
+      SetState(InfoScreen1);
       break;
     case Notification:  // fal through
     case LapTime:

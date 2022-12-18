@@ -84,8 +84,8 @@ ILI9341_t3n displayRight = ILI9341_t3n(TFTR_CS, TFTR_DC, TFTR_RST);
 unsigned long previousUpdateTime = 0;
 
 // pins for the steering wheel buttons
-const int button1Pin = 14;
-const int button2Pin = 15;
+const int button1Pin = 14; // page up
+const int button2Pin = 15; // page down
 int button1State = HIGH;
 int button2State = LOW;
 int button1StatePrev = HIGH;
@@ -201,25 +201,47 @@ void loop() {
   unsigned long elapsed = millis() - previousUpdateTime;
   previousUpdateTime = millis();
 
-  // check the buttons. If neither are in a notification state, advance both.
-  // However, if one IS in a notification state, only advance that one to get
+  // checks page up button. If not in a notification state, advance.
+  // However, if in a notification state, only advance that to get
   // rid of the notification
   if (checkButton(button1Pin, button1State, button1StatePrev, button1Time,
                   buttonDebounceDelay)) {
     // only the screen
     if (screensController.IsNotificationActive() &&
         !lightsController.IsNotificationActive()) {
-      screensController.OnButtonPress();
+      screensController.OnButtonPressUp();
 
       // only the lights
     } else if (!screensController.IsNotificationActive() &&
                lightsController.IsNotificationActive()) {
-      lightsController.OnButtonPress();
+      lightsController.OnButtonPressUp();
 
       // both
     } else {
-      screensController.OnButtonPress();
-      lightsController.OnButtonPress();
+      screensController.OnButtonPressUp();
+      lightsController.OnButtonPressUp();
+    }
+  }
+
+  // checks page down button. If not in a notification state, advance.
+  // However, if in a notification state, only advance that to get
+  // rid of the notification
+  if (checkButton(button2Pin, button2State, button2StatePrev, button2Time,
+                  buttonDebounceDelay)) {
+    // only the screen
+    if (screensController.IsNotificationActive() &&
+        !lightsController.IsNotificationActive()) {
+      screensController.OnButtonPressDown();
+
+      // only the lights
+    } else if (!screensController.IsNotificationActive() &&
+               lightsController.IsNotificationActive()) {
+      lightsController.OnButtonPressDown();
+
+      // both
+    } else {
+      screensController.OnButtonPressDown();
+      lightsController.OnButtonPressDown();
     }
   }
 
