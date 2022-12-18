@@ -214,12 +214,12 @@ void loop() {
       // only the lights
     } else if (!screensController.IsNotificationActive() &&
                lightsController.IsNotificationActive()) {
-      lightsController.OnButtonPressUp();
+      lightsController.OnButtonPress();
 
       // both
     } else {
       screensController.OnButtonPressUp();
-      lightsController.OnButtonPressUp();
+      lightsController.OnButtonPress();
     }
   }
 
@@ -236,12 +236,12 @@ void loop() {
       // only the lights
     } else if (!screensController.IsNotificationActive() &&
                lightsController.IsNotificationActive()) {
-      lightsController.OnButtonPressDown();
+      lightsController.OnButtonPress();
 
       // both
     } else {
       screensController.OnButtonPressDown();
-      lightsController.OnButtonPressDown();
+      lightsController.OnButtonPress();
     }
   }
 

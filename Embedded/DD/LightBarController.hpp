@@ -32,8 +32,7 @@ class LightBarController {
 
   void Update(unsigned long &elapsed);
   void Initialize();
-  void OnButtonPressUp();
-  void OnButtonPressDown();
+  void OnButtonPress();
   void OnNotificationRecieved(int R, int G, int B);
 
   /**
@@ -257,22 +256,12 @@ void LightBarController::SetState(LEDStates state) {
  * Called when the control button is pressed. This can either change the screen
  * state or disable the current notification screen.
  */
-void LightBarController::OnButtonPressUp() {
+void LightBarController::OnButtonPress() {
   switch (state_) {
     case Normal:
       break;
     case Notification:
       SetState(Normal);
-      break;
-  }
-}
-
-void LightBarController::OnButtonPressDown() {
-  switch (state_) {
-    case Notification:
-      break;
-    case Normal:
-      SetState(Notification);
       break;
   }
 }
