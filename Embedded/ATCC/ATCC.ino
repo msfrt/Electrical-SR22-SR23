@@ -27,6 +27,9 @@ const int ATCCMS = 1;
 // brake bias calculation for front ATCC
 #include "bias_calc.hpp"
 
+// rotor temp calculation for ATCC
+#include "rotor_temp_calc.hpp"
+
 // rainbow RGB
 #include "rainbow_pixels.hpp"
 
@@ -73,6 +76,8 @@ void loop() {
     case 0:
       sample_ADCs_F();
       send_can_F();
+      
+      calculate_rotor_temp(ATCCF_rotorTempFL, ATCCF_rotorTempFR, ATCCR_rotorTempRL, ATCCR_rotorTempRR);
       calculate_brake_bias(ATCCF_brakePressureF, ATCCF_brakePressureR, ATCCF_brakeBias);
       break;
     case 1:

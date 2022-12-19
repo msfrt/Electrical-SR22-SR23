@@ -366,7 +366,7 @@ void set_mailboxes() {
   can2.setMBFilter(MB0, PDM_pdmVoltAvg.get_msg_id());
   can2.setMBFilter(MB1, ATCCF_brakeBias.get_msg_id());
   can2.setMBFilter(MB2, ATCCF_rotorTempFL.get_msg_id());  // includes FR
-  can2.setMBFilter(MB3, ATCCR_rotorTempRL.get_msg_id());  // includes FR
+  can2.setMBFilter(MB3, ATCCR_rotorTempRL.get_msg_id());  // includes RR
   can2.setMBFilter(MB4, PDM_coolingOverrideActive.get_msg_id());
   can2.setMBFilter(MB5, PDM_fanLeftDutyCycle.get_msg_id());
   can2.setMBFilter(MB6, 0);

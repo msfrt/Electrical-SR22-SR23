@@ -111,7 +111,9 @@ ScreensController::ScreensController(ILI9341_t3n &left, ILI9341_t3n &right)
   info_screen_2_left_->SetSignal(1, &ATCCF_rotorTempFL, "FL:", "%5.1f");
   info_screen_2_left_->SetSignal(2, &ATCCF_rotorTempFR, "FR:", "%5.1f");
   info_screen_2_left_->SetSignal(3, &ATCCR_rotorTempRL, "RL:", "%5.1f");
-  info_screen_2_left_->SetSignal(4, &ATCCR_shiftingPressure, "SFT:", "%3.1f");
+  info_screen_2_left_->SetSignal(4, &ATCCR_rotorTempRR, "RR:", "%5.1f");
+  // info_screen_2_left_->SetSignal(4, &ATCCR_shiftingPressure, "SFT:", "%3.1f");
+  
   // keep the same screen on the right side
   info_screen_2_right_ = info_screen_1_right_;
 
