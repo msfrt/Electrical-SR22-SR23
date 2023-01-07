@@ -25,6 +25,7 @@ class ScreensController {
   enum ScreenStates { /*StartupLeft, StartupRight,*/ GearInfo,
                       InfoScreen1,
                       InfoScreen2,
+                      InfoScreen3,
                       Notification,
                       LapTime,
                       Titan };
@@ -56,7 +57,7 @@ class ScreensController {
   void SetState(ScreenStates state);
 
   ScreenStates state_;                  ///< screen states
-  ScreenStates state_prev_ = GearInfo;  ///< Used to return to previous screen
+  ScreenStates state_prev_ = InfoScreen1;  ///< Used to return to previous screen
                                         ///< states after temporary states
   unsigned long state_start_time_ =
       0;  ///< The time in milliseconds that the current state started
@@ -75,6 +76,9 @@ class ScreensController {
 
   ScreenInfo *info_screen_2_left_ = nullptr;
   ScreenInfo *info_screen_2_right_ = nullptr;
+
+  ScreenInfo *info_screen_3_left_ = nullptr;
+  ScreenInfo *info_screen_3_right_ = nullptr;
 
   ScreenMessage *message_screen_ = nullptr;
 
@@ -113,9 +117,22 @@ ScreensController::ScreensController(ILI9341_t3n &left, ILI9341_t3n &right)
   info_screen_2_left_->SetSignal(3, &ATCCR_rotorTempRL, "RL:", "%5.1f");
   info_screen_2_left_->SetSignal(4, &ATCCR_rotorTempRR, "RR:", "%5.1f");
   // info_screen_2_left_->SetSignal(4, &ATCCR_shiftingPressure, "SFT:", "%3.1f");
+
+  /* Info screen 3 */
+  info_screen_3_left_ = new ScreenInfo(display_left_);
+  info_screen_3_left_->SetSignal(1, &M400_engineTemp, "ENGT:", "%4.0f");
+  info_screen_3_left_->SetSignal(2, &M400_fuelPressure, "FUEL:", "%4.1f");
+  info_screen_3_left_->SetSignal(3, &M400_inletAirTemp, "INT:", "%5.0f");
+  info_screen_3_left_->SetSignal(4, &ATCCR_shiftingPressure, "SFTP:", "%3.1f");
+  // info_screen_3_left_->SetSignal(1, Null, "fL:", "%5.1f");
+  // info_screen_3_left_->SetSignal(2, Null, "fR:", "%5.1f");
+  // info_screen_3_left_->SetSignal(3, None, "rL:", "%5.1f");
+  // info_screen_3_left_->SetSignal(4, None, "rR:", "%5.1f");
+
   
   // keep the same screen on the right side
   info_screen_2_right_ = info_screen_1_right_;
+  info_screen_3_right_ = info_screen_1_right_;
 
   /* message screen */
   message_screen_ = new ScreenMessage(display_left_);
@@ -140,6 +157,9 @@ ScreensController::~ScreensController() {
   /* Screen 2 */
   delete info_screen_2_left_;
 
+  /* Screen 3 */
+  delete info_screen_3_left_;
+
   /* message display */
   delete message_screen_;
 
@@ -152,7 +172,7 @@ ScreensController::~ScreensController() {
  *
  * Sets the first state for the controller
  */
-void ScreensController::Initialize() { SetState(GearInfo); }
+void ScreensController::Initialize() { SetState(InfoScreen1); }
 
 /**
  * Update
@@ -191,17 +211,25 @@ void ScreensController::Update(unsigned long &elapsed) {
       info_screen_2_right_->Update(elapsed);
       break;
 
+    case InfoScreen3:
+      info_screen_3_left_->Update(elapsed);
+      info_screen_3_right_->Update(elapsed);
+      break;
+
     case Notification:
       message_screen_->Update(elapsed);
 
       // update the last state's right screen, too!
       switch (state_prev_) {
-        case GearInfo:  // fall through
-        case InfoScreen1:
+        case InfoScreen1:  // fall through
+        case GearInfo:
           info_screen_1_right_->Update(elapsed);
           break;
         case InfoScreen2:
           info_screen_2_right_->Update(elapsed);
+          break;
+        case InfoScreen3:
+          info_screen_3_right_->Update(elapsed);
           break;
         case Notification:
           break;
@@ -222,12 +250,15 @@ void ScreensController::Update(unsigned long &elapsed) {
       lap_time_screen_->Update(elapsed);
       // update the last state's right screen, too!
       switch (state_prev_) {
-        case GearInfo:  // fall through
-        case InfoScreen1:
+        case InfoScreen1:  // fall through
+        case GearInfo:
           info_screen_1_right_->Update(elapsed);
           break;
         case InfoScreen2:
           info_screen_2_right_->Update(elapsed);
+          break;
+        case InfoScreen3:
+          info_screen_3_right_->Update(elapsed);
           break;
         case Notification:
           break;
@@ -268,6 +299,8 @@ void ScreensController::SetState(ScreenStates state) {
     case InfoScreen1:
       break;
     case InfoScreen2:
+      break;
+    case InfoScreen3:
       break;
     case LapTime:  // fall through
     case Notification:
@@ -311,6 +344,10 @@ void ScreensController::SetState(ScreenStates state) {
       info_screen_2_left_->Initialize();
       info_screen_2_right_->Initialize();
       break;
+    case InfoScreen3:
+      info_screen_3_left_->Initialize();
+      info_screen_3_right_->Initialize();
+      break;
     case Notification:
       message_screen_->Initialize();
       break;
@@ -341,6 +378,9 @@ void ScreensController::OnButtonPressUp() {
       SetState(InfoScreen2);
       break;
     case InfoScreen2:
+      SetState(InfoScreen3);
+      break;
+    case InfoScreen3:
       SetState(GearInfo);
       break;
     case Notification:  // fal through
@@ -361,13 +401,16 @@ void ScreensController::OnButtonPressDown() {
     //     SetState(InfoScreen1);
     //     break;
     case GearInfo:
-      SetState(InfoScreen2);
+      SetState(InfoScreen3);
       break;
     case InfoScreen1:
       SetState(GearInfo);
       break;
     case InfoScreen2:
       SetState(InfoScreen1);
+      break;
+    case InfoScreen3:
+      SetState(InfoScreen2);
       break;
     case Notification:  // fal through
     case LapTime:
