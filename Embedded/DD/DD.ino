@@ -245,6 +245,26 @@ void loop() {
     }
   }
 
+//FOR MOM
+// if (checkButton(button1Pin, button1State, button1StatePrev, button1Time,
+//                 buttonDebounceDelay)){
+//     // only the screen
+//     if (screensController.IsNotificationActive() &&
+//         !lightsController.IsNotificationActive()) {
+//       screensController.OnMom();
+
+//       // only the lights
+//     } else if (!screensController.IsNotificationActive() &&
+//                lightsController.IsNotificationActive()) {
+//       lightsController.OnButtonPress();
+
+//       // both
+//     } else {
+//       screensController.OnMom();
+//       lightsController.OnButtonPress();
+//     }
+//   }
+
   // read any incoming CAN messages
   // Serial.println("Reading CAN:");
   readCan();

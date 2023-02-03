@@ -6,6 +6,7 @@
 #include "ScreenMessage.hpp"
 #include "ScreenNumber.hpp"
 #include "ScreenStartupAnim.hpp"
+#include "images/Mom.cpp"
 
 class ScreensController {
  public:
@@ -40,6 +41,7 @@ class ScreensController {
   void Initialize();
   void OnButtonPressUp(); // page up
   void OnButtonPressDown(); // page down
+  void OnMom(); // XD
   void OnMessage(String message);
   void OnNewLap();
 
@@ -350,6 +352,12 @@ void ScreensController::SetState(ScreenStates state) {
       lap_time_screen_->Initialize();
       break;
     case Titan:
+      display_left_.fillScreen(ILI9341_BLACK);
+      display_right_.fillScreen(ILI9341_BLACK);
+      display_left_.writeRect(0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT, (uint16_t*)MOM_LEFT_bits);
+      display_right_.writeRect(0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT, (uint16_t*)MOM_RIGHT_bits);
+      display_left_.updateScreen();
+      display_right_.updateScreen();
       break;
   }
 }
@@ -358,6 +366,7 @@ void ScreensController::SetState(ScreenStates state) {
  * Called when the control button is pressed. This can either change the screen
  * state or disable the current notification screen.
  */
+
 void ScreensController::OnButtonPressUp() {
   switch (state_) {
     // case StartupLeft:
@@ -376,13 +385,14 @@ void ScreensController::OnButtonPressUp() {
       SetState(InfoScreen3);
       break;
     case InfoScreen3:
-      SetState(GearInfo);
+      SetState(Titan);
       break;
     case Notification:  // fal through
     case LapTime:
       SetState(state_prev_);
       break;
     case Titan:
+      SetState(GearInfo);
       break;
   }
 }
@@ -396,7 +406,7 @@ void ScreensController::OnButtonPressDown() {
     //     SetState(InfoScreen1);
     //     break;
     case GearInfo:
-      SetState(InfoScreen3);
+      SetState(Titan);
       break;
     case InfoScreen1:
       SetState(GearInfo);
@@ -412,10 +422,39 @@ void ScreensController::OnButtonPressDown() {
       SetState(state_prev_);
       break;
     case Titan:
+      SetState(InfoScreen3);
       break;
   }
 }
 
+void ScreensController::OnMom() {
+  switch (state_) {
+    // case StartupLeft:
+    //     SetState(InfoScreen1);
+    //     break;
+    // case StartupRight:
+    //     SetState(InfoScreen1);
+    //     break;
+    case GearInfo:
+      SetState(Titan);
+      break;
+    case InfoScreen1:
+      SetState(Titan);
+      break;
+    case InfoScreen2:
+      SetState(Titan);
+      break;
+    case InfoScreen3:
+      SetState(Titan);
+      break;
+    case Notification:  // fal through
+    case LapTime:
+      SetState(state_prev_);
+      break;
+    case Titan:
+      break;
+  }
+}
 /**
  * What to do when a message is recieved
  * \param msg The message to display
