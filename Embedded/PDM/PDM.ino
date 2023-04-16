@@ -73,6 +73,7 @@ EasyTimer odometer_update_timer(2);
 
 //sets override percentage for fans
 const int override_percent = 80;
+const int wp_override_percent = 50;
 
 // eeprom-saved signals
 #include "EEPROM_sigs.hpp"
@@ -258,6 +259,7 @@ void loop() {
   if(coolDownState == HIGH){
     CMD_fanLeftOverride = override_percent;
     CMD_fanRightOverride = override_percent;
+    CMD_waterPumpOverride = wp_override_percent;
   } 
   else if(coolDownState == LOW){
     // populate left fan table
@@ -267,6 +269,11 @@ void loop() {
     // populate right fan table
     int* fanr_table_ptr = fan_right_table[0];
     fan_right.fill_table(fanr_table_ptr);
+
+    // populate water pump table
+    int *wp_table_ptr = wp_table[0];
+    water_pump.fill_table(wp_table_ptr);
+
   }
   lastButtonState = reading; 
   
