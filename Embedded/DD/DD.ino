@@ -247,9 +247,15 @@ void loop() {
 
 
   // read any incoming CAN messages
-  // Serial.println("Reading CAN:");
+  Serial.println("Reading CAN:");
   readCan();
-  // can1.events();
+  can1.events();
+  
+  Serial.println(M400_groundSpeed.get_msg_id());
+  Serial.println(M400_groundSpeed.value());
+  Serial.println(GPS_posStat.get_msg_id());
+  Serial.println(GPS_posStat.value());
+  //test_callback1();
 
   // sample the light sensor and update the brightness if percent returned is >
   // -1
@@ -304,17 +310,17 @@ void loop() {
   if (debug.isup()) {
     // screensController.OnButtonPress();
     // lightsController.OnButtonPress();
-    // can1.mailboxStatus();
+    can1.mailboxStatus();
   }
 }
 
 void test_callback1(const CAN_message_t &imsg) {
-  // Serial.println("Recieved 1");
+  Serial.println("Recieved 1");
   decode_CAN1(imsg);
 }
 
 void test_callback2(const CAN_message_t &imsg) {
-  // Serial.println("Recieved 2");
+  Serial.println("Recieved 2");
   decode_CAN1(imsg);
 }
 
@@ -355,13 +361,16 @@ void set_mailboxes() {
   can1.setMBFilter(MB5, M400_oilTemp.get_msg_id());
   can1.setMBFilter(MB6, CMD_driverMessageChar0.get_msg_id());
   can1.setMBFilter(MB7, CMD_driverNotificationLightR.get_msg_id());
-  can1.setMBFilter(MB8, 0);
-  can1.setMBFilter(MB9, 0);
-  can1.setMBFilter(MB10, 0);
-  can1.setMBFilter(MB11, 0);
+  can1.setMBFilter(MB8, GPS_posStat.get_msg_id());
+  can1.setMBFilter(MB9, GPS_date.get_msg_id());
+  can1.setMBFilter(MB10, GPS_latitudeDir.get_msg_id());
+  can1.setMBFilter(MB11, GPS_longitudeDir.get_msg_id());
   can1.setMBFilter(MB12, 0);
   can1.setMBFilter(MB13, 0);
   can1.setMBFilter(MB14, 0);
+  // //-------------------------------------------//
+  // Serial.println(M400_groundSpeed.get_msg_id());
+  // Serial.println(GPS_posStat.get_msg_id());
 
   can2.setMBFilter(REJECT_ALL);
   can2.setMBFilter(MB0, PDM_pdmVoltAvg.get_msg_id());

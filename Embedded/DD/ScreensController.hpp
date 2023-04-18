@@ -6,7 +6,6 @@
 #include "ScreenMessage.hpp"
 #include "ScreenNumber.hpp"
 #include "ScreenStartupAnim.hpp"
-#include "images/Mom.cpp"
 
 class ScreensController {
  public:
@@ -98,12 +97,19 @@ ScreensController::ScreensController(ILI9341_t3n &left, ILI9341_t3n &right)
   /* gear screen */
   gear_screen_ = new ScreenNumber(display_left_, M400_gear, "GEAR:");
 
+  // /* Info screen 1 */
+  // info_screen_1_left_ = new ScreenInfo(display_left_);
+  // info_screen_1_left_->SetSignal(1, &M400_groundSpeed, "SPD:", "%4.1f");
+  // info_screen_1_left_->SetSignal(2, &PDM_pdmVoltAvg, "BAT:", "%4.1f");
+  // info_screen_1_left_->SetSignal(3, &ATCCF_brakeBias, "BIAS:", "%2.0f%%");
+  // info_screen_1_left_->SetSignal(4, &PDM_fanLeftDutyCycle, "FANS:", "%3.0f");
+
   /* Info screen 1 */
   info_screen_1_left_ = new ScreenInfo(display_left_);
-  info_screen_1_left_->SetSignal(1, &M400_groundSpeed, "SPD:", "%4.1f");
-  info_screen_1_left_->SetSignal(2, &PDM_pdmVoltAvg, "BAT:", "%4.1f");
-  info_screen_1_left_->SetSignal(3, &ATCCF_brakeBias, "BIAS:", "%2.0f%%");
-  info_screen_1_left_->SetSignal(4, &PDM_fanLeftDutyCycle, "FANS:", "%3.0f");
+  info_screen_1_left_->SetSignal(1, &GPS_posStat, "pos:", "%4.1f");
+  info_screen_1_left_->SetSignal(2, &GPS_date, "DAT:", "%4.1f");
+  info_screen_1_left_->SetSignal(3, &GPS_latitudeDir, "LATD:", "%2.0f%%");
+  info_screen_1_left_->SetSignal(4, &GPS_longitudeDir, "LOND:", "%3.0f");
 
   info_screen_1_right_ = new ScreenInfo(display_right_);
   info_screen_1_right_->SetSignal(1, &M400_rpm, "RPM:", "%5.1f", 1000);
