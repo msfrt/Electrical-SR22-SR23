@@ -106,16 +106,22 @@ ScreensController::ScreensController(ILI9341_t3n &left, ILI9341_t3n &right)
 
   /* Info screen 1 */
   info_screen_1_left_ = new ScreenInfo(display_left_);
-  info_screen_1_left_->SetSignal(1, &GPS_posStat, "pos:", "%4.1f");
-  info_screen_1_left_->SetSignal(2, &GPS_date, "DAT:", "%4.1f");
-  info_screen_1_left_->SetSignal(3, &GPS_latitudeDir, "LATD:", "%2.0f%%");
-  info_screen_1_left_->SetSignal(4, &GPS_longitudeDir, "LOND:", "%3.0f");
+  info_screen_1_left_->SetSignal(1, &GPS_posStat, "pos:", "%4.0f");
+  info_screen_1_left_->SetSignal(2, &GPS_latitude, "", "%4.4f", 10000);
+  info_screen_1_left_->SetSignal(3, &GPS_latitudeDir, "LATD:", "%4.0f");
+  info_screen_1_left_->SetSignal(4, &GPS_UTC, "", "%4.3f", 1000);
 
   info_screen_1_right_ = new ScreenInfo(display_right_);
-  info_screen_1_right_->SetSignal(1, &M400_rpm, "RPM:", "%5.1f", 1000);
-  info_screen_1_right_->SetSignal(2, &M400_oilPressure, "OILP:", "%4.1f");
-  info_screen_1_right_->SetSignal(3, &M400_oilTemp, "OILT:", "%4.0f");
-  info_screen_1_right_->SetSignal(4, &C50_tcSet, "TCSET:", "%3.0f");
+  info_screen_1_right_->SetSignal(1, &GPS_groundSpeed_knots, "SPD:", "%5.2f", 100);
+  info_screen_1_right_->SetSignal(2, &GPS_longitude, "", "%4.4f", 10000);
+  info_screen_1_right_->SetSignal(3, &GPS_longitudeDir, "LOND:", "%4.0f");
+  info_screen_1_right_->SetSignal(4, &GPS_date, "DATE:", "%4.0f");
+
+  // info_screen_1_right_ = new ScreenInfo(display_right_);
+  // info_screen_1_right_->SetSignal(1, &M400_rpm, "RPM:", "%5.1f", 1000);
+  // info_screen_1_right_->SetSignal(2, &M400_oilPressure, "OILP:", "%4.1f");
+  // info_screen_1_right_->SetSignal(3, &M400_oilTemp, "OILT:", "%4.0f");
+  // info_screen_1_right_->SetSignal(4, &C50_tcSet, "TCSET:", "%3.0f");
 
   /* Info screen 2 */
   info_screen_2_left_ = new ScreenInfo(display_left_);

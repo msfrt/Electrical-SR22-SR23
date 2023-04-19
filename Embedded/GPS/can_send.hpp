@@ -4,6 +4,7 @@
 #include <FlexCAN_T4.h>
 #include <EasyTimer.h>
 //#include <BoardTemp.h>
+#include <StateCAN.h>
 
 #include "CAN/CAN1.hpp"
 #include "gps.hpp"
@@ -75,7 +76,7 @@ void send_GPS_12(){
 
   // send the message
   cbus1.write(msg);
-  Serial.write("longDir");
+  //Serial.write("longDir");
 }
 
 void send_GPS_13(){
@@ -94,7 +95,7 @@ void send_GPS_13(){
 
   // send the message
   cbus1.write(msg);
-  Serial.write("latDir");
+  //Serial.write("latDir");
 }
 
 void send_GPS_14(){
@@ -115,7 +116,7 @@ void send_GPS_14(){
 
   // send the message
   cbus1.write(msg);
-  Serial.write("date");
+  //Serial.write("date");
 }
 
 void send_GPS_15(){
@@ -126,7 +127,7 @@ void send_GPS_15(){
 
   // load up the message buffer
   // msg.buf[0] = GPS_posStat.can_value();
-  msg.buf[0] = &GPS_posStat;
+  msg.buf[0] = GPS_posStat.can_value();
   msg.buf[1] = 0;
   msg.buf[2] = 0;
   msg.buf[3] = 0;
@@ -137,7 +138,7 @@ void send_GPS_15(){
 
   // send the message
   cbus1.write(msg);
-  Serial.write("pos");
+  //Serial.write("pos");
   //Serial.write(GPS_posStat.can_value());
 }
 
@@ -183,7 +184,7 @@ void send_can(){
     send_GPS_15();
   }
 
-  Serial.println("CAN sent!");
+  //Serial.println("CAN sent!");
 
 }
 

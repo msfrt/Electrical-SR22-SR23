@@ -98,7 +98,8 @@ void setup() {
   // pixel.begin();
   // pixel.show();
 
-  Serial.println("Software Serial GPS Test Echo Test");
+  //Serial.println("Software Serial GPS Test Echo Test");
+  
   // you can send various commands to get it started
   mySerial.println(PMTK_SET_NMEA_OUTPUT_RMCONLY);
   //mySerial.println(PMTK_SET_NMEA_OUTPUT_ALLDATA);
@@ -124,7 +125,7 @@ void loop() {
     
     send_can();
     
-    Serial.println();
+    //Serial.println();
 
     // char c = mySerial.read();  
     
