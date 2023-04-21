@@ -194,7 +194,7 @@ void setup() {
 
   debug.set_delay_millis(10000);
 
-  can1.mailboxStatus();
+  //can1.mailboxStatus();
 }
 
 void loop() {
