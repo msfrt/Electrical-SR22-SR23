@@ -7,7 +7,6 @@
 #include <StateCAN.h>
 
 #include "CAN/CAN1.hpp"
-#include "gps.hpp"
 
 FlexCAN_T4<CAN1, RX_SIZE_256, TX_SIZE_16> cbus1;
 static CAN_message_t msg;
@@ -65,18 +64,18 @@ void send_GPS_12(){
   msg.id = 162;
   msg.len = 8;
 
-  msg.buf[0] = GPS_longitudeDir.can_value();
-  msg.buf[1] = 0;
-  msg.buf[2] = 0;
-  msg.buf[3] = 0;
-  msg.buf[4] = GPS_longitude.can_value();
-  msg.buf[5] = GPS_longitude.can_value() >> 8;
-  msg.buf[6] = GPS_longitude.can_value() >> 16;
-  msg.buf[7] = GPS_longitude.can_value() >> 24;
+  msg.buf[0] = GPS_latitude.can_value();
+  msg.buf[1] = GPS_latitude.can_value() >> 8;
+  msg.buf[2] = GPS_latitude.can_value() >> 16;
+  msg.buf[3] = GPS_latitude.can_value() >> 24;
+  msg.buf[4] = GPS_altitude.can_value();
+  msg.buf[5] = GPS_altitude.can_value() >> 8;
+  msg.buf[6] = GPS_altitude.can_value() >> 16;
+  msg.buf[7] = GPS_altitude.can_value() >> 24;
 
   // send the message
   cbus1.write(msg);
-  //Serial.write("longDir");
+  //Serial.write(" Lat + Alt ");
 }
 
 void send_GPS_13(){
@@ -84,18 +83,18 @@ void send_GPS_13(){
   msg.id = 163;
   msg.len = 8;
 
-  msg.buf[0] = GPS_latitudeDir.can_value();
-  msg.buf[1] = 0;
-  msg.buf[2] = 0;
-  msg.buf[3] = 0;
-  msg.buf[4] = GPS_latitude.can_value();
-  msg.buf[5] = GPS_latitude.can_value() >> 8;
-  msg.buf[6] = GPS_latitude.can_value() >> 16;
-  msg.buf[7] = GPS_latitude.can_value() >> 24;
+  msg.buf[0] = GPS_longitude.can_value();
+  msg.buf[1] = GPS_longitude.can_value() >> 8;
+  msg.buf[2] = GPS_longitude.can_value() >> 16;
+  msg.buf[3] = GPS_longitude.can_value() >> 24;
+  msg.buf[4] = GPS_speed.can_value();
+  msg.buf[5] = GPS_speed.can_value() >> 8;
+  msg.buf[6] = GPS_speed.can_value() >> 16;
+  msg.buf[7] = GPS_speed.can_value() >> 24;
 
   // send the message
   cbus1.write(msg);
-  //Serial.write("latDir");
+  //Serial.write(" Lon + Spd ");
 }
 
 void send_GPS_14(){
@@ -105,18 +104,18 @@ void send_GPS_14(){
   msg.len = 8;
 
   // load up the message buffer
-  msg.buf[0] = GPS_date.can_value();
-  msg.buf[1] = 0;
-  msg.buf[2] = 0;
-  msg.buf[3] = 0;
-  msg.buf[4] = GPS_UTC.can_value();
-  msg.buf[5] = GPS_UTC.can_value() >> 8;
-  msg.buf[6] = GPS_UTC.can_value() >> 16;
-  msg.buf[7] = GPS_UTC.can_value() >> 24;
+  msg.buf[0] = GPS_age.can_value();
+  msg.buf[1] = GPS_course.can_value();
+  msg.buf[2] = GPS_HDOP.can_value();
+  msg.buf[3] = GPS_satelliteFix.can_value();
+  msg.buf[4] = 0;
+  msg.buf[5] = 0;
+  msg.buf[6] = 0;
+  msg.buf[7] = 0;
 
   // send the message
   cbus1.write(msg);
-  //Serial.write("date");
+  //Serial.write(" Age + Course + HDOP + satFix ");
 }
 
 void send_GPS_15(){
@@ -127,14 +126,14 @@ void send_GPS_15(){
 
   // load up the message buffer
   // msg.buf[0] = GPS_posStat.can_value();
-  msg.buf[0] = GPS_posStat.can_value();
-  msg.buf[1] = 0;
-  msg.buf[2] = 0;
-  msg.buf[3] = 0;
-  msg.buf[4] = GPS_groundSpeed_knots.can_value();
-  msg.buf[5] = GPS_groundSpeed_knots.can_value() >> 8;
-  msg.buf[6] = GPS_groundSpeed_knots.can_value() >> 16;
-  msg.buf[7] = GPS_groundSpeed_knots.can_value() >> 24;
+  msg.buf[0] = GPS_hour.can_value();
+  msg.buf[1] = GPS_minutes.can_value();
+  msg.buf[2] = GPS_seconds.can_value();
+  msg.buf[3] = GPS_hundredths.can_value();
+  msg.buf[4] = GPS_day.can_value();
+  msg.buf[5] = GPS_month.can_value();
+  msg.buf[6] = GPS_year.can_value();
+  msg.buf[7] = 0;
 
   // send the message
   cbus1.write(msg);

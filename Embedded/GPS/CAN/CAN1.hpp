@@ -15,20 +15,23 @@
 #include <StateCAN.h>
 
 // Message: GPS_15 [0xa5]
-StateSignal GPS_posStat(8, false, 1, 0.0, 0, 255, 0.0, -1, 165);
-StateSignal GPS_groundSpeed_knots(32, true, 1, 0.0, 0, 100000, 0.0, -1, 165);
+StateSignal GPS_hour(8, false, 1, 0.0, 0, 0, 0.0, -1, 165);
+StateSignal GPS_minutes(8, false, 1, 0.0, 0, 0, 0.0, -1, 165);
+StateSignal GPS_seconds(8, false, 1, 0.0, 0, 0, 0.0, -1, 165);
+StateSignal GPS_hundredths(8, false, 1, 0.0, 0, 0, 0.0, -1, 165);
+StateSignal GPS_day(8, false, 1, 0.0, 0, 0, 0.0, -1, 165);
+StateSignal GPS_month(8, false, 1, 0.0, 0, 0, 0.0, -1, 165);
+StateSignal GPS_year(8, false, 1, 0.0, 0, 0, 0.0, -1, 165);
 
 // Message: GPS_14 [0xa4]
-StateSignal GPS_date(8, false, 1, 0.0, 0, 999999, 0.0, -1, 164);
-StateSignal GPS_UTC(32, true, 1, 0.0, 0, 9999999, 0.0, -1, 164);
+StateSignal GPS_age(8, false, 1, 0.0, 0, 0, 0.0, -1, 164);
+StateSignal GPS_course(8, false, 1, 0.0, 0, 0, 0.0, -1, 164);
+StateSignal GPS_HDOP(8, false, 1, 0.0, 0, 0, 0.0, -1, 164);
+StateSignal GPS_satelliteFix(8, false, 1, 0.0, 0, 0, 0.0, -1, 164);
 
 // Message: GPS_13 [0xa3]
-StateSignal GPS_latitudeDir(8, false, 1, 0.0, 0, 255, 0.0, -1, 163);
-StateSignal GPS_latitude(32, true, 1, 0.0, -90, 90, 0.0, -1, 163);
-
-// Message: GPS_12 [0xa2]
-StateSignal GPS_longitudeDir(8, false, 1, 0.0, 0, 255, 0.0, -1, 162);
-StateSignal GPS_longitude(32, true, 1, 0.0, -180, 180, 0.0, -1, 162);
+StateSignal GPS_longitude(32, true, 1, 0.0, 0, 0, 0.0, -1, 163);
+StateSignal GPS_speed(32, false, 1, 0.0, 0, 0, 0.0, -1, 163);
 
 // Message: CMD_12 [0xd4]
 StateSignal CMD_driverMessageChar0(8, false, 1, 0.0, 0, 255, 0.0, -1, 212);
@@ -51,9 +54,9 @@ StateSignal CMD_fanRightOverride(8, true, 1, 0.0, 0, 100, 0.0, -1, 210);
 StateSignal CMD_waterPumpOverride(8, true, 1, 0.0, 0, 100, 0.0, -1, 210);
 StateSignal CMD_brakeLightOverride(8, true, 1, 0.0, 0, 100, 0.0, -1, 210);
 
-// Message: C50_gps [0x79]
-StateSignal C50_gps_lat(32, true, 1, 0.0, -90, 90, 0.0, -1, 121);
-StateSignal C50_gps_long(32, true, 1, 0.0, -180, 180, 0.0, -1, 121);
+// Message: GPS_12 [0xa2]
+StateSignal GPS_latitude(32, true, 1, 0.0, 0, 0, 0.0, -1, 162);
+StateSignal GPS_altitude(32, false, 1, 0.0, 0, 0, 0.0, -1, 162);
 
 // Message: C50_m400Data [0x78]
 StateSignal C50_m400ExhaustGasTemp4(16, true, 10, 0.0, 0, 0, 0.0, -1, 120);
@@ -170,8 +173,13 @@ StateSignal M400_driveSpeedRight(16, true, 10, 0.0, -3276, 3276, 0.0, -1, 100);
  */
 void read_GPS_15(const CAN_message_t &imsg) {
 
-	GPS_posStat.set_can_value((imsg.buf[0]));
-	GPS_groundSpeed_knots.set_can_value((imsg.buf[4]) | (imsg.buf[5] << 8) | (imsg.buf[6] << 16) | (imsg.buf[7] << 24));
+	GPS_hour.set_can_value((imsg.buf[0]));
+	GPS_minutes.set_can_value((imsg.buf[1]));
+	GPS_seconds.set_can_value((imsg.buf[2]));
+	GPS_hundredths.set_can_value((imsg.buf[3]));
+	GPS_day.set_can_value((imsg.buf[4]));
+	GPS_month.set_can_value((imsg.buf[5]));
+	GPS_year.set_can_value((imsg.buf[6]));
 
 }
 
@@ -181,8 +189,10 @@ void read_GPS_15(const CAN_message_t &imsg) {
  */
 void read_GPS_14(const CAN_message_t &imsg) {
 
-	GPS_date.set_can_value((imsg.buf[0]));
-	GPS_UTC.set_can_value((imsg.buf[4]) | (imsg.buf[5] << 8) | (imsg.buf[6] << 16) | (imsg.buf[7] << 24));
+	GPS_age.set_can_value((imsg.buf[0]));
+	GPS_course.set_can_value((imsg.buf[1]));
+	GPS_HDOP.set_can_value((imsg.buf[2]));
+	GPS_satelliteFix.set_can_value((imsg.buf[3]));
 
 }
 
@@ -192,19 +202,8 @@ void read_GPS_14(const CAN_message_t &imsg) {
  */
 void read_GPS_13(const CAN_message_t &imsg) {
 
-	GPS_latitudeDir.set_can_value((imsg.buf[0]));
-	GPS_latitude.set_can_value((imsg.buf[4]) | (imsg.buf[5] << 8) | (imsg.buf[6] << 16) | (imsg.buf[7] << 24));
-
-}
-
-/*
- * Decode a CAN frame for the message GPS_12
- * \param imsg A reference to the incoming CAN message frame
- */
-void read_GPS_12(const CAN_message_t &imsg) {
-
-	GPS_longitudeDir.set_can_value((imsg.buf[0]));
-	GPS_longitude.set_can_value((imsg.buf[4]) | (imsg.buf[5] << 8) | (imsg.buf[6] << 16) | (imsg.buf[7] << 24));
+	GPS_longitude.set_can_value((imsg.buf[0]) | (imsg.buf[1] << 8) | (imsg.buf[2] << 16) | (imsg.buf[3] << 24));
+	GPS_speed.set_can_value((imsg.buf[4]) | (imsg.buf[5] << 8) | (imsg.buf[6] << 16) | (imsg.buf[7] << 24));
 
 }
 
@@ -251,13 +250,13 @@ void read_CMD_10(const CAN_message_t &imsg) {
 }
 
 /*
- * Decode a CAN frame for the message C50_gps
+ * Decode a CAN frame for the message GPS_12
  * \param imsg A reference to the incoming CAN message frame
  */
-void read_C50_gps(const CAN_message_t &imsg) {
+void read_GPS_12(const CAN_message_t &imsg) {
 
-	C50_gps_lat.set_can_value((imsg.buf[0]) | (imsg.buf[1] << 8) | (imsg.buf[2] << 16) | (imsg.buf[3] << 24));
-	C50_gps_long.set_can_value((imsg.buf[4]) | (imsg.buf[5] << 8) | (imsg.buf[6] << 16) | (imsg.buf[7] << 24));
+	GPS_latitude.set_can_value((imsg.buf[0]) | (imsg.buf[1] << 8) | (imsg.buf[2] << 16) | (imsg.buf[3] << 24));
+	GPS_altitude.set_can_value((imsg.buf[4]) | (imsg.buf[5] << 8) | (imsg.buf[6] << 16) | (imsg.buf[7] << 24));
 
 }
 
@@ -519,7 +518,7 @@ void read_M400_dataSet1(const CAN_message_t &imsg) {
 
 
 /*
- * Decode a CAN message for the bus captured in CAN1.dbc.
+ * Decode a CAN message for the bus captured in CAN1_GPS _ACC.dbc.
  * To more efficiently allocate microcontroller resources, simply comment
  * out unnecessary messages that do not need to be decoded.
  * \param imsg A reference to the incoming CAN frame
@@ -540,10 +539,6 @@ void decode_CAN1(const CAN_message_t &imsg) {
 			read_GPS_13(imsg);
 			break;
 
-		case 162:
-			read_GPS_12(imsg);
-			break;
-
 		case 212:
 			read_CMD_12(imsg);
 			break;
@@ -556,8 +551,8 @@ void decode_CAN1(const CAN_message_t &imsg) {
 			read_CMD_10(imsg);
 			break;
 
-		case 121:
-			read_C50_gps(imsg);
+		case 162:
+			read_GPS_12(imsg);
 			break;
 
 		case 120:

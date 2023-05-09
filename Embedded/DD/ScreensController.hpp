@@ -98,35 +98,35 @@ ScreensController::ScreensController(ILI9341_t3n &left, ILI9341_t3n &right)
   gear_screen_ = new ScreenNumber(display_left_, M400_gear, "GEAR:");
 
   // /* Info screen 1 */
-  // info_screen_1_left_ = new ScreenInfo(display_left_);
-  // info_screen_1_left_->SetSignal(1, &M400_groundSpeed, "SPD:", "%4.1f");
-  // info_screen_1_left_->SetSignal(2, &PDM_pdmVoltAvg, "BAT:", "%4.1f");
-  // info_screen_1_left_->SetSignal(3, &ATCCF_brakeBias, "BIAS:", "%2.0f%%");
-  // info_screen_1_left_->SetSignal(4, &PDM_fanLeftDutyCycle, "FANS:", "%3.0f");
+  info_screen_1_left_ = new ScreenInfo(display_left_);
+  info_screen_1_left_->SetSignal(1, &M400_groundSpeed, "SPD:", "%4.1f");
+  info_screen_1_left_->SetSignal(2, &PDM_pdmVoltAvg, "BAT:", "%4.1f");
+  info_screen_1_left_->SetSignal(3, &ATCCF_brakeBias, "BIAS:", "%2.0f%%");
+  info_screen_1_left_->SetSignal(4, &PDM_fanLeftDutyCycle, "FANS:", "%3.0f");
 
   /* Info screen 1 */
-  info_screen_1_left_ = new ScreenInfo(display_left_);
-  info_screen_1_left_->SetSignal(1, &GPS_posStat, "pos:", "%4.0f");
-  info_screen_1_left_->SetSignal(2, &GPS_latitude, "", "%4.6f", 1000000);
-  info_screen_1_left_->SetSignal(3, &GPS_latitudeDir, "LATD:", "%4.0f");
-  info_screen_1_left_->SetSignal(4, &GPS_UTC, "", "%4.3f", 1000);
-
-  info_screen_1_right_ = new ScreenInfo(display_right_);
-  info_screen_1_right_->SetSignal(1, &GPS_groundSpeed_knots, "SPD:", "%5.2f", 100);
-  info_screen_1_right_->SetSignal(2, &GPS_longitude, "", "%4.6f", 1000000);
-  info_screen_1_right_->SetSignal(3, &GPS_longitudeDir, "LOND:", "%4.0f");
-  info_screen_1_right_->SetSignal(4, &GPS_date, "DATE:", "%4.0f");
+  // info_screen_1_left_ = new ScreenInfo(display_left_);
+  // info_screen_1_left_->SetSignal(1, &GPS_year, "YR:", "%4.0f");
+  // info_screen_1_left_->SetSignal(2, &GPS_latitude, "", "%4.6f", 1000000);
+  // info_screen_1_left_->SetSignal(3, &GPS_satelliteFix, "FIX:", "%4.0f");
+  // info_screen_1_left_->SetSignal(4, &GPS_altitude, "ALT:", "%3.0f");
 
   // info_screen_1_right_ = new ScreenInfo(display_right_);
-  // info_screen_1_right_->SetSignal(1, &M400_rpm, "RPM:", "%5.1f", 1000);
-  // info_screen_1_right_->SetSignal(2, &M400_oilPressure, "OILP:", "%4.1f");
-  // info_screen_1_right_->SetSignal(3, &M400_oilTemp, "OILT:", "%4.0f");
-  // info_screen_1_right_->SetSignal(4, &C50_tcSet, "TCSET:", "%3.0f");
+  // info_screen_1_right_->SetSignal(1, &GPS_HDOP, "HDOP:", "%4.0f");
+  // info_screen_1_right_->SetSignal(2, &GPS_longitude, "", "%4.6f", 1000000);
+  // info_screen_1_right_->SetSignal(3, &GPS_age, "AGE:", "%4.0f");
+  // info_screen_1_right_->SetSignal(4, &GPS_seconds, "SEC:", "%4.0f");
+
+  info_screen_1_right_ = new ScreenInfo(display_right_);
+  info_screen_1_right_->SetSignal(1, &M400_rpm, "RPM:", "%5.1f", 1000);
+  info_screen_1_right_->SetSignal(2, &M400_oilPressure, "OILP:", "%4.1f");
+  info_screen_1_right_->SetSignal(3, &M400_oilTemp, "OILT:", "%4.0f");
+  info_screen_1_right_->SetSignal(4, &C50_tcSet, "TCSET:", "%3.0f");
 
   /* Info screen 2 */
   info_screen_2_left_ = new ScreenInfo(display_left_);
-  info_screen_2_left_->SetSignal(1, &ATCCF_rotorTempFL, "FL:", "%5.1f");
-  info_screen_2_left_->SetSignal(2, &ATCCF_rotorTempFR, "FR:", "%5.1f");
+  info_screen_2_left_->SetSignal(1, &ATCCF_tireTempFLO, "FLO:", "%5.1f");
+  info_screen_2_left_->SetSignal(2, &ATCCF_tireTempFRO, "FRO:", "%5.1f");
   info_screen_2_left_->SetSignal(3, &ATCCR_rotorTempRL, "RL:", "%5.1f");
   info_screen_2_left_->SetSignal(4, &ATCCR_rotorTempRR, "RR:", "%5.1f");
   // info_screen_2_left_->SetSignal(4, &ATCCR_shiftingPressure, "SFT:", "%3.1f");

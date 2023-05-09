@@ -247,32 +247,9 @@ void loop() {
 
 
   // read any incoming CAN messages
-  //Serial.println("Reading CAN:");
-  readCan();
-  //can1.events();
-  
-  // Serial.println(M400_groundSpeed.get_msg_id());
-  // Serial.println(M400_groundSpeed.value());
-  
-  // Serial.println(GPS_UTC.get_msg_id());
-  // Serial.println("UTC: ");
-  // Serial.println(GPS_UTC.value());
-
-  // Serial.println(GPS_posStat.get_msg_id());
-  // Serial.println("pos: ");
-  // Serial.println(static_cast<char>(GPS_posStat.value()));
-  
-  // Serial.println(GPS_date.get_msg_id());
-  // Serial.println("Date: ");
-  // Serial.println(GPS_date.value());
-
-  // Serial.println(GPS_longitudeDir.get_msg_id());
-  // Serial.println("LongDir: ");
-  // Serial.println(static_cast<char>(GPS_longitudeDir.value()));
-
-  // Serial.println(GPS_latitudeDir.get_msg_id());
-  // Serial.println("LatDir: ");
-  // Serial.println(static_cast<char>(GPS_latitudeDir.value()));
+  // Serial.println("Reading CAN:");
+  // readCan();
+  // can1.events();
 
   //test_callback1();
 
@@ -373,14 +350,14 @@ void set_mailboxes() {
   // recieved.
   can1.setMBFilter(REJECT_ALL);
   can1.setMBFilter(MB0, VCU_laptrigger.get_msg_id());
-  can1.setMBFilter(MB1, GPS_UTC.get_msg_id());
-  can1.setMBFilter(MB2, GPS_posStat.get_msg_id());
-  can1.setMBFilter(MB3, GPS_latitude.get_msg_id());
-  can1.setMBFilter(MB4, GPS_latitudeDir.get_msg_id());
-  can1.setMBFilter(MB5, GPS_longitude.get_msg_id());
-  can1.setMBFilter(MB6, GPS_longitudeDir.get_msg_id());
-  can1.setMBFilter(MB7, GPS_groundSpeed_knots.get_msg_id());
-  can1.setMBFilter(MB8, GPS_date.get_msg_id());
+  can1.setMBFilter(MB1, C50_tcSet.get_msg_id());
+  can1.setMBFilter(MB2, M400_groundSpeed.get_msg_id());
+  can1.setMBFilter(MB3, M400_rpm.get_msg_id());
+  can1.setMBFilter(MB4, M400_oilPressure.get_msg_id());
+  can1.setMBFilter(MB5, M400_oilTemp.get_msg_id());
+  can1.setMBFilter(MB6, CMD_driverMessageChar0.get_msg_id());
+  can1.setMBFilter(MB7, CMD_driverNotificationLightR.get_msg_id());
+  can1.setMBFilter(MB8, 0);
   can1.setMBFilter(MB9, 0);
   can1.setMBFilter(MB10, 0);
   can1.setMBFilter(MB11, 0);
@@ -394,8 +371,8 @@ void set_mailboxes() {
   can2.setMBFilter(REJECT_ALL);
   can2.setMBFilter(MB0, PDM_pdmVoltAvg.get_msg_id());
   can2.setMBFilter(MB1, ATCCF_brakeBias.get_msg_id());
-  can2.setMBFilter(MB2, ATCCF_rotorTempFL.get_msg_id());  // includes FR
-  can2.setMBFilter(MB3, ATCCR_rotorTempRL.get_msg_id());  // includes RR
+  can2.setMBFilter(MB2, ATCCF_tireTempFLO.get_msg_id());  // includes FR
+  can2.setMBFilter(MB3, ATCCF_tireTempFRO.get_msg_id());  // includes RR
   can2.setMBFilter(MB4, PDM_coolingOverrideActive.get_msg_id());
   can2.setMBFilter(MB5, PDM_fanLeftDutyCycle.get_msg_id());
   can2.setMBFilter(MB6, 0);

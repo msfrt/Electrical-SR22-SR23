@@ -8,8 +8,8 @@
     
 ******************************************************************************/
 
-#ifndef CAN1_HPP
-#define CAN1_HPP
+#ifndef CAN1_ACC_HPP
+#define CAN1_ACC_HPP
 
 #include <FlexCAN_T4.h>
 #include <StateCAN.h>
@@ -523,7 +523,7 @@ void read_M400_dataSet1(const CAN_message_t &imsg) {
  * out unnecessary messages that do not need to be decoded.
  * \param imsg A reference to the incoming CAN frame
  */
-void decode_CAN1(const CAN_message_t &imsg) {
+void decode_CAN1_GPS _ACC(const CAN_message_t &imsg) {
 
 	switch (imsg.id) {
 
