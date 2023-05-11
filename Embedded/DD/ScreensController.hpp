@@ -6,7 +6,6 @@
 #include "ScreenMessage.hpp"
 #include "ScreenNumber.hpp"
 #include "ScreenStartupAnim.hpp"
-#include "images/Mom.cpp"
 
 class ScreensController {
  public:
