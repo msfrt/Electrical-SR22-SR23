@@ -256,12 +256,13 @@ void loop() {
     }
   }
 
-  if(coolDownState == HIGH){
+  if(coolDownState == HIGH){ // temporary fix after FTT
     CMD_fanLeftOverride = override_percent;
     CMD_fanRightOverride = override_percent;
     CMD_waterPumpOverride = wp_override_percent;
   } 
-  else if(coolDownState == LOW){
+  
+  else if(coolDownState == LOW){ // check to see if the below is efficient
     // populate left fan table
     int* fanl_table_ptr = fan_left_table[0]; // create a temp ptr to populate PWM device
     fan_left.fill_table(fanl_table_ptr); // populate the PWMDevice table
@@ -275,6 +276,7 @@ void loop() {
     water_pump.fill_table(wp_table_ptr);
 
   }
+  
   lastButtonState = reading; 
   
   /*

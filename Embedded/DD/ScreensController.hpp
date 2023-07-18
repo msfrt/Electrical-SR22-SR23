@@ -123,7 +123,7 @@ ScreensController::ScreensController(ILI9341_t3n &left, ILI9341_t3n &right)
   info_screen_3_left_->SetSignal(1, &M400_engineTemp, "ENGT:", "%4.0f");
   info_screen_3_left_->SetSignal(2, &M400_fuelPressure, "FUEL:", "%4.1f");
   info_screen_3_left_->SetSignal(3, &M400_inletAirTemp, "INT:", "%5.0f");
-  info_screen_3_left_->SetSignal(4, &ATCCR_shiftingPressure, "SFTP:", "%3.1f");
+  info_screen_3_left_->SetSignal(4, &M400_lambda1, "LAMB:", "%3.2f");
   
   // keep the same screen on the right side
   info_screen_2_right_ = info_screen_1_right_;

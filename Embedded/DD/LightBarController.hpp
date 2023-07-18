@@ -66,7 +66,7 @@ class LightBarController {
   LightBarBlink *tc_bar_left_ = nullptr;
   LightBarBlink *tc_bar_right_ = nullptr;
 
-  LightBarBlinkSinusoidal *cooling_light_left_ = nullptr;
+  LightBarBlinkSinusoidal *cooling_light_left_ = nullptr; 
   LightBarBlinkSinusoidal *cooling_light_right_ = nullptr;
 
   LightBarBlink *notification_bar_left_ = nullptr;
